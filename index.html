@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabah Heritage | Digital Experience</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #090a0f; 
+            --text-color: #ffffff;
+            --accent-color: #c5a059;
+            --font-main: 'Space Mono', monospace;
+            --font-heading: 'Syncopate', sans-serif;
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            overflow-x: hidden; 
+            scroll-behavior: smooth;
+        }
+
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* BROWSER AUDIO GATEWAY SPLASH SCREEN */
+        #audio-unlocker {
+            position: fixed;
+            inset: 0;
+            background: #050508;
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .unlock-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 40px;
+            color: white;
+            font-family: var(--font-heading);
+            font-size: 11px;
+            letter-spacing: 6px;
+            transition: 0.4s ease;
+        }
+        .unlock-btn:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.3);
+            color: var(--accent-color);
+        }
+
+        /* HARDWARE SPEED LOADER ROUTINE */
+        #glitch-loader {
+            position: fixed;
+            inset: 0;
+            background: #050508;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .loader-content { text-align: center; }
+        .loader-title {
+            font-family: var(--font-heading);
+            font-size: clamp(1.2rem, 4vw, 2.2rem);
+            font-weight: 700;
+            letter-spacing: 12px;
+            color: #fff;
+            margin-bottom: 30px;
+            min-height: 40px;
+            text-shadow: 0 0 30px rgba(197, 160, 89, 0.4);
+        }
+        
+        .loader-title::after {
+            content: '_';
+            animation: blink 0.6s infinite alternate;
+        }
+        @keyframes blink { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+        .bar-frame { width: 340px; height: 2px; background: rgba(255, 255, 255, 0.05); margin: 0 auto; position: relative; }
+        .bar-fill { height: 100%; width: 0%; background: var(--accent-color); box-shadow: 0 0 20px var(--accent-color); }
+
+        /* HUD CURSOR RETICLE STYLES */
+        #cursor-dot { width: 4px; height: 4px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 100001; }
+        #cursor-hud {
+            width: 46px;
+            height: 46px;
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, background-color 0.3s ease;
+        }
+        #cursor-hud::before { content: ''; position: absolute; width: 100%; height: 100%; border: 1px dashed rgba(255, 255, 255, 0.25); border-radius: 50%; animation: spinHUD 8s linear infinite; }
+        #cursor-hud.target-locked { width: 26px; height: 26px; border-color: #ffffff; background-color: rgba(197, 160, 89, 0.35); box-shadow: 0 0 25px rgba(197, 160, 89, 0.7); }
+        @keyframes spinHUD { to { transform: rotate(360deg); } }
+
+        .hud-coordinates { position: absolute; left: 55px; font-size: 7px; color: var(--accent-color); letter-spacing: 2px; white-space: nowrap; opacity: 0.7; }
+        
+        /* BORNEO GEOMETRIC PATTERN COATED SURFACE */
+        .pattern-layer {
+            position: fixed;
+            inset: 0;
+            background: 
+                conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 90%, rgba(197, 160, 89, 0.05) 90.1deg, rgba(197, 160, 89, 0.05) 100deg),
+                conic-gradient(from 180deg at 50% 50%, transparent 0deg, transparent 90%, rgba(197, 160, 89, 0.05) 90.1deg, rgba(197, 160, 89, 0.05) 100deg);
+            background-size: 60px 60px;
+            opacity: 0.6; 
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* FLASHLIGHT ATMOSPHERE LAYER */
+        .flashlight-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(
+                circle 700px at var(--mouse-x) var(--mouse-y), 
+                rgba(9, 10, 15, 0) 0%, 
+                rgba(9, 10, 15, 0.65) 100%
+            ); 
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .grain { position: fixed; inset: 0; z-index: 99; background: url('https://grainy-gradients.vercel.app/noise.svg'); opacity: 0.02; pointer-events: none; }
+
+        /* SITE UI INTERFACE HEADER */
+        .site-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 60px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(-30px);
+            transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1), transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .logo-box { font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.6em; line-height: 2; }
+        .nav-links { display: flex; flex-direction: column; gap: 15px; text-align: right; }
+        
+        .nav-links a { 
+            font-size: 9px; 
+            text-decoration: none; 
+            color: var(--text-color); 
+            letter-spacing: 4px; 
+            opacity: 0.5; 
+            padding: 5px 10px; 
+            position: relative; 
+            transition: opacity 0.3s ease, color 0.3s ease, letter-spacing 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .nav-links a::before { 
+            content: ''; 
+            position: absolute; 
+            right: 0; 
+            bottom: 0; 
+            width: 0%; 
+            height: 1px; 
+            background: var(--accent-color); 
+            box-shadow: 0 0 10px var(--accent-color); 
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        
+        .nav-links a.active {
+            opacity: 1;
+            color: var(--accent-color);
+            text-shadow: 0 0 15px rgba(197, 160, 89, 0.6);
+        }
+        .nav-links a.active::before { width: 100%; }
+        .nav-links a:hover { opacity: 1; color: var(--accent-color); letter-spacing: 10px; text-shadow: 0 0 15px rgba(197, 160, 89, 0.6); }
+        .nav-links a:hover::before { width: 100%; }
+
+        /* HERO PANEL CORE ENGINE */
+        .hero-main {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .hero-title { font-family: var(--font-heading); font-size: clamp(3.5rem, 13vw, 9.5rem); font-weight: 700; line-height: 0.9; margin-bottom: 30px; letter-spacing: -2px; text-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        .hero-title span { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); display: block; opacity: 0; filter: blur(20px); }
+        .hero-title .title-lower { opacity: 0; filter: blur(20px); }
+        .hero-description { max-width: 520px; margin: 0 auto; font-size: 11px; line-height: 2.5; letter-spacing: 2px; opacity: 0; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .cta-wrapper { margin-top: 60px; opacity: 0; transform: scale(0.9); }
+
+        /* INTRO REVEAL SEQUENCES */
+        .interface-active .site-header { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .interface-active .hero-title span { animation: driftLeft 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .interface-active .hero-title .title-lower { animation: driftRight 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .interface-active .hero-description { animation: fadeUpIn 2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards; }
+        .interface-active .cta-wrapper { animation: fadeUpIn 2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards; pointer-events: auto; }
+
+        @keyframes driftLeft { 0% { transform: translateX(-120px); opacity: 0; filter: blur(15px); } 100% { transform: translateX(0); opacity: 1; filter: blur(0px); } }
+        @keyframes driftRight { 0% { transform: translateX(120px); opacity: 0; filter: blur(15px); } 100% { transform: translateX(0); opacity: 1; filter: blur(0px); } }
+        @keyframes fadeUpIn { 0% { transform: translateY(25px); opacity: 0; } 100% { transform: translateY(0); opacity: 0.8; } }
+
+        .cta-btn {
+            background: rgba(9, 10, 15, 0.4);
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 22px 55px;
+            color: white;
+            font-family: var(--font-main);
+            font-size: 10px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 101; 
+            backdrop-filter: blur(8px);
+        }
+        .cta-btn:hover { background: white; color: black; border-color: white; transform: scale(1.05); box-shadow: 0 0 40px rgba(197, 160, 89, 0.6); }
+
+        /* CINEMATIC NATIVE VIDEO SECTION */
+        .video-section {
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .video-section video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #000;
+        }
+
+        .bottom-ui { position: fixed; bottom: 40px; width: calc(100% - 100px); left: 50px; display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 4px; opacity: 0.5; z-index: 100; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <script>
+        if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+        window.scrollTo(0, 0);
+    </script>
+
+    <div id="audio-unlocker">
+        <button class="unlock-btn" id="unlock-trigger">ENGAGE SYSTEM</button>
+    </div>
+
+    <div id="webgl-container"></div>
+
+    <div id="glitch-loader">
+        <div class="loader-content">
+            <h1 class="loader-title" id="typewriter-title"></h1>
+            <div class="bar-frame"><div class="bar-fill" id="loader-bar"></div></div>
+        </div>
+    </div>
+
+    <div id="cursor-dot"></div>
+    <div id="cursor-hud"><div class="hud-coordinates" id="hud-xy">LOC_X: 000 // LOC_Y: 000</div></div>
+    
+    <div class="grain"></div>
+    <div class="pattern-layer"></div>
+    <div class="flashlight-overlay" id="flashlight"></div>
+
+    <header class="site-header">
+        <div class="logo-box">SABAH<br>HERITAGE<br></div>
+        <nav class="nav-links">
+            <a href="#" class="active">HOME</a>
+            <a href="explore.html">EXPLORE</a>
+            <a href="gallery.html">GALLERY</a>
+            <a href="game.html">GAME</a>
+            <a href="about.html">ABOUT</a>
+        </nav>
+    </header>
+
+    <main class="hero-main" id="hero-node">
+        <h1 class="hero-title">
+            <span>DISCOVER</span>
+            <div class="title-lower">SABAH</div>
+        </h1>
+        <p class="hero-description">A visual exploration into the heart of North Borneo's Heritage.</p>
+        <div class="cta-wrapper">
+            <button class="cta-btn" id="initiate-btn">Initiate Experience</button>
+        </div>
+    </main>
+
+    <section class="video-section" id="video-experience">
+        <video id="bg-video" loop playsinline preload="auto">
+            <source src="yt1.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </section>
+
+    <div class="bottom-ui">
+        <div>TRACK_ID: 2026</div>
+        <div id="timer">DATA_LOG: 00:00:00:00</div>
+    </div>
+
+    <script>
+        const dot = document.getElementById('cursor-dot');
+        const hud = document.getElementById('cursor-hud');
+        const hudXy = document.getElementById('hud-xy');
+        const flashlight = document.getElementById('flashlight');
+        const initiateBtn = document.getElementById('initiate-btn');
+        const heroNode = document.getElementById('hero-node');
+        const videoSection = document.getElementById('video-experience');
+        const audioUnlocker = document.getElementById('audio-unlocker');
+        const unlockTrigger = document.getElementById('unlock-trigger');
+        const bgVideo = document.getElementById('bg-video');
+
+        let mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+        let hyperSpeed = 0.02;
+        let isWarping = false;
+
+        // --- OSCILLATOR GENERATOR INTERFACE ---
+        let audioCtx;
+
+        function initAudioEngine() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playEngageSystemSound() {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const subOsc = audioCtx.createOscillator();
+            const sweepOsc = audioCtx.createOscillator();
+            const masterGain = audioCtx.createGain();
+
+            subOsc.type = 'sine';
+            subOsc.frequency.setValueAtTime(45, audioCtx.currentTime); 
+            subOsc.frequency.linearRampToValueAtTime(75, audioCtx.currentTime + 0.5);
+
+            sweepOsc.type = 'sawtooth';
+            sweepOsc.frequency.setValueAtTime(110, audioCtx.currentTime);
+            sweepOsc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.6);
+
+            masterGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            masterGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.7);
+
+            subOsc.connect(masterGain);
+            sweepOsc.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+
+            subOsc.start();
+            sweepOsc.start();
+            subOsc.stop(audioCtx.currentTime + 0.7);
+            sweepOsc.stop(audioCtx.currentTime + 0.7);
+        }
+
+        function playTypewriterBeep() {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const modulationOsc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const modGain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            const pitchVariance = 850 + (Math.random() * 300);
+            osc.frequency.setValueAtTime(pitchVariance, audioCtx.currentTime); 
+
+            modulationOsc.type = 'square';
+            modulationOsc.frequency.setValueAtTime(60, audioCtx.currentTime);
+            
+            modGain.gain.setValueAtTime(300, audioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.05);
+
+            modulationOsc.connect(modGain);
+            modGain.connect(osc.frequency);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            modulationOsc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+            modulationOsc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        function playWarpSweep() {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(850, audioCtx.currentTime + 0.8); 
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.8);
+        }
+
+        function playInterfaceLockSound() {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(620, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(1250, audioCtx.currentTime + 0.08); 
+            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.25);
+        }
+
+        // --- DISMISS SYSTEM SPLASH GATEWAY ---
+        unlockTrigger.addEventListener('click', () => {
+            initAudioEngine();
+            playEngageSystemSound(); 
+            audioUnlocker.style.opacity = "0";
+            setTimeout(() => {
+                audioUnlocker.remove();
+                setTimeout(runTypewriterStream, 150);
+            }, 800);
+        });
+
+        // --- WEBGL MATRIX PARTICLES ENGINE ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x090a0f, 0.012); 
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 30;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.getElementById('webgl-container').appendChild(renderer.domElement);
+
+        const tunnelSegments = 60;
+        const points = [];
+        for (let i = 0; i < tunnelSegments; i++) { points.push(new THREE.Vector3(0, 0, i * 4 - 80)); }
+        
+        const tunnelPath = new THREE.CatmullRomCurve3(points);
+        const tubeGeometry = new THREE.TubeGeometry(tunnelPath, 100, 14, 18, false);
+        const wireframeGeo = new THREE.WireframeGeometry(tubeGeometry);
+        
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xc5a059, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending });
+        const tunnelMesh = new THREE.LineSegments(wireframeGeo, lineMaterial);
+        scene.add(tunnelMesh);
+
+        const extraParticles = 800;
+        const particleGeo = new THREE.BufferGeometry();
+        const positions = new Float32Array(extraParticles * 3);
+        for(let i=0; i<extraParticles*3; i+=3) {
+            let angle = Math.random() * Math.PI * 2;
+            let radius = Math.random() * 3 + 11; 
+            positions[i] = Math.cos(angle) * radius;
+            positions[i+1] = Math.sin(angle) * radius;
+            positions[i+2] = (Math.random() - 0.5) * 150;
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const partMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.25, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending });
+        const dynamicDust = new THREE.Points(particleGeo, partMaterial);
+        scene.add(dynamicDust);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        function renderTunnelLoop() {
+            requestAnimationFrame(renderTunnelLoop);
+            tunnelMesh.rotation.z += 0.0015;
+            dynamicDust.rotation.z -= 0.0005;
+            const dustPositions = dynamicDust.geometry.attributes.position.array;
+            for(let i = 2; i < dustPositions.length; i += 3) {
+                dustPositions[i] += isWarping ? hyperSpeed * 85 : hyperSpeed * 10;
+                if(dustPositions[i] > 40) { dustPositions[i] = -110; }
+            }
+            dynamicDust.geometry.attributes.position.needsUpdate = true;
+            if(!isWarping) {
+                camera.position.x += (mouse.x * 6 - camera.position.x) * 0.05;
+                camera.position.y += (-mouse.y * 6 - camera.position.y) * 0.05;
+                tunnelMesh.position.x = mouse.x * -2;
+                tunnelMesh.position.y = mouse.y * -2;
+            }
+            renderer.render(scene, camera);
+        }
+        renderTunnelLoop();
+
+        // --- HIGH-SPEED TYPEWRITER ENGINE ---
+        const textToType = "SABAH HERITAGE";
+        const typewriterElement = document.getElementById('typewriter-title');
+        const loaderBar = document.getElementById('loader-bar');
+        let charIndex = 0;
+        let loadPct = 0;
+
+        function runTypewriterStream() {
+            if (charIndex < textToType.length) {
+                typewriterElement.textContent += textToType.charAt(charIndex);
+                playTypewriterBeep(); 
+                charIndex++;
+                setTimeout(runTypewriterStream, 40); 
+            } else {
+                const runLoadBar = setInterval(() => {
+                    loadPct += 4; 
+                    loaderBar.style.width = loadPct + '%';
+                    if (loadPct >= 100) {
+                        clearInterval(runLoadBar);
+                        setTimeout(() => {
+                            document.getElementById('glitch-loader').style.opacity = "0";
+                            setTimeout(() => {
+                                document.getElementById('glitch-loader').remove();
+                                document.body.classList.add('interface-active');
+                                playInterfaceLockSound();
+                            }, 1200);
+                        }, 400);
+                    }
+                }, 40); 
+            }
+        }
+
+        // --- ACTIVE INTERACTION REVEAL LIGHTS & RADAR ---
+        document.addEventListener('mousemove', (e) => {
+            mouse.targetX = e.clientX; mouse.targetY = e.clientY;
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = (e.clientY / window.innerHeight) * 2 - 1;
+            
+            flashlight.style.setProperty('--mouse-x', mouse.targetX + 'px');
+            flashlight.style.setProperty('--mouse-y', mouse.targetY + 'px');
+            
+            dot.style.left = mouse.targetX + 'px'; dot.style.top = mouse.targetY + 'px';
+            hudXy.innerText = `LOC_X: ${mouse.targetX.toString().padStart(4, '0')} // LOC_Y: ${mouse.targetY.toString().padStart(4, '0')}`;
+        });
+
+        function runCursorEaser() {
+            let currentX = parseFloat(hud.style.left) || 0; let currentY = parseFloat(hud.style.top) || 0;
+            let targetOffset = hud.classList.contains('target-locked') ? 13 : 23;
+            hud.style.left = currentX + ((mouse.targetX - targetOffset) - currentX) * 0.15 + 'px';
+            hud.style.top = currentY + ((mouse.targetY - targetOffset) - currentY) * 0.15 + 'px';
+            requestAnimationFrame(runCursorEaser);
+        }
+        runCursorEaser();
+
+        document.querySelectorAll('button, a').forEach(element => {
+            element.onmouseenter = () => hud.classList.add('target-locked');
+            element.onmouseleave = () => hud.classList.remove('target-locked');
+        });
+
+        // --- EXPERIENCE STREAM CONTROLLER SEQUENCE ---
+        initiateBtn.addEventListener('click', () => {
+            if(isWarping) return;
+            isWarping = true;
+            
+            playWarpSweep(); 
+            
+            lineMaterial.opacity = 0.9;
+            partMaterial.size = 0.55;
+            heroNode.style.opacity = "0";
+
+            // HARDWARE TRIGGER: Unmutes audio stream dynamically upon user validation
+            if (bgVideo) {
+                bgVideo.muted = false; // Safely unmuting based on explicit user action
+                bgVideo.volume = 1.0;   // Force full structural audio initialization
+                bgVideo.load();
+                var playPromise = bgVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Local unmuted playback initialization handled:", error);
+                    });
+                }
+            }
+
+            setTimeout(() => {
+                videoSection.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => {
+                    lineMaterial.opacity = 0.55;
+                    partMaterial.size = 0.25;
+                    heroNode.style.opacity = "1";
+                    isWarping = false;
+                }, 1000);
+            }, 250); 
+        });
+
+        function runOsdClock() {
+            const dateObj = new Date();
+            document.getElementById('timer').innerText = "DATA_LOG: " + 
+                dateObj.getHours().toString().padStart(2, '0') + ":" + 
+                dateObj.getMinutes().toString().padStart(2, '0') + ":" + 
+                dateObj.getSeconds().toString().padStart(2, '0') + ":" + 
+                Math.floor(Math.random() * 99).toString().padStart(2, '0');
+        }
+        setInterval(runOsdClock, 40);
+    </script>
+</body>
+</html>

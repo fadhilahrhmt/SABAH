@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sabah Archive // Kadazan Sync</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #030303;
+      --accent: #d4af37;
+      --grid: rgba(212, 175, 55, 0.05);
+      --ui-border: rgba(255, 255, 255, 0.1);
+      --text-main: #ffffff;
+      --text-dim: #888;
+      --nav-bg: #030303;
+      --panel-bg: rgba(10, 10, 10, 0.85);
+      --font-main: 'Space Mono', monospace;
+      --font-heading: 'Syncopate', sans-serif;
+      --glass-border: rgba(255, 255, 255, 0.15);
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f5f7;
+      --accent: #b38f1d;
+      --grid: rgba(179, 143, 29, 0.05);
+      --ui-border: rgba(0, 0, 0, 0.15);
+      --text-main: #1d1d1f;
+      --text-dim: #6e6e73;
+      --nav-bg: #f5f5f7;
+      --panel-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(0, 0, 0, 0.1);
+    }
+
+    /* --- CUSTOM CURSOR SYNC CONFIGURATION --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+
+    #cursor { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: background 0.2s; }
+    #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: transform 0.1s ease-out, background 0.2s, border-color 0.2s; }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 40px 40px;
+      color: var(--text-main);
+      font-family: var(--font-main);
+      height: 100vh;
+      overflow: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* --- HUD FRAME --- */
+    .hud-frame { position: fixed; inset: 20px; border: 1px solid var(--ui-border); pointer-events: none; z-index: 10; transition: border-color 0.3s; }
+    .hud-corner { position: absolute; width: 20px; height: 20px; border: 1px solid var(--accent); transition: border-color 0.3s; }
+    .tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+    .br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+    /* --- NAVIGATION --- */
+    .site-nav {
+      position: fixed; top: 0; width: 100%; height: 80px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 50px; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
+      z-index: 5000;
+      backdrop-filter: blur(20px);
+      transition: background 0.4s, border-color 0.4s;
+    }
+
+    .logo-box h1 { font-family: var(--font-heading); font-size: 14px; letter-spacing: 4px; }
+    
+    .nav-menu { display: flex; gap: 30px; list-style: none; }
+    .nav-menu a { 
+      color: var(--text-main); text-decoration: none; font-size: 11px; 
+      opacity: 0.6; transition: 0.3s; text-transform: uppercase; font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .nav-menu a.active, .nav-menu a:hover { opacity: 1; color: var(--accent); }
+
+    .nav-right { display: flex; align-items: center; gap: 25px; }
+    
+    .mode-swap {
+      background: none; 
+      border: 1px solid var(--accent); 
+      color: var(--accent); 
+      padding: 5px 15px; 
+      font-size: 10px; 
+      font-family: var(--font-main);
+      transition: background 0.3s, color 0.3s;
+    }
+    .mode-swap:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent); border-left: 1px solid var(--glass-border); padding-left: 20px; }
+
+    /* --- FIXED HOVER-STOP SCROLL CONTAINER --- */
+    .wardrobe-scroll-container {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      padding-bottom: 5px;
+      margin-top: 15px;
+      mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    }
+
+    .wardrobe-track {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+    }
+    
+    /* CRITICAL FIX: When cursor is ANYWHERE over the container box, the inner track stops moving */
+    .wardrobe-scroll-container:hover .wardrobe-track { 
+      animation-play-state: paused !important; 
+    }
+
+    .wardrobe-item {
+      flex-shrink: 0;
+      width: 240px;  
+      height: 280px; 
+      margin-right: 18px;
+      position: relative;
+      border: 1px solid var(--ui-border);
+      background: #111;
+      overflow: hidden;
+    }
+    .wardrobe-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(1);
+      opacity: 0.5;
+      transition: transform 0.5s ease, filter 0.5s ease, opacity 0.5s ease;
+    }
+    .wardrobe-item:hover img {
+      transform: scale(1.15);
+      filter: grayscale(0);
+      opacity: 1;
+    }
+    .wardrobe-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(3, 3, 3, 0.85);
+      color: var(--accent);
+      font-size: 0.65rem;
+      padding: 8px;
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-top: 1px solid var(--ui-border);
+    }
+    .wardrobe-item:hover .wardrobe-label {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    @keyframes gearSwipe {
+      0% { transform: translateX(0px); }
+      100% { transform: translateX(calc(-100% + 310px)); }
+    }
+
+    /* --- TEXTILE SWIPING GALLERY (RIGHT SIDE) --- */
+    .pattern-archive-label {
+      font-size: 0.6rem;
+      color: var(--accent);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .pattern-scroll-container {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      padding-bottom: 10px;
+      mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    }
+
+    .pattern-track {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: scanSwipe 12s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+    }
+    .pattern-scroll-container:hover .pattern-track { animation-play-state: paused !important; }
+
+    .pattern-item {
+      flex-shrink: 0;
+      width: 140px;
+      height: 180px;
+      margin-right: 15px;
+      position: relative;
+      border: 1px solid var(--ui-border);
+      background: #111;
+      overflow: hidden;
+      mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    .pattern-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+      filter: grayscale(1);
+      transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+
+    .pattern-item:hover .pattern-img {
+      opacity: 1;
+      filter: grayscale(0);
+      transform: scale(1.1);
+    }
+
+    @keyframes scanSwipe {
+      0% { transform: translateX(0px); }
+      100% { transform: translateX(calc(-100% + 250px)); }
+    }
+
+    /* --- VIEWPORT GRID --- */
+    .viewer-container {
+      display: grid; 
+      grid-template-columns: 380px 1fr 340px; 
+      height: 100vh; 
+      padding: 110px 40px 40px; 
+      gap: 20px;
+    }
+
+    .panel { 
+      background: var(--panel-bg); 
+      border: 1px solid var(--ui-border); 
+      padding: 20px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+      pointer-events: auto;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .panel-header { font-size: 0.6rem; color: var(--accent); border-bottom: 1px solid var(--ui-border); padding-bottom: 8px; margin-bottom: 15px; letter-spacing: 3px; }
+
+    .terminal-btn {
+      display: block; width: 100%; background: transparent; border: 1px solid var(--accent);
+      color: var(--accent); padding: 10px; font-family: 'Space Mono'; font-size: 0.65rem;
+      text-align: center; text-decoration: none; margin-bottom: 10px; transition: 0.3s;
+    }
+    .terminal-btn:hover, .terminal-btn.active { background: var(--accent); color: var(--bg); box-shadow: 0 0 10px var(--accent); }
+
+    .model-stage { 
+      position: relative; 
+      border: 1px solid var(--ui-border);
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+      transition: border-color 0.3s;
+    }
+    #realModelCanvas { width: 100% !important; height: 100% !important; }
+    .status-overlay { position: absolute; bottom: 15px; left: 15px; font-size: 0.55rem; color: var(--accent); }
+
+    @media (max-width: 1100px) {
+      .viewer-container { grid-template-columns: 1fr; height: auto; padding-top: 180px; }
+      .site-nav { padding: 0 20px; flex-direction: column; height: auto; gap: 15px; padding-top: 15px; padding-bottom: 15px; }
+      .nav-menu { gap: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursor-follower"></div>
+
+  <div class="hud-frame"><div class="hud-corner tl"></div><div class="hud-corner br"></div></div>
+
+  <nav class="site-nav">
+    <div class="logo-box"><h1 data-glitch="SABAH_HERITAGE">SABAH_HERITAGE</h1></div>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="game.html">Game</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+        <button id="themeToggle" onclick="toggleTheme()" class="mode-swap">MODE_SWAP</button>
+        <div id="digital-clock">00:00:00</div>
+    </div>
+  </nav>
+
+  <main class="viewer-container">
+    <aside class="panel">
+      <div>
+        <div class="panel-header" data-glitch="NODE_SELECTION">NODE_SELECTION</div>
+        <button id="loadFemale" class="terminal-btn active" data-glitch="[ KADAZAN_FEMALE ]">[ KADAZAN_FEMALE ]</button>
+        <button id="loadMale" class="terminal-btn" data-glitch="[ KADAZAN_MALE ]">[ KADAZAN_MALE ]</button>
+        
+        <div class="panel-header" style="margin-top:25px;" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
+        <div class="wardrobe-scroll-container">
+          <div id="wardrobeTrack" class="wardrobe-track">
+             </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="model-stage" id="stageContainer">
+      <canvas id="realModelCanvas"></canvas>
+      <div class="status-overlay">RENDER_MODE: <span id="modelStatus">IDLE</span></div>
+    </section>
+
+    <aside class="panel">
+      <div>
+        <div class="panel-header" data-glitch="ASSET_METADATA">ASSET_METADATA</div>
+        
+        <div class="pattern-archive-label">TEXTILE_PATTERNS // SCAN_04</div>
+        
+        <div class="pattern-scroll-container">
+          <div class="pattern-track">
+            <div class="pattern-item"><img src="g2.jpg" class="pattern-img"></div>
+            <div class="pattern-item"><img src="g1.jpg" class="pattern-img"></div>
+            <div class="pattern-item"><img src="g3.jpg" class="pattern-img"></div>
+          </div>
+        </div>
+
+        <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 1.2rem; margin-top: 15px;">LINANGKIT</h2>
+        <p style="font-size: 0.6rem; color: var(--text-dim); margin-top:10px; line-height: 1.8; text-transform: uppercase;">
+          ARCHIVAL TEXTILE ANALYSIS:<br>
+          traditional decorative embroidery technique practiced by the Kadazan-Dusun community in Sabah.<br>
+          The word linangkit comes from the local term meaning "to join" or "to connect," referring to the way colorful threads are intricately stitched together to form beautiful geometric patterns.<br>
+          
+        </p>
+      </div>
+      <a href="kadazan.html" class="terminal-btn" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
+    </aside>
+  </main>
+
+  <script>
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+    import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+    import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
+
+    /* WARDROBE HORIZONTAL TRACK CONFIGURATION */
+    const costumeData = {
+      female: [
+        { name: "Sinuangga", img: "baju.png" },
+        { name: "Tapi", img: "skirt.png" },
+        { name: "Siung", img: "topi.png" },
+        { name: "Himpogot", img: "rantai.png" }
+      ],
+      male: [
+        { name: "Gaung", img: "k1.png" },
+        { name: "Suar", img: "k2.png" },
+        { name: "Siung", img: "k3.png" }
+      ]
+    };
+
+    const wardrobeTrack = document.getElementById('wardrobeTrack');
+
+    function updateWardrobeDisplay(gender) {
+      wardrobeTrack.innerHTML = '';
+      
+      // Clear inline track styling before rebuilding data structures
+      wardrobeTrack.style.animation = 'none';
+      wardrobeTrack.offsetHeight; 
+      wardrobeTrack.style.animation = 'gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
+
+      costumeData[gender].forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'wardrobe-item';
+        div.innerHTML = `
+          <img src="${item.img}" alt="${item.name}">
+          <div class="wardrobe-label">${item.name}</div>
+        `;
+        
+        div.addEventListener('mouseenter', () => {
+          follower.style.transform = 'scale(1.3)';
+          follower.style.borderColor = 'var(--text-main)';
+        });
+        div.addEventListener('mouseleave', () => {
+          follower.style.transform = 'scale(1)';
+          follower.style.borderColor = 'var(--accent)';
+        });
+
+        wardrobeTrack.appendChild(div);
+      });
+    }
+
+    // Initialize Box Content
+    updateWardrobeDisplay('female');
+
+    /* INTERACTIVE TEXT GLITCH ENGINE */
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_//][";
+    function triggerGlitch(element) {
+      let iteration = 0;
+      const originalText = element.dataset.glitch || element.innerText;
+      clearInterval(element.glitchInterval);
+      
+      element.glitchInterval = setInterval(() => {
+        element.innerText = originalText
+          .split("")
+          .map((letter, index) => {
+            if(index < iteration) return originalText[index];
+            return letters[Math.floor(Math.random() * letters.length)];
+          })
+          .join("");
+        
+        if(iteration >= originalText.length) {
+          clearInterval(element.glitchInterval);
+        }
+        iteration += 1 / 3;
+      }, 25);
+    }
+
+    document.querySelectorAll('[data-glitch]').forEach(el => {
+      el.addEventListener('mouseenter', () => triggerGlitch(el));
+    });
+
+    /* GALLERY MOUSE LOGIC SYNC */
+    const cursor = document.getElementById('cursor');
+    const follower = document.getElementById('cursor-follower');
+    let mouseX = 0, mouseY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth) - 0.5;
+        mouseY = (e.clientY / window.innerHeight) - 0.5;
+
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+        follower.style.left = (e.clientX - 20) + 'px';
+        follower.style.top = (e.clientY - 20) + 'px';
+    });
+
+    document.querySelectorAll('.nav-menu a, button, .terminal-btn, .pattern-item, .mode-swap').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            follower.style.transform = 'scale(1.5)';
+            follower.style.borderColor = 'var(--text-main)';
+            if (item.classList.contains('mode-swap')) {
+                follower.style.background = 'rgba(212, 175, 55, 0.2)';
+                cursor.style.background = 'var(--text-main)';
+            }
+        });
+        item.addEventListener('mouseleave', () => {
+            follower.style.transform = 'scale(1)';
+            follower.style.borderColor = 'var(--accent)';
+            follower.style.background = 'transparent';
+            cursor.style.background = 'var(--accent)';
+        });
+    });
+
+    /* CLOCK COMPONENT ENGINE */
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* THREE.JS ENGINE */
+    const stage = document.getElementById('stageContainer');
+    const canvas = document.getElementById('realModelCanvas');
+    const status = document.getElementById('modelStatus');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, stage.clientWidth / stage.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(stage.clientWidth, stage.clientHeight);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const pointLight = new THREE.PointLight(0xd4af37, 1);
+    pointLight.position.set(5, 5, 5);
+    scene.add(pointLight);
+
+    const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    backLight.position.set(-5, 3, -5);
+    scene.add(backLight);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    camera.position.set(0, 0, 3);
+
+    /* INTERACTIVE PROCEDURAL HOLOGRAM MATRIX */
+    const particleCount = 1500;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    const colorAccent = new THREE.Color('#d4af37');
+
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      const radius = 0.8 + Math.random() * 0.4;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+
+      positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i+1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i+2] = radius * Math.cos(phi);
+
+      colors[i] = colorAccent.r;
+      colors[i+1] = colorAccent.g;
+      colors[i+2] = colorAccent.b;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const pCanvas = document.createElement('canvas');
+    pCanvas.width = 16; pCanvas.height = 16;
+    const ctx = pCanvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(2, 2, 12, 12);
+    const pTexture = new THREE.CanvasTexture(pCanvas);
+
+    const material = new THREE.PointsMaterial({
+      size: 0.015,
+      map: pTexture,
+      transparent: true,
+      opacity: 0.35,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    const particleSystem = new THREE.Points(geometry, material);
+    scene.add(particleSystem);
+
+    /* MODEL LOADER CORE */
+    let loadedMesh = null;
+    const gltfLoader = new GLTFLoader();
+
+    function loadModel(filename) {
+      status.innerText = "LOADING...";
+      
+      if (loadedMesh) {
+        scene.remove(loadedMesh);
+        loadedMesh.traverse((child) => {
+          if (child.isMesh) {
+            child.geometry.dispose();
+            if (Array.isArray(child.material)) {
+              child.material.forEach((mat) => mat.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        });
+        loadedMesh = null;
+      }
+
+      gltfLoader.load(
+        filename, 
+        (gltf) => {
+          loadedMesh = gltf.scene;
+
+          const box = new THREE.Box3().setFromObject(loadedMesh);
+          const center = box.getCenter(new THREE.Vector3());
+          const size = box.getSize(new THREE.Vector3());
+          
+          loadedMesh.position.x += (loadedMesh.position.x - center.x);
+          loadedMesh.position.y += (loadedMesh.position.y - center.y);
+          loadedMesh.position.z += (loadedMesh.position.z - center.z);
+          
+          const maxDim = Math.max(size.x, size.y, size.z);
+          const scale = 1.6 / maxDim;
+          loadedMesh.scale.set(scale, scale, scale);
+
+          scene.add(loadedMesh);
+          status.innerText = "STABLE";
+          material.opacity = 0.15;
+        },
+        (xhr) => {
+          if (xhr.total > 0) {
+            status.innerText = `SYNCING: ${Math.round((xhr.loaded / xhr.total * 100))}%`;
+          }
+        },
+        (error) => {
+          console.warn('GLB asset link bypassed. Displaying holographic matrix field fallback.');
+          status.innerText = "MATRIX_ACTIVE";
+          material.opacity = 0.5;
+        }
+      );
+    }
+
+    loadModel('kadazan3d.glb');
+
+    const btnFemale = document.getElementById('loadFemale');
+    const btnMale = document.getElementById('loadMale');
+
+    btnFemale.onclick = () => {
+      if (!btnFemale.classList.contains('active')) {
+        btnFemale.classList.add('active');
+        btnMale.classList.remove('active');
+        triggerGlitch(btnFemale);
+        updateWardrobeDisplay('female');
+        loadModel('kadazan3d.glb');
+      }
+    };
+
+    btnMale.onclick = () => {
+      if (!btnMale.classList.contains('active')) {
+        btnMale.classList.add('active');
+        btnFemale.classList.remove('active');
+        triggerGlitch(btnMale);
+        updateWardrobeDisplay('male');
+        loadModel('kadazan3dmale.glb');
+      }
+    };
+
+    /* ANIMATION LOOP & PARALLAX TRACKING */
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      particleSystem.rotation.y += 0.001;
+      particleSystem.rotation.x += 0.0005;
+
+      particleSystem.position.x += (mouseX * 0.3 - particleSystem.position.x) * 0.05;
+      particleSystem.position.y += (-mouseY * 0.3 - particleSystem.position.y) * 0.05;
+
+      if (loadedMesh) {
+        loadedMesh.rotation.y += 0.003;
+      }
+      
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = stage.clientWidth / stage.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(stage.clientWidth, stage.clientHeight);
+    });
+  </script>
+</body>
+</html>

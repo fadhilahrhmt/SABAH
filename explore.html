@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SABAH_HERITAGE | Explore Sector</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #080808;
+            --surface: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --accent: #d4af37; 
+            --map-stroke: rgba(255, 255, 255, 0.5); 
+            --border: rgba(255, 255, 255, 0.15);
+            --grid: rgba(212, 175, 55, 0.08);
+            --font-main: 'Space Mono', monospace;
+            --font-head: 'Syncopate', sans-serif;
+            --nav-hover-accent: #d4af37; 
+            --glow: drop-shadow(0 0 8px var(--accent));
+            
+            --ai-bg: rgba(8, 8, 8, 0.95);
+            --ai-input-bg: rgba(255, 255, 255, 0.02);
+            --ai-text-user: #d4af37;
+        }
+
+        [data-theme="light"] {
+            --bg: #f9f7f2;
+            --surface: rgba(0, 0, 0, 0.05);
+            --text: #1a1a1a;
+            --accent: #8b6e3c;
+            --map-stroke: rgba(0, 0, 0, 0.4);
+            --border: rgba(0, 0, 0, 0.1);
+            --grid: rgba(0, 0, 0, 0.05);
+            --nav-hover-accent: #8b6e3c; 
+            --glow: drop-shadow(0 0 4px var(--accent));
+            
+            --ai-bg: rgba(240, 237, 227, 0.98);
+            --ai-input-bg: rgba(0, 0, 0, 0.03);
+            --ai-text-user: #8b6e3c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        body { background-color: var(--bg); color: var(--text); font-family: var(--font-main); height: 100vh; overflow: hidden; display: flex; transition: background 0.4s, color 0.4s; }
+
+        .grid-overlay { position: fixed; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 60px 60px; z-index: 1; pointer-events: none; }
+
+        /* NAVIGATION SYSTEM */
+        .site-nav { position: fixed; top: 0; width: 100%; height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 50px; background: var(--bg); border-bottom: 1px solid var(--border); z-index: 1000; transition: background 0.4s, border-color 0.4s; }
+        .logo-box h1 { font-family: var(--font-head); font-size: 14px; letter-spacing: 4px; }
+        .nav-menu { display: flex; gap: 30px; list-style: none; }
+        .nav-menu a { color: var(--text); text-decoration: none; font-size: 11px; opacity: 0.6; text-transform: uppercase; font-weight: 700; transition: color 0.2s, opacity 0.2s; }
+        .nav-menu a.active-page { color: var(--accent); opacity: 1; pointer-events: none; }
+        .clock-box { font-size: 14px; font-weight: 700; color: var(--accent); border-left: 1px solid var(--border); padding-left: 20px; }
+        .swap-btn { background: none; border: 1px solid var(--accent); color: var(--accent); font-size: 10px; padding: 6px 15px; transition: all 0.2s; }
+
+        /* METER PANEL SIDEBAR (LEFT) */
+        .sidebar { position: fixed; left: 0; top: 80px; bottom: 0; width: 340px; border-right: 1px solid var(--border); background: var(--surface); padding: 40px; z-index: 500; display: flex; flex-direction: column; gap: 25px; transition: background 0.4s, border-color 0.4s; }
+        
+        .compass-wrapper { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .compass-btn { background: none; border: 1px dashed var(--accent); color: var(--accent); font-size: 8px; padding: 3px 8px; border-radius: 3px; transition: 0.2s; }
+        .compass { width: 130px; height: 130px; border: 2px solid var(--accent); border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); box-shadow: inset 0 0 15px rgba(212,175,55,0.1); }
+        .compass::before { content: ''; position: absolute; inset: 8px; border: 1px dashed rgba(255,255,255,0.15); border-radius: 50%; pointer-events: none; }
+        
+        .compass .cardinal { position: absolute; font-size: 10px; font-weight: 700; opacity: 0.8; }
+        .compass .n { top: 6px; color: var(--accent); font-size: 12px; }
+        .compass .s { bottom: 6px; }
+        .compass .e { right: 8px; }
+        .compass .w { left: 8px; }
+
+        .needle-box { width: 100%; height: 100%; position: absolute; display: flex; align-items: center; justify-content: center; transition: transform 0.1s ease-out; will-change: transform; }
+        .needle { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 45px solid var(--accent); position: absolute; bottom: 50%; filter: drop-shadow(0 0 5px var(--accent)); }
+        .needle-south { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 45px solid rgba(255,255,255,0.2); position: absolute; top: 50%; }
+        .center-pivot { width: 8px; height: 8px; background: var(--bg); border: 2px solid var(--accent); border-radius: 50%; position: absolute; z-index: 10; }
+
+        .summary-card { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--accent); padding: 20px; border-radius: 4px; font-size: 10px; line-height: 1.6; }
+
+        /* INTERACTIVE SVG STAGE STYLING */
+        .map-stage { position: fixed; inset: 80px 380px 0 340px; display: flex; align-items: center; justify-content: center; perspective: 1500px; padding: 0px 20px; overflow: hidden; }
+        .interactive-container { width: 100%; height: 100%; display: grid; grid-template-columns: 1fr; align-items: center; justify-content: center; transform-style: preserve-3d; transition: transform 0.15s ease-out; position: relative; }
+        
+        #map-svg { width: 100%; height: 92vh; max-height: 92vh; overflow: visible; justify-self: center; }
+        .region { fill: rgba(255,255,255,0.02); stroke: var(--map-stroke); stroke-width: 5; transition: 0.3s; pointer-events: all; }
+        .region:hover { fill: rgba(212, 175, 55, 0.2); stroke: var(--accent); stroke-width: 10; filter: drop-shadow(0 0 20px var(--accent)); }
+
+        /* HUD OVERLAY CONTAINER */
+        .data-hud { 
+            position: absolute; 
+            left: 30px; 
+            top: 30px; 
+            width: 320px; 
+            background: var(--bg); 
+            border: 1px solid var(--accent); 
+            opacity: 0; 
+            visibility: hidden;
+            transform: translateZ(50px); 
+            transition: opacity 0.3s, visibility 0.3s; 
+            z-index: 800; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .data-hud.active { 
+            opacity: 1; 
+            visibility: visible;
+        }
+        .hud-img-wrap { width: 100%; height: 130px; overflow: hidden; border-bottom: 1px solid var(--accent); position: relative; flex-shrink: 0; }
+        .hud-img-wrap::after { content: 'SYS_SCAN_DATA'; position: absolute; bottom: 4px; left: 8px; font-size: 8px; background: var(--bg); padding: 2px 6px; border: 1px solid var(--accent); color: var(--accent); }
+        
+        .hud-close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--bg);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-size: 10px;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 10;
+            transition: all 0.2s;
+        }
+        .hud-close-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .hud-img { width: 100%; height: 100%; background-size: cover; background-position: center; }
+        .hud-content { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+        .hud-content h2 { font-family: var(--font-head); font-size: 12px; color: var(--accent); margin-bottom: 2px; }
+        .hud-content p { font-size: 10px; line-height: 1.6; opacity: 0.8; }
+
+        .hud-audio-btn {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: var(--font-main);
+            font-size: 11px;
+            font-weight: bold;
+            padding: 10px 12px;
+            margin-top: 5px;
+            text-align: center;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        .hud-audio-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+            filter: drop-shadow(0 0 5px var(--accent));
+        }
+
+        /* AUDIO REEL STATUS */
+        .audio-indicator { margin-top: 10px; font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; opacity: 0; transition: opacity 0.3s; }
+        .audio-indicator.playing { opacity: 1; }
+        .audio-pulse { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 0.6s infinite alternate; }
+
+        /* HERITAGE AI CORE WINDOW TERMINAL (RIGHT) */
+        .ai-sidebar { position: fixed; right: 0; top: 80px; bottom: 0; width: 380px; border-left: 1px solid var(--border); background: var(--ai-bg); backdrop-filter: blur(10px); padding: 30px; z-index: 500; display: flex; flex-direction: column; gap: 20px; transition: background 0.4s, border-color 0.4s; }
+        .ai-terminal-header { border-bottom: 1px solid var(--accent); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.4s; }
+        .ai-terminal-header h3 { font-family: var(--font-head); font-size: 11px; color: var(--accent); letter-spacing: 2px; }
+        .ai-status { display: flex; align-items: center; gap: 6px; font-size: 9px; opacity: 0.8; }
+        .ai-status-dot { width: 6px; height: 6px; background: #00ff66; border-radius: 50%; box-shadow: 0 0 8px #00ff66; }
+        .ai-status-dot.thinking { background: #ffaa00; box-shadow: 0 0 8px #ffaa00; animation: pulse 1s infinite alternate; }
+
+        .ai-chat-body { flex: 1; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 16px; font-size: 11px; border-bottom: 1px solid var(--border); padding-bottom: 15px; transition: border-color 0.4s; }
+        .ai-chat-body::-webkit-scrollbar { width: 4px; }
+        .ai-chat-body::-webkit-scrollbar-thumb { background: var(--accent); }
+
+        .chat-msg { line-height: 1.6; white-space: pre-line; }
+        .chat-msg.bot { position: relative; padding-left: 15px; border-left: 1px solid var(--accent); color: var(--text); transition: border-color 0.4s, color 0.4s; }
+        .chat-msg.bot::before { content: '>'; position: absolute; left: 0; top: 0; color: var(--accent); font-weight: bold; }
+        .chat-msg.user { color: var(--ai-text-user); text-align: right; opacity: 0.8; font-weight: 700; transition: color 0.4s; }
+
+        .ai-input-wrapper { position: relative; display: flex; flex-direction: column; gap: 10px; }
+        .ai-input { width: 100%; background: var(--ai-input-bg); border: 1px solid var(--border); color: var(--text); font-family: var(--font-main); font-size: 11px; padding: 12px; outline: none; transition: border-color 0.2s, background 0.4s, color 0.4s; }
+        .ai-input:focus { border-color: var(--accent); }
+        
+        .ai-actions { display: flex; justify-content: space-between; align-items: center; }
+        .ai-hint { font-size: 8px; opacity: 0.4; }
+        .ai-btn-group { display: flex; gap: 10px; }
+        
+        .ai-execute-btn { background: none; border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-main); font-size: 10px; font-weight: bold; padding: 8px 18px; transition: all 0.2s; }
+        .ai-execute-btn:hover { background: var(--accent); color: var(--bg); filter: var(--glow); }
+        
+        .new-session-btn { background: none; border: 1px solid rgba(212, 175, 55, 0.4); color: var(--text); font-family: var(--font-main); font-size: 10px; font-weight: bold; padding: 8px 15px; opacity: 0.8; transition: all 0.2s; }
+        .new-session-btn:hover { border-color: var(--accent); opacity: 1; background: rgba(212, 175, 55, 0.05); }
+
+        /* MOUSE RETICLES STYLING */
+        #c { width: 8px; height: 8px; background: var(--accent); position: fixed; pointer-events: none; z-index: 3000; border-radius: 50%; transform: translate(-50%, -50%); transition: background 0.2s, transform 0.2s; }
+        #cr { width: 40px; height: 40px; border: 1px solid var(--accent); position: fixed; pointer-events: none; z-index: 2999; border-radius: 50%; transition: transform 0.08s ease-out, border-color 0.2s, width 0.2s, height 0.2s; transform: translate(-50%, -50%); }
+
+        body.nav-hovering #c { background: var(--accent); transform: translate(-50%, -50%) scale(1.5); }
+        body.nav-hovering #cr { border-color: var(--nav-hover-accent); width: 52px; height: 52px; }
+        
+        .nav-menu a:hover { opacity: 1; color: var(--nav-hover-accent); }
+        .swap-btn:hover { background: var(--nav-hover-accent); color: var(--bg); box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+        .compass-btn:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--nav-hover-accent); color: var(--nav-hover-accent); }
+
+        @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="c"></div><div id="cr"></div>
+    <div class="grid-overlay"></div>
+
+    <nav class="site-nav">
+        <div class="logo-box"><h1>SABAH_HERITAGE</h1></div>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-item">HOME</a></li>
+            <li><a href="explore.html" class="nav-item active-page">EXPLORE</a></li>
+            <li><a href="gallery.html" class="nav-item">GALLERY</a></li>
+            <li><a href="game.html" class="nav-item">GAME</a></li>
+            <li><a href="about.html" class="nav-item">ABOUT</a></li>
+        </ul>
+        <div style="display:flex; align-items:center; gap:25px;">
+            <button onclick="toggleTheme()" class="swap-btn nav-item">SWAP_MODE</button>
+            <div id="clock" class="clock-box">00:00:00</div>
+        </div>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="compass-wrapper">
+            <button class="compass-btn nav-item" onclick="initGyro()">CALIBRATE SENSOR</button>
+            <div class="compass">
+                <span class="cardinal n">N</span><span class="cardinal ne">NE</span><span class="cardinal e">E</span><span class="cardinal se">SE</span>
+                <span class="cardinal s">S</span><span class="cardinal sw">SW</span><span class="cardinal w">W</span><span class="cardinal nw">NW</span>
+                <div class="center-pivot"></div>
+                <div class="needle-box" id="needle-box"><div class="needle"></div><div class="needle-south"></div></div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <strong style="color:var(--accent); letter-spacing:1px;">REGION SUMMARY</strong><br><br>
+            • Kadazan &rarr; West Coast Lowlands<br>
+            • Dusun &rarr; Interior & West Uplands<br>
+            • Bajau Samah &rarr; West Coast Plains<br>
+            • Bajau Laut &rarr; Semporna Sea Domain<br>
+            • Murut &rarr; Interior Highlands<br>
+            • Bugis &rarr; Tawau/Southeast Sector<br>
+            • Rungus &rarr; Kudat/Northern Zone
+        </div>
+
+        <div style="margin-top:auto; font-size:10px; border-left:3px solid var(--accent); padding-left:15px;">
+            <span style="opacity:0.5">ACTIVE SECTOR:</span><br>
+            <span id="sector-name" style="font-weight:700; color:var(--accent);">AWAITING SCAN</span>
+            <div class="audio-indicator" id="audio-ui-status">
+                <div class="audio-pulse"></div><span>Streaming Sector Intel...</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="map-stage">
+        <div class="interactive-container" id="interactive-frame">
+            <svg id="map-svg" viewBox="0 0 800 600">
+                <path class="region nav-item" data-audio="Northern Zone.mp3" data-title="NORTHERN ZONE" data-loc="Kudat, Kota Marudu, Pitas" data-ethnic="Rungus, Dusun (Tobilung)" data-img="https://mlup3e8wwmu8.i.optimole.com/w:1043/h:777/q:mauto/f:best/https://letstravelborneo.com/wp-content/uploads/2023/06/Schermafbeelding-2023-06-13-125239.png" d="M380,180 L420,70 L510,120 L480,220 Z" />
+                <path class="region nav-item" data-audio="west coast zone.mp3" data-title="WEST COAST ZONE" data-loc="Penampang, Papar, KK, Tuaran, Kota Belud, Ranau" data-ethnic="Kadazan (Lowlands), Bajau Samah, Dusun (Tindal/Lotud sub-tribes)" data-img="https://cdn.bookatrekking.com/data/images/2020/02/shutterstock-586259927.jpg" d="M380,180 L480,220 L440,320 L350,420 L310,250 Z" />
+                <path class="region nav-item" data-audio="Interior Zone.mp3" data-title="INTERIOR ZONE" data-loc="Keningau, Tenom, Nabawan, Tambunan" data-ethnic="Murut (Highlands), Dusun (Liwan), Kadazan (Membakut)" data-img="https://sabahtourism.com/assets/uploads/RS528_LEE_0768E-1.jpg" d="M350,420 L230,490 L340,590 L450,460 L440,320 Z" />
+                <path class="region nav-item" data-audio="East Coast Zone.mp3" data-title="EAST COAST ZONE" data-loc="Sandakan, Kinabatangan, Beluran" data-ethnic="Suluk, Orang Sungai, Eastern Kadazan/Dusun" data-img="https://sandakan.rainforestlodge.com/cdn/shop/files/1b_sepilok-orang-utan-rehabilitation-centre-sandakan-amazing-borneo-2_1100x.jpg?v=1708671307" d="M480,220 L510,120 L650,200 L720,300 L600,380 L440,320 Z" />
+                <path class="region nav-item" data-audio="Northeast Zone.mp3" data-title="SECTOR NORTHEAST / SOUTHEAST" data-loc="Tawau, Semporna, Lahad Datu" data-ethnic="Bugis, Bajau Laut (Sea Bajau), Suluk" data-img="https://www.ontourmalaysia.com/wp-content/uploads/2022/03/island-hopping-semporna-day-trip.jpg" d="M600,380 L720,300 L780,400 L700,560 L510,590 L450,460 L440,320 Z" />
+            </svg>
+
+            <div class="data-hud" id="hud">
+                <div class="hud-img-wrap">
+                    <button class="hud-close-btn nav-item" onclick="closeHUD()">X</button>
+                    <div class="hud-img" id="hud-img"></div>
+                </div>
+                <div class="hud-content">
+                    <h2 id="hud-title">SCANNING...</h2>
+                    <p id="hud-loc" style="color:var(--accent); font-weight:700; margin-bottom:4px;"></p>
+                    <p id="hud-ethnic"></p>
+                    <button id="hud-play-btn" class="hud-audio-btn nav-item">PLAY SECTOR AUDIO</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <aside class="ai-sidebar" id="aiSidebarFrame">
+        <div class="ai-terminal-header">
+            <h3>HERITAGE_CORE_AI</h3>
+            <div class="ai-status" id="aiStatusBlock">
+                <div class="ai-status-dot" id="aiStatusDot"></div>
+                <span id="aiStatusText">ONLINE</span>
+            </div>
+        </div>
+        <div class="ai-chat-body" id="aiChatBody">
+            <div class="chat-msg bot">Systems online. Click directly on any sector of the map to open up its parameters and play its localized audio recording.</div>
+        </div>
+        <div class="ai-input-wrapper">
+            <input type="text" class="ai-input" id="aiInput" placeholder="Query Kadazan outfit, zones, Bugis celebration..." onkeydown="if(event.key === 'Enter') executeAIQuery()">
+            <div class="ai-actions">
+                <span class="ai-hint">[ENTER TO SCAN]</span>
+                <div class="ai-btn-group">
+                    <button class="new-session-btn nav-item" onclick="resetAISession()">NEW_SESSION</button>
+                    <button class="ai-execute-btn nav-item" onclick="executeAIQuery()">EXECUTE</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        const containerFrame = document.getElementById('interactive-frame');
+        const needleBox = document.getElementById('needle-box');
+        const hud = document.getElementById('hud');
+        const playBtn = document.getElementById('hud-play-btn');
+        const clock = document.getElementById('clock');
+        const audioUiStatus = document.getElementById('audio-ui-status');
+        let standardDeviceGyro = false;
+        
+        let activeAudioEngine = null;
+        let currentAudioFile = ""; 
+
+        function updateClock() { clock.innerText = new Date().toLocaleTimeString('en-GB', { hour12: false }); }
+        setInterval(updateClock, 1000);
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        }
+
+        function resetAISession() {
+            const chatBody = document.getElementById('aiChatBody');
+            chatBody.innerHTML = ''; 
+            let rebootMsg = document.createElement('div');
+            rebootMsg.className = 'chat-msg bot';
+            rebootMsg.innerText = "Data log buffer successfully cleared. Neural workspace rebooted.\n\nAwaiting isolated structural query inputs...";
+            chatBody.appendChild(rebootMsg);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // --- SABAH HERITAGE DETAILED KNOWLEDGE DATABASE MATRIX ---
+        const CULTURAL_DATABASE = {
+            districts: {
+                "sandakan": { zone: "EAST COAST ZONE", ethnic: "Orang Sungai, Suluk, and Eastern Kadazan/Dusun" },
+                "beluran": { zone: "EAST COAST ZONE", ethnic: "Orang Sungai and Tidong" },
+                "kinabatangan": { zone: "EAST COAST ZONE", ethnic: "Orang Sungai (River People)" },
+                "semporna": { zone: "NORTHEAST / SOUTHEAST ZONE (Maritime Domain)", ethnic: "Bajau Laut (Sea Bajau) and Suluk" },
+                "tawau": { zone: "NORTHEAST / SOUTHEAST ZONE (Maritime Domain)", ethnic: "Bugis, Tidong, and Bajau" },
+                "lahad datu": { zone: "NORTHEAST / SOUTHEAST ZONE (Maritime Domain)", ethnic: "Suluk, Bajau, and Idahan" },
+                "tuaran": { zone: "WEST COAST ZONE", ethnic: "Dusun (Lotud sub-tribe) and Bajau Samah" },
+                "penampang": { zone: "WEST COAST ZONE", ethnic: "Kadazan (Lowland Plains)" },
+                "papar": { zone: "WEST COAST ZONE", ethnic: "Kadazan and Bajau Samah" },
+                "kota kinabalu": { zone: "WEST COAST ZONE", ethnic: "Kadazan, Bajau, and Chinese-Sabahan" },
+                "putatan": { zone: "WEST COAST ZONE", ethnic: "Kadazan and Bruneian Malay" },
+                "kota belud": { zone: "WEST COAST ZONE", ethnic: "Bajau Samah (famous horsemen) and Dusun (Tindal)" },
+                "ranau": { zone: "WEST COAST ZONE / HIGHLANDS", ethnic: "Dusun (Bundu and Liwan sub-tribes)" },
+                "keningau": { zone: "INTERIOR ZONE", ethnic: "Dusun (Liwan) and Murut" },
+                "tenom": { zone: "INTERIOR ZONE", ethnic: "Murut (Timugon and Tagol sub-tribes)" },
+                "nabawan": { zone: "INTERIOR ZONE", ethnic: "Murut (Tagol)" },
+                "tambunan": { zone: "INTERIOR ZONE", ethnic: "Dusun (Liwan and Tuhawon)" },
+                "beaufort": { zone: "INTERIOR ZONE / SOUTHWEST", ethnic: "Bisaya, Kedayan, and Bruneian Malay" },
+                "kudat": { zone: "NORTHERN ZONE", ethnic: "Rungus" },
+                "kota marudu": { zone: "NORTHERN ZONE", ethnic: "Dusun (Tobilung) and Rungus" },
+                "pitas": { zone: "NORTHERN ZONE", ethnic: "Rungus and Tombonuo" }
+            },
+            zones: {
+                "west coast": "WEST COAST ZONE:\n• Districts: Penampang, Papar, Putatan, Kota Kinabalu, Tuaran, Kota Belud, Ranau.\n• Key Ethnics: Kadazan, Bajau Samah, Dusun (Tindal/Lotud).",
+                "interior": "INTERIOR ZONE:\n• Districts: Tenom, Keningau, Nabawan, Tambunan, Beaufort.\n• Key Ethnics: Murut, Dusun (Liwan), Bisaya.",
+                "northern": "NORTHERN ZONE:\n• Districts: Kudat, Kota Marudu, Pitas.\n• Key Ethnics: Rungus, Dusun (Tobilung).",
+                "east coast": "EAST COAST ZONE:\n• Districts: Sandakan, Beluran, Kinabatangan.\n• Key Ethnics: Orang Sungai, Suluk, Eastern Kadazan/Dusun.",
+                "southeast": "NORTHEAST / SOUTHEAST ZONE:\n• Districts: Semporna, Tawau, Lahad Datu.\n• Key Ethnics: Bajau Laut, Bugis, Suluk."
+            },
+            ethnicData: {
+                "kadazan": {
+                    outfit: "Sinuaga: A midnight-black velvet crop blouse paired with an ankle-length skirt ('Tapi'), beautifully embellished with gold embroidery braiding ('Siga') and authentic heavy chain belts made from real silver or brass coins ('Hompog'). Worn by Penampang Kadazan women.",
+                    food: "Hinava: Fresh raw solid white fish fillets (typically mackerel) cured completely cold via fresh lime juices, tossed together with grated 'Bambangan' wild ginger seeds, sliced shallots, and spicy bird's eye chilies.",
+                    celebration: "Pesta Kaamatan (Harvest Festival): Celebrated annually throughout May. It features the 'Unduk Ngadau' beauty pageant representing the sacrificial spirit of Huminodun, rhythmic 'Sumazau' dancing, and traditional rice wine ('Lihing')."
+                },
+                "dusun": {
+                    outfit: "Pakaian Tradisional Lotud / Tindal: Varied by sub-tribe. For instance, the Lotud outfit in Tuaran uses black linen decorated with intricate multi-colored needlework chain patterns and heavy multi-layered bead necklaces called 'Pinakol'.",
+                    food: "Bosou (Tonsom): A highly pungent fermented condiment created by mixing raw freshwater river fish or wild local meats with fresh white rice, rock salt, and grated wild 'Pangi' seed hulls which act as an organic preservative.",
+                    celebration: "Pesta Kaamatan: Celebrated comprehensively across upland agricultural communities to offer gratitude to the rice spirit ('Bambazon') for a fertile agricultural season."
+                },
+                "murut": {
+                    outfit: "Pinongkolo: Formed out of sturdy black cotton cloth dressed with geometric glass bead embroidery. Men wear a 'Sinuada' vest with long bird feathers tucked into their headgears, while women pair it with layered bead chains around their waist.",
+                    food: "Jeruk / Pinarasang: Fermented wild boar meat ('Sinalau') or wild river fish mixed with native jungle herbs and sealed inside sections of bamboo pipes to slow-cure over weeks.",
+                    celebration: "Pesta Kalimaran: Held annually in Tenom right after the lunar new year cycles. It honors Murut cultural arts, featuring traditional 'Magunatip' bamboo jumping dances and weapon crafting displays."
+                },
+                "bajau samah": {
+                    outfit: "Badu Sipak: A brilliant, bright satin or silk suit (often in yellow, green, or red) characterized by flared split sleeves ('Sipak') decorated with gold button highlights, worn gracefully alongside a matching hand-woven headpiece.",
+                    food: "Kuih Jala and Penjaram: Traditional sweet snacks made of rice flour and brown palm sugar syrup, deep-fried to create a crispy lace lattice net texture.",
+                    celebration: "Tamu Besar Kota Belud: A massive annual cultural gathering showcasing the skilled 'Cowboys of the East' riding highly decorated horses in full warrior outfits alongside matching traditional parasols."
+                },
+                "bajau laut": {
+                    outfit: "Lepa Dress: Lightweight, vibrant loose-fitting silk tunics designed for ease of movement along maritime vessels, accompanied by brass fingernail extensions ('Kuku') used for stylized sea-dance routines.",
+                    food: "Sagol / Kilau: Sea-fish dish cooked where fish liver is mashed and combined into a spicy turmeric paste, served on top of grated cassava fibers ('Tapo').",
+                    celebration: "Regatta Lepa: Celebrated every April in Semporna. Dozens of traditional wooden sailing boats ('Lepa') are dressed in brilliant primary-colored banners ('Sambulayang') competing for the title of most beautiful vessel."
+                },
+                "bugis": {
+                    outfit: "Baju Bodo: A traditional sheer, structured gauze blouse made from woven fibers, paired with a matching plaid-patterned 'Sarung' silk skirt wrapped tightly at the lower hips.",
+                    food: "Burasa: Rich glutinous rice grains packed cleanly inside green banana leaf wrappers, pre-soaked and boiled for hours in heavy coconut milk extract.",
+                    celebration: "Hari Raya and Wedding Pageantry: Celebrated through ancestral 'Pesta Adat' traditions highlighting high-class dowry distributions and traditional instruments."
+                },
+                "rungus": {
+                    outfit: "Sukub: Hand-woven black warp-cotton textiles dominated by elaborate, geometric multi-layer beadworks ('Pinakol' cross-bands) and heavy brass heavy rings coiled around their arms and necks.",
+                    food: "Tinamba: Local wild yams and hill rice steamed slowly inside local aromatic jungle leaves along with wild river crabs.",
+                    celebration: "Pesta Gendang Rungus: Celebrated inside traditional communal Longhouses with traditional gong sets to mark a prosperous agricultural cycle."
+                }
+            }
+        };
+
+        // --- INTELLIGENT ROUTING PARSING ENGINE ---
+        function executeAIQuery() {
+            const input = document.getElementById('aiInput');
+            const chatBody = document.getElementById('aiChatBody');
+            const statusText = document.getElementById('aiStatusText');
+            const statusDot = document.getElementById('aiStatusDot');
+            
+            const promptText = input.value.trim();
+            if(!promptText) return;
+
+            let userMsg = document.createElement('div');
+            userMsg.className = 'chat-msg user';
+            userMsg.innerText = promptText;
+            chatBody.appendChild(userMsg);
+
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            statusText.innerText = "THINKING";
+            statusDot.className = "ai-status-dot thinking";
+
+            let botMsg = document.createElement('div');
+            botMsg.className = 'chat-msg bot';
+            botMsg.innerText = "Scanning subset arrays...";
+            chatBody.appendChild(botMsg);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            const q = promptText.toLowerCase();
+
+            setTimeout(() => {
+                let responseText = "";
+
+                // 1. EVALUATE DISTRICT DIRECT QUERY
+                let matchedDistrict = null;
+                for (let district in CULTURAL_DATABASE.districts) {
+                    if (q.includes(district)) {
+                        matchedDistrict = district;
+                        break;
+                    }
+                }
+
+                if (matchedDistrict) {
+                    const dData = CULTURAL_DATABASE.districts[matchedDistrict];
+                    responseText = `DISTRICT NODE SCAN [${matchedDistrict.toUpperCase()}]:\n• Located within: ${dData.zone}\n• Principal Populations: ${dData.ethnic}`;
+                    
+                    if (q.includes('zone') || q.includes('wilayah')) {
+                        const zoneKey = dData.zone.toLowerCase().replace(' zone', '').split(' / ')[0];
+                        if (CULTURAL_DATABASE.zones[zoneKey]) {
+                            responseText += `\n\n${CULTURAL_DATABASE.zones[zoneKey]}`;
+                        }
+                    }
+                    
+                    botMsg.innerText = responseText;
+                    finalizeBotResponse();
+                    return;
+                }
+
+                // 2. EVALUATE ZONE DIRECT QUERY
+                let matchedZone = null;
+                for (let zone in CULTURAL_DATABASE.zones) {
+                    if (q.includes(zone)) {
+                        matchedZone = zone;
+                        break;
+                    }
+                }
+                if (matchedZone && (q.includes('zone') || q.includes('where') || q.includes('wilayah') || q.includes('daerah'))) {
+                    botMsg.innerText = CULTURAL_DATABASE.zones[matchedZone];
+                    finalizeBotResponse();
+                    return;
+                }
+
+                // 3. EVALUATE ETHNIC SUBSET QUERY (FOOD / OUTFIT / CELEBRATION)
+                let matchedEthnic = null;
+                if (q.includes('samah')) matchedEthnic = "bajau samah";
+                else if (q.includes('laut') || (q.includes('bajau') && q.includes('sea'))) matchedEthnic = "bajau laut";
+                else if (q.includes('kadazan')) matchedEthnic = "kadazan";
+                else if (q.includes('dusun')) matchedEthnic = "dusun";
+                else if (q.includes('murut')) matchedEthnic = "murut";
+                else if (q.includes('bugis')) matchedEthnic = "bugis";
+                else if (q.includes('rungus')) matchedEthnic = "rungus";
+
+                if (matchedEthnic) {
+                    const eth = CULTURAL_DATABASE.ethnicData[matchedEthnic];
+                    const isFood = q.includes('food') || q.includes('makanan') || q.includes('eat') || q.includes('hinava') || q.includes('bosou') || q.includes('burasa');
+                    const isOutfit = q.includes('outfit') || q.includes('costume') || q.includes('clothing') || q.includes('baju') || q.includes('pakaian') || q.includes('sinuaga');
+                    const isCelebration = q.includes('celebration') || q.includes('festival') || q.includes('perayaan') || q.includes('pesta') || q.includes('kaamatan') || q.includes('lepa') || q.includes('kalimaran');
+
+                    if (isFood) {
+                        responseText = `CULINARY REGISTRY [${matchedEthnic.toUpperCase()}]:\n• ${eth.food}`;
+                    } else if (isOutfit) {
+                        responseText = `TRADITIONAL ATTIRE REGISTRY [${matchedEthnic.toUpperCase()}]:\n• ${eth.outfit}`;
+                    } else if (isCelebration) {
+                        responseText = `FESTIVAL CELEBRATION REGISTRY [${matchedEthnic.toUpperCase()}]:\n• ${eth.celebration}`;
+                    } else {
+                        responseText = `ETHNIC CLASSIFICATION DATA [${matchedEthnic.toUpperCase()}]:\n\n` +
+                                       `• CELEBRATION: ${eth.celebration}\n\n` +
+                                       `• ATTIRE: ${eth.outfit}\n\n` +
+                                       `• CULINARY: ${eth.food}`;
+                    }
+                    
+                    botMsg.innerText = responseText;
+                    finalizeBotResponse();
+                    return;
+                }
+
+                // 4. BALANCING GLOBAL FAILSAFE ROUTING
+                const globalScopeTokens = ['sabah', 'borneo', 'tarian', 'dance', 'tamu', 'district', 'location'];
+                const isSabahRelated = globalScopeTokens.some(token => q.includes(token)) || q.includes('zone') || q.includes('celebration') || q.includes('food') || q.includes('outfit');
+
+                if (!isSabahRelated) {
+                    botMsg.innerText = "Please target your search to specific parameters (e.g., 'Semporna zone', 'Kadazan outfit', 'Murut food', 'Sandakan ethnic groups').";
+                } else {
+                    botMsg.innerText = "System processing parameters returned too many matches. Please define your target clearer:\n\n" +
+                                       "• For places: Try checking 'Sandakan', 'Semporna', or 'Tuaran'.\n" +
+                                       "• For cultural parameters: Specify ethnicity + 'outfit', 'food', or 'celebration'.";
+                }
+                
+                finalizeBotResponse();
+            }, 450);
+
+            function finalizeBotResponse() {
+                statusText.innerText = "ONLINE";
+                statusDot.className = "ai-status-dot";
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        }
+
+        // --- ABSOLUTE INTERACTIVE SVG HUD MAP LOGIC ---
+        document.querySelectorAll('.region').forEach(path => {
+            path.addEventListener('click', function() {
+                const title = this.getAttribute('data-title');
+                const loc = this.getAttribute('data-loc');
+                const ethnic = this.getAttribute('data-ethnic');
+                const img = this.getAttribute('data-img');
+                const audioFile = this.getAttribute('data-audio');
+
+                document.getElementById('sector-name').innerText = title;
+                document.getElementById('hud-title').innerText = title;
+                document.getElementById('hud-loc').innerText = "DISTRICTS: " + loc;
+                document.getElementById('hud-ethnic').innerText = "DOMINANT ETHNICITIES: " + ethnic;
+                document.getElementById('hud-img').style.backgroundImage = `url('${img}')`;
+
+                hud.classList.add('active');
+                currentAudioFile = audioFile;
+
+                playBtn.innerText = "PLAY SECTOR AUDIO";
+            });
+        });
+
+        function closeHUD() {
+            hud.classList.remove('active');
+            stopAudioStream();
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (!currentAudioFile) return;
+
+            if (activeAudioEngine && !activeAudioEngine.paused) {
+                stopAudioStream();
+                playBtn.innerText = "PLAY SECTOR AUDIO";
+            } else {
+                startAudioStream(currentAudioFile);
+                playBtn.innerText = "STOP SECTOR AUDIO";
+            }
+        });
+
+        function startAudioStream(file) {
+            stopAudioStream();
+            activeAudioEngine = new Audio(file);
+            activeAudioEngine.loop = true;
+            activeAudioEngine.play().then(() => {
+                audioUiStatus.classList.add('playing');
+            }).catch(e => console.log("Audio pipeline initialization halted:", e));
+        }
+
+        function stopAudioStream() {
+            if (activeAudioEngine) {
+                activeAudioEngine.pause();
+                activeAudioEngine = null;
+            }
+            audioUiStatus.classList.remove('playing');
+            playBtn.innerText = "PLAY SECTOR AUDIO";
+        }
+
+        // --- COMPASS & INTERACTIVE HOLOGRAPHIC MOUSE ENGINE ---
+        document.addEventListener('mousemove', (e) => {
+            const c = document.getElementById('c');
+            const cr = document.getElementById('cr');
+            c.style.left = e.clientX + 'px';
+            c.style.top = e.clientY + 'px';
+            cr.style.left = e.clientX + 'px';
+            cr.style.top = e.clientY + 'px';
+
+            const xNorm = (e.clientX / window.innerWidth) - 0.5;
+            const yNorm = (e.clientY / window.innerHeight) - 0.5;
+            containerFrame.style.transform = `rotateY(${xNorm * 10}deg) rotateX(${-yNorm * 10}deg)`;
+
+            const angleRad = Math.atan2(e.clientY - (window.innerHeight/2), e.clientX - (window.innerWidth/3));
+            const angleDeg = angleRad * (180 / Math.PI) + 90;
+            if(!standardDeviceGyro) {
+                needleBox.style.transform = `rotate(${angleDeg}deg)`;
+            }
+        });
+
+        function initGyro() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(permissionState => {
+                    if (permissionState === 'granted') {
+                        standardDeviceGyro = true;
+                        window.addEventListener('deviceorientation', (e) => {
+                            const heading = e.webkitCompassHeading || (360 - e.alpha);
+                            needleBox.style.transform = `rotate(${heading}deg)`;
+                        });
+                    }
+                });
+            } else {
+                alert("Internal Hardware Sensors not registered on system platform. Falling back to mouse tracker matrix.");
+            }
+        }
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('mouseenter', () => document.body.classList.add('nav-hovering'));
+            item.addEventListener('mouseleave', () => document.body.classList.remove('nav-hovering'));
+        });
+    </script>
+</body>
+</html>
