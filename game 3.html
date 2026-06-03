@@ -214,6 +214,7 @@
             backdrop-filter: blur(10px);
         }
 
+        /* Mobile Leaderboard Panel: Hidden natively during active gameplay match states */
         .mobile-score-container {
             display: none;
             margin: 15px 0;
@@ -263,7 +264,6 @@
             .site-nav { padding: 0 20px; height: 70px; }
             .logo-box h1 { font-size: 11px; letter-spacing: 2px; }
 
-            /* Navigation link list forces clean standard hamburger overlay */
             .hamburger { display: flex; }
             
             .nav-menu {
@@ -295,7 +295,6 @@
             .swap-mode-btn { padding: 4px 10px; font-size: 9px; }
             #digital-clock { padding-left: 12px; font-size: 11px; }
 
-            /* Grid Area Responsive Restructuring */
             .game-container { 
                 grid-template-columns: 1fr; 
                 margin-top: 70px; 
@@ -309,7 +308,7 @@
             .game-area { height: 100%; display: flex; flex-direction: column; }
             .stats-bar { margin-bottom: 10px; font-size: 10px; text-align: center; }
 
-            /* Flawless 3x4 layout setup preventing any offscreen content scroll */
+            /* Balanced 3x4 Layout Structure Grid Arena */
             .game-grid {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
@@ -320,11 +319,12 @@
             .card { height: 100%; width: 100%; }
             .card-front img { max-width: 90%; max-height: 90%; }
             
-            /* Overlays Fitting Optimization */
             .overlay { padding: 10px; overflow-y: auto; }
             .panel { padding: 30px 20px; max-width: 380px; }
             
-            .mobile-score-container { display: block; }
+            /* Displays leaderboard inside win overlay exclusively when match concludes */
+            #win-overlay .mobile-score-container { display: block; }
+            
             .action-btn { padding: 10px 20px; font-size: 9px; margin-top: 10px; }
             input { margin-bottom: 15px; padding: 8px; }
         }
@@ -550,7 +550,7 @@
         const isMobile = window.innerWidth <= 1100;
 
         if (isMobile) {
-            targetMatches = 6; // 6 random unique pairs generates a clean 12-card desktop grid array
+            targetMatches = 6; 
             document.getElementById('total-matches-label').innerText = "6";
             
             let shuffledItems = [...items].sort(() => Math.random() - 0.5);
@@ -561,7 +561,7 @@
                 deck.push({ name: x.n, val: `<img src="${x.i}">` });
             });
         } else {
-            targetMatches = 12; // Static full portfolio library asset set for full desktop monitor aspect ratios
+            targetMatches = 12; 
             document.getElementById('total-matches-label').innerText = "12";
             items.forEach(x => {
                 deck.push({ name: x.n, val: `<img src="${x.i}">` });
