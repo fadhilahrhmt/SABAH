@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Hub | Sabah Heritage Archive</title>
+    <title>Gallery | Sabah Heritage Archive</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
@@ -27,30 +27,38 @@
             --glass-border: rgba(0, 0, 0, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        html, body { cursor: none; }
+        a, button { cursor: none; }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: var(--font-main);
             min-height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
             transition: background 0.4s ease;
         }
 
-        /* 1. UNIFIED NAVIGATION BAR */
+        /* NAVIGATION BAR */
         .site-nav {
-            position: fixed; top: 0; width: 100%; height: 80px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 50px; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
-            z-index: 5000;
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            min-height: 80px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 0 50px; 
+            background: var(--nav-bg); 
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 9999; /* Forces navbar completely above gallery containers */
         }
 
         .logo-box h1 { font-family: var(--font-heading); font-size: 14px; letter-spacing: 4px; }
         
-        .nav-menu { display: flex; gap: 30px; list-style: none; }
+        .nav-menu { display: flex; gap: 30px; list-style: none; align-items: center; }
         .nav-menu a { 
             color: var(--text-color); text-decoration: none; font-size: 11px; 
             opacity: 0.6; transition: 0.3s; text-transform: uppercase; font-weight: 700;
@@ -59,18 +67,16 @@
 
         .nav-right { display: flex; align-items: center; gap: 25px; }
         
-        /* MODE SWAP BUTTON */
         .swap-mode-btn {
-            background: none;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            padding: 5px 15px;
-            font-size: 10px;
+            background: none; 
+            border: 1px solid var(--accent-color); 
+            color: var(--accent-color); 
+            padding: 5px 15px; 
+            font-size: 10px; 
             font-family: var(--font-main);
-            cursor: pointer;
             transition: background 0.3s ease, color 0.3s ease;
         }
-
+        
         .swap-mode-btn:hover {
             background: var(--accent-color);
             color: var(--bg-color);
@@ -78,147 +84,162 @@
 
         #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent-color); border-left: 1px solid var(--glass-border); padding-left: 20px; }
 
-        /* 2. GAME HUB INTERFACE */
-        .hub-viewport {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 100px 5vw 0;
-            z-index: 5;
-            position: relative;
+        /* MOBILE MENU TOGGLE ICON BUTTON */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-family: var(--font-main);
+            font-size: 16px;
+            padding: 5px 12px;
         }
 
-        .hub-header {
+        /* GALLERY INTRO */
+        .gallery-intro {
             text-align: center;
-            margin-bottom: 50px;
+            padding: 160px 20px 60px;
         }
-
-        .hub-header h1 {
+        .gallery-intro h1 {
             font-family: var(--font-heading);
-            font-size: clamp(1.2rem, 3vw, 2rem);
-            letter-spacing: 12px;
-            color: var(--text-color);
-            margin-bottom: 15px;
-        }
-
-        .hub-header p {
-            font-size: 10px;
-            opacity: 0.5;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        /* Technical Bento Grid */
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        .game-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            padding: 40px;
-            text-decoration: none;
-            color: var(--text-color);
-            position: relative;
-            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 350px;
-        }
-
-        /* Tactical Accents */
-        .card-glitch {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 2px;
-            background: var(--accent-color);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: 0.4s;
-        }
-
-        .game-card:hover {
-            background: rgba(212, 175, 89, 0.05);
-            border-color: var(--accent-color);
-            transform: translateY(-10px);
-        }
-
-        .game-card:hover .card-glitch { transform: scaleX(1); }
-
-        .game-id {
-            font-size: 9px;
-            color: var(--accent-color);
-            letter-spacing: 2px;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            letter-spacing: 8px;
             margin-bottom: 20px;
-            font-weight: 700;
+            color: var(--text-color);
         }
-
-        .game-title {
-            font-family: var(--font-heading);
-            font-size: 18px;
-            letter-spacing: 3px;
-            line-height: 1.4;
-            margin-bottom: 15px;
-        }
-
-        .game-desc {
+        .gallery-intro p {
             font-size: 10px;
-            line-height: 1.8;
-            opacity: 0.6;
+            letter-spacing: 3px;
+            opacity: 0.5;
             text-transform: uppercase;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .btn-start {
-            margin-top: 30px;
-            font-size: 9px;
-            letter-spacing: 4px;
-            font-weight: 700;
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: 0.3s;
-        }
-
-        .btn-start::after {
-            content: '→';
-            transition: 0.3s;
-        }
-
-        .game-card:hover .btn-start {
+        /* GALLERY GRID */
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto 100px;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 25px;
+            position: relative;
+            z-index: 5;
         }
 
-        /* 3. BACKGROUND EFFECTS */
-        .grain {
-            position: fixed; inset: 0;
-            background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.04; pointer-events: none; z-index: 100;
+        .gallery-item {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+            aspect-ratio: 16 / 10;
+            border: 1px solid var(--glass-border);
+            transition: border-color 0.4s;
+            text-decoration: none;
         }
 
+        .gallery-item:hover { border-color: var(--accent-color); }
+
+        .img-wrapper {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+        }
+
+        .zone-img {
+            width: 120%; 
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            filter: grayscale(100%);
+            transform: translateX(-10%);
+            transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s, filter 0.6s;
+        }
+
+        .gallery-item:hover .zone-img {
+            transform: translateX(0%) scale(1.1); 
+            opacity: 0.9;
+            filter: grayscale(0%);
+        }
+
+        .item-overlay {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 25px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%);
+            z-index: 10;
+        }
+
+        .item-overlay span { color: var(--accent-color); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+        .item-overlay h2 { font-family: var(--font-heading); color: #fff; font-size: 14px; letter-spacing: 2px; }
+
+        /* GRID BACKGROUND */
         .grid-bg {
             position: fixed; inset: 0;
             background-image: linear-gradient(var(--glass-border) 1px, transparent 1px),
                               linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
-            background-size: 60px 60px; z-index: 1; pointer-events: none;
+            background-size: 60px 60px; z-index: -1; pointer-events: none;
             opacity: 0.3;
         }
 
-        /* 4. CURSOR SYSTEM */
-        #cursor { width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 6000; }
-        #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 5999; transition: 0.1s ease-out; }
+        #cursor { width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 6000; transform: translate3d(0,0,0); }
+        #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 5999; transition: 0.1s ease-out; transform: translate3d(0,0,0); }
 
-        @media (max-width: 1000px) {
-            .game-grid { grid-template-columns: 1fr; }
-            .hub-viewport { padding-top: 120px; overflow-y: auto; }
-            body { overflow-y: auto; }
+        /* --- RESPONSIVE OVERRIDES --- */
+        @media (max-width: 991px) {
+            html, body, a, button { cursor: auto !important; }
+            #cursor, #cursor-follower { display: none !important; }
+            
+            .site-nav { 
+                padding: 15px 24px; 
+                height: auto;
+            }
+            
+            .mobile-menu-toggle { 
+                display: block; 
+            }
+            
+            /* Responsive Dropdown Menu Block */
+            .nav-menu {
+                position: absolute;
+                top: 100%; /* Spawns exactly below header box border line */
+                left: 0;
+                width: 100%;
+                background: var(--nav-bg);
+                border-bottom: 1px solid var(--glass-border);
+                flex-direction: column;
+                gap: 0;
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-out;
+            }
+            
+            .nav-menu.mobile-active { 
+                max-height: 400px; /* Expands dynamically smoothly */
+            }
+            
+            .nav-menu li { 
+                width: 100%; 
+            }
+            
+            .nav-menu a { 
+                display: block; 
+                padding: 16px 24px; 
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+                width: 100%;
+            }
+            
+            #digital-clock { display: none; } /* Drop clock framework on tablet viewports */
+            .gallery-container { padding: 0 24px; grid-template-columns: 1fr; }
+            .zone-img { opacity: 0.7; filter: grayscale(20%); }
+        }
+        
+        @media (max-width: 480px) {
+            .site-nav { padding: 12px 16px; }
+            .logo-box h1 { font-size: 11px; letter-spacing: 2px; }
+            .gallery-intro { padding: 140px 16px 40px; }
+            .gallery-intro h1 { font-size: 22px; letter-spacing: 4px; }
         }
     </style>
 </head>
@@ -226,98 +247,115 @@
 
     <div id="cursor"></div>
     <div id="cursor-follower"></div>
-    <div class="grain"></div>
     <div class="grid-bg"></div>
 
     <nav class="site-nav">
         <div class="logo-box"><h1>SABAH_HERITAGE</h1></div>
-        <ul class="nav-menu">
+        <ul class="nav-menu" id="navMenu">
             <li><a href="index.html">Home</a></li>
             <li><a href="explore.html">Explore</a></li>
-            <li><a href="gallery.html">Gallery</a></li>
-            <li><a href="game.html" class="active">Game</a></li>
+            <li><a href="gallery.html" class="active">Gallery</a></li>
+            <li><a href="game.html">Game</a></li>
             <li><a href="about.html">About</a></li>
         </ul>
         <div class="nav-right">
             <button onclick="toggleTheme()" class="swap-mode-btn">MODE_SWAP</button>
             <div id="digital-clock">00:00:00</div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" id="menuToggleBtn">☰</button>
         </div>
     </nav>
 
-    <main class="hub-viewport">
-        <div class="hub-header">
-            <h1>CHOOSE_YOUR_QUEST</h1>
-            <p>Active Simulation: Cultural Heritage Restoration Protocols</p>
-        </div>
+    <div class="gallery-intro">
+        <h1>REGIONAL_DATA_LOG</h1>
+        <p>Tactical visual records of Sabah's 5 demographic zones. Hover to scan.</p>
+    </div>
 
-        <div class="game-grid">
-            <a href="game 2.html" class="game-card">
-                <div class="card-glitch"></div>
-                <div>
-                    <div class="game-id">LOG_01 // COGNITIVE</div>
-                    <h3 class="game-title">HERITAGE<br>MATCH</h3>
-                    <p class="game-desc">Test visual memory. Synchronize ancestral symbols across Sabah's ethnic divisions.</p>
-                </div>
-                <div class="btn-start">INITIALIZE_QUEST</div>
-            </a>
+    <div class="gallery-container">
+        <a href="kadazan.html" class="gallery-item">
+            <div class="img-wrapper">
+                <img src="https://sabah.gov.my/sites/default/files/inline-images/traditional-attire-people.jpg" class="zone-img" alt="West Coast">
+            </div>
+            <div class="item-overlay">
+                <span>ZONE_01 // KADAZAN-DUSUN</span>
+                <h2>WEST COAST ZONE</h2>
+            </div>
+        </a>
 
-            <a href="game 3.html" class="game-card">
-                <div class="card-glitch"></div>
-                <div>
-                    <div class="game-id">LOG_02 // GEOMETRIC</div>
-                    <h3 class="game-title">WOVEN<br>ROOTS</h3>
-                    <p class="game-desc">Restore digital textile patterns. A meditative reconstruction of Kadazan geometric art.</p>
-                </div>
-                <div class="btn-start">INITIALIZE_QUEST</div>
-            </a>
+        <a href="murut.html" class="gallery-item">
+            <div class="img-wrapper">
+                <img src="https://www.mysabah.com/wordpress/wp-content/uploads/2009/04/Murut-Kalimaran-Festival.jpg" class="zone-img" alt="Interior">
+            </div>
+            <div class="item-overlay">
+                <span>ZONE_02 // MURUT</span>
+                <h2>INTERIOR ZONE</h2>
+            </div>
+        </a>
 
-            <a href="game 4.html" class="game-card">
-                <div class="card-glitch"></div>
-                <div>
-                    <div class="game-id">LOG_03 // RESOURCE</div>
-                    <h3 class="game-title">SACRED<br>HARVEST</h3>
-                    <p class="game-desc">Real-time preservation simulation. Protect the land's bounty in the valleys of Ranau.</p>
-                </div>
-                <div class="btn-start">INITIALIZE_QUEST</div>
-            </a>
-        </div>
-    </main>
+        <a href="bajau.html" class="gallery-item">
+            <div class="img-wrapper">
+                <img src="https://media-perpaduan.com/wp-content/uploads/2023/11/img_1139-2-1.jpg" class="zone-img" alt="East Coast">
+            </div>
+            <div class="item-overlay">
+                <span>ZONE_03 // BAJAU</span>
+                <h2>EAST COAST ZONE</h2>
+            </div>
+        </a>
+    </div>
 
     <script>
-        // CLOCK SYSTEM
         function updateClock() {
             const now = new Date();
-            document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            const clockEl = document.getElementById('digital-clock');
+            if (clockEl) {
+                clockEl.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            }
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // THEME SYSTEM
         function toggleTheme() {
             const current = document.documentElement.getAttribute('data-theme');
             document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         }
 
-        // CURSOR SYSTEM
+        function toggleMobileMenu() {
+            const menu = document.getElementById('navMenu');
+            const btn = document.getElementById('menuToggleBtn');
+            menu.classList.toggle('mobile-active');
+            if(menu.classList.contains('mobile-active')) {
+                btn.innerText = '✕';
+            } else {
+                btn.innerText = '☰';
+            }
+        }
+
+        // Custom Mouse Pointer Fallbacks
         const cursor = document.getElementById('cursor');
         const follower = document.getElementById('cursor-follower');
+        let isTouchDevice = false;
+
+        window.addEventListener('touchstart', function onFirstTouch() {
+            isTouchDevice = true;
+            if(cursor) cursor.style.display = 'none';
+            if(follower) follower.style.display = 'none';
+            window.removeEventListener('touchstart', onFirstTouch, false);
+        }, false);
 
         document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            follower.style.left = (e.clientX - 20) + 'px';
-            follower.style.top = (e.clientY - 20) + 'px';
+            if (!isTouchDevice && window.innerWidth > 991) {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                follower.style.left = (e.clientX - 20) + 'px';
+                follower.style.top = (e.clientY - 20) + 'px';
+            }
         });
 
-        // HOVER EFFECTS
-        document.querySelectorAll('.game-card, .nav-menu a, button').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                follower.style.transform = 'scale(1.8)';
-                follower.style.background = 'rgba(212, 175, 55, 0.1)';
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                if(!isTouchDevice && window.innerWidth > 991) follower.style.transform = 'scale(1.5)';
             });
-            el.addEventListener('mouseleave', () => {
-                follower.style.transform = 'scale(1)';
-                follower.style.background = 'transparent';
+            item.addEventListener('mouseleave', () => {
+                if(!isTouchDevice && window.innerWidth > 991) follower.style.transform = 'scale(1)';
             });
         });
     </script>
