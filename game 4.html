@@ -44,7 +44,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: background 0.4s ease, color 0.4s ease;
+            transition: background var 0.4s ease, color 0.4s ease;
         }
 
         /* --- UNIFIED NAVIGATION --- */
@@ -82,6 +82,30 @@
 
         #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent-color); border-left: 1px solid var(--glass-border); padding-left: 20px; }
 
+        /* --- HAMBURGER STYLES --- */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 22px;
+            height: 16px;
+            background: transparent;
+            border: none;
+            z-index: 5500;
+        }
+        .menu-toggle span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background-color: var(--text-color);
+            transition: 0.3s transform ease, 0.3s opacity ease;
+        }
+
+        /* Active Animated State for Hamburger Bars */
+        .menu-toggle.is-active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-toggle.is-active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.is-active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
         /* --- HIGHLY VISIBLE DYNAMIC LEADERBOARD --- */
         #ui-leaderboard {
             position: absolute; right: 30px; top: 100px; width: 280px;
@@ -104,6 +128,28 @@
             display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 1px;
             padding: 10px 0; border-bottom: 1px solid var(--glass-border); 
             font-weight: 700;
+        }
+
+        /* --- MOBILE EMBEDDED LEADERBOARD CONTAINER --- */
+        .mobile-scorecard-container {
+            display: none;
+            width: 100%;
+            max-width: 320px;
+            margin: 20px auto;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            text-align: left;
+        }
+        .mobile-scorecard-container h3 {
+            font-family: var(--font-heading);
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+            text-align: center;
         }
 
         /* --- GAME STAGE --- */
@@ -166,6 +212,7 @@
             background: var(--bg-color); border: 1px solid var(--accent-color);
             padding: 60px; text-align: center; max-width: 600px; position: relative;
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
+            max-height: 95vh; overflow-y: auto;
         }
 
         /* IMMUTABLE TRIBE DATASET OVERLAY */
@@ -216,6 +263,56 @@
         /* CURSOR */
         #cursor { width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 7000; }
         #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 6999; transition: 0.1s ease-out; }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 1100px) {
+            * { cursor: auto !important; }
+            #cursor, #cursor-follower { display: none !important; }
+
+            body { height: auto; min-height: 100vh; overflow-x: hidden; }
+            .site-nav { padding: 0 20px; height: 70px; }
+            .logo-box h1 { font-size: 11px; letter-spacing: 2px; }
+
+            /* Hide Sidebar Scoreboard on Mobile during core execution */
+            #ui-leaderboard { display: none !important; }
+
+            /* Reveal Mobile Overlay Score Container */
+            .mobile-scorecard-container { display: block; }
+
+            /* Navigation Links Restructured to full viewport slide-out drawer */
+            .menu-toggle { display: flex; }
+            .nav-menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 100%;
+                height: 100vh;
+                background: var(--nav-bg);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 40px;
+                z-index: 5001;
+                transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .nav-menu.is-active { right: 0; }
+            .nav-menu a { font-size: 16px; letter-spacing: 2px; }
+
+            .nav-right { gap: 15px; }
+            #digital-clock { padding-left: 10px; font-size: 11px; }
+            .swap-mode-btn { padding: 4px 10px; font-size: 9px; }
+
+            /* Scaled Components down for Touch Viewports */
+            #game-stage { margin-top: 70px; }
+            .stats-bar { left: 15px; top: 15px; font-size: 9px; padding: 8px 12px; }
+            #player-basket { width: 160px; height: 200px; }
+            .falling-item { width: 45px; height: 45px; }
+            
+            .modal-box { padding: 30px 20px; width: 90%; }
+            #mode-overlay .modal-box div { grid-template-columns: 1fr !important; gap: 10px; }
+            .tribe-card { padding: 15px; }
+            .action-btn { padding: 10px 20px; font-size: 10px; margin: 5px; }
+        }
     </style>
 </head>
 <body>
@@ -225,7 +322,7 @@
 
     <nav class="site-nav">
         <div class="logo-box"><h1>SABAH_ARCHIVE</h1></div>
-        <ul class="nav-menu">
+        <ul class="nav-menu" id="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="explore.html">Explore</a></li>
             <li><a href="gallery.html">Gallery</a></li>
@@ -235,6 +332,11 @@
         <div class="nav-right">
             <button class="swap-mode-btn" onclick="toggleTheme()">MODE_SWAP</button>
             <div id="digital-clock">00:00:00</div>
+            <button class="menu-toggle" id="mobile-hamburger" onclick="toggleMobileNav()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
@@ -282,8 +384,13 @@
     <div id="result-overlay" class="overlay">
         <div class="modal-box">
             <h2 id="result-title" style="font-family: var(--font-heading); color: #ff4d4d; font-size: 20px;">CONNECTION_LOST</h2>
-            <p id="result-desc" style="font-size: 14px; margin: 20px 0;"></p>
+            <p id="result-desc" style="font-size: 14px; margin: 20px 0; white-space: pre-line;"></p>
             
+            <div class="mobile-scorecard-container">
+                <h3>// SYSTEM_RECORDS</h3>
+                <div id="mobile-leaderboard-content"></div>
+            </div>
+
             <div id="name-input-container" style="display:none; flex-direction: column;">
                 <p style="color: var(--accent-color); font-size: 10px; margin-bottom: 10px;">NEW ARCHIVE RECORD DETECTED</p>
                 <input type="text" id="player-name-field" placeholder="ENTER_ID" maxlength="10">
@@ -311,6 +418,19 @@
         bajau:   { bg: 'bajau-bg.jpg',  item: 'fish.png',  char: 'b.png', boxBg: 'rgba(10, 24, 28, 0.92)', glow: 'rgba(0, 180, 216, 0.4)' },
         murut:   { bg: 'murut-bg.jpg',  item: 'bamboo.png',char: 'm.png', boxBg: 'rgba(20, 14, 10, 0.92)', glow: 'rgba(230, 92, 41, 0.4)' }
     };
+
+    function toggleMobileNav() {
+        document.getElementById('nav-links').classList.toggle('is-active');
+        document.getElementById('mobile-hamburger').classList.toggle('is-active');
+    }
+
+    // Auto-close menu drawer when anchor routes get accessed
+    document.querySelectorAll('#nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById('nav-links').classList.remove('is-active');
+            document.getElementById('mobile-hamburger').classList.remove('is-active');
+        });
+    });
 
     function updateClock() {
         document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
@@ -356,33 +476,44 @@
     const cursor = document.getElementById('cursor');
     const follower = document.getElementById('cursor-follower');
     
-    /* DIRECT POSITION ALIGNMENT WITH FLUSH RIGHT BOX STOPPING */
-    document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-        follower.style.left = (e.clientX - 20) + 'px';
-        follower.style.top = (e.clientY - 20) + 'px';
-
+    function moveBasketHandler(clientX) {
         if (!gameActive) return;
         const basket = document.getElementById('player-basket');
+        const basketWidth = window.innerWidth <= 1100 ? 160 : 380;
+        const basketHeight = window.innerWidth <= 1100 ? 200 : 420;
         
-        // Exact pixel offset position where the right score column panel container starts
-        let scoreBoxStartPos = window.innerWidth - 310;
+        let scoreBoxStartPos = window.innerWidth;
+        if (window.innerWidth > 1100) {
+            scoreBoxStartPos = window.innerWidth - 310;
+        }
         
-        // Shift base mapping coordinate so the basket element stays perfectly centered on your mouse position
-        let targetX = e.clientX - 190;
-        
-        // Boundaries: Minimum allows complete left corner travel. 
-        // Maximum forces the exact right boundary edge to stop flush against the score box panel.
-        let minBound = -190;
-        let maxBound = scoreBoxStartPos - 380;
+        let targetX = clientX - (basketWidth / 2);
+        let minBound = -(basketWidth / 2);
+        let maxBound = scoreBoxStartPos - basketWidth;
         
         let secureX = Math.max(minBound, Math.min(targetX, maxBound));
         basket.style.left = secureX + 'px';
         
-        let absoluteStageBottom = window.innerHeight - 420;
+        let absoluteStageBottom = window.innerHeight - basketHeight;
         basket.style.top = absoluteStageBottom + 'px';
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        if(window.innerWidth > 1100) {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            follower.style.left = (e.clientX - 20) + 'px';
+            follower.style.top = (e.clientY - 20) + 'px';
+        }
+        moveBasketHandler(e.clientX);
     });
+
+    // Native Touch Device Interface Alignment mapping
+    document.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+            moveBasketHandler(e.touches[0].clientX);
+        }
+    }, { passive: true });
 
     document.addEventListener('click', () => { initAudio(); });
 
@@ -462,13 +593,17 @@
         const scores = JSON.parse(localStorage.getItem('wovenTop5_Endless')) || [
             {name: 'ARCHIVIST', val: 50}, {name: 'ELDER', val: 30}, {name: 'SEEKER', val: 10}
         ];
-        const container = document.getElementById('leaderboard-content');
-        container.innerHTML = scores.map((s, i) => `
+        
+        const markup = scores.map((s, i) => `
             <div class="score-row">
                 <span>${i+1}. ${s.name}</span>
                 <span style="color:var(--accent-color)">${s.val}</span>
             </div>
         `).join('');
+
+        // Map content directly across separate rendering nodes
+        document.getElementById('leaderboard-content').innerHTML = markup;
+        document.getElementById('mobile-leaderboard-content').innerHTML = markup;
     }
 
     function showModes() {
@@ -492,7 +627,8 @@
         document.getElementById('player-basket').style.display = 'block';
         
         const basket = document.getElementById('player-basket');
-        basket.style.top = (window.innerHeight - 420) + 'px';
+        const basketHeight = window.innerWidth <= 1100 ? 200 : 420;
+        basket.style.top = (window.innerHeight - basketHeight) + 'px';
 
         score = 0; lives = 3; gameActive = true; currentStep = 0;
         updateStats();
@@ -531,33 +667,26 @@
 
         item.style.backgroundImage = `url(${modes[targetMode].item})`;
         
-        // Prevent drop points from rendering pieces items directly above the scoreboard zone
-        let maxAllowedWidth = window.innerWidth - 310 - 70;
-        if (maxAllowedWidth < 200) maxAllowedWidth = window.innerWidth - 70; 
+        const itemSize = window.innerWidth <= 1100 ? 45 : 70;
+        let rightBoundaryOffset = window.innerWidth <= 1100 ? 0 : 310;
+        let maxAllowedWidth = window.innerWidth - rightBoundaryOffset - itemSize;
+        if (maxAllowedWidth < 100) maxAllowedWidth = window.innerWidth - itemSize;
         
         item.style.left = Math.random() * maxAllowedWidth + 'px'; 
-        item.style.top = '-70px';
+        item.style.top = `-${itemSize}px`;
         document.getElementById('game-stage').appendChild(item);
 
-        let pos = -70;
+        let pos = -itemSize;
         let speed = 5;
 
         if (!isDifferentTribe) {
-            if (score >= 90) {
-                speed = 17;
-            } else if (score >= 70) {
-                speed = 17;
-            } else if (score >= 50) {
-                speed = 14; 
-            } else {
-                speed = 5 + (score / 10);
-            }
+            if (score >= 90) { speed = 17; } 
+            else if (score >= 70) { speed = 17; } 
+            else if (score >= 50) { speed = 14; } 
+            else { speed = 5 + (score / 10); }
         } else {
-            if (score >= 90) {
-                speed = 17;
-            } else if (score >= 70) {
-                speed = 8.5;
-            }
+            if (score >= 90) { speed = 17; } 
+            else if (score >= 70) { speed = 8.5; }
         }
 
         let fall = setInterval(() => {
@@ -569,8 +698,7 @@
             const b = document.getElementById('player-basket').getBoundingClientRect();
             const i = item.getBoundingClientRect();
             
-            /* HIGH SPEED COLLISION PLANAR CHECK */
-            if (i.bottom >= b.top && i.top <= b.bottom && i.left < b.right - 15 && i.right > b.left + 15) {
+            if (i.bottom >= b.top && i.top <= b.bottom && i.left < b.right - 5 && i.right > b.left + 5) {
                 clearInterval(fall);
                 item.remove();
                 
@@ -612,6 +740,8 @@
             document.getElementById('name-input-container').style.display = 'none';
             document.getElementById('final-buttons').style.display = 'block';
         }
+        
+        updateLeaderboardUI();
         document.getElementById('result-overlay').style.display = 'flex';
     }
 
