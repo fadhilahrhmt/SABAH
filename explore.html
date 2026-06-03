@@ -204,74 +204,83 @@
         .compass-btn:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--nav-hover-accent); color: var(--nav-hover-accent); }
 
         @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
-       /* ==========================================
-   MOBILE SCREEN REPAIR OVERRIDE
-   Only applies to screens under 992px wide.
-   ========================================== */
+      /* --- CSS Toggle System for Mobile Only --- */
+.mobile-toggle-bar {
+    display: none;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    gap: 10px;
+    z-index: 999;
+}
+
 @media (max-width: 991px) {
-    /* 1. Allow the body wrapper to expand and scroll down naturally */
     body {
         overflow-y: auto !important;
         height: auto !important;
-        min-height: 100vh !important;
-        display: block !important;
     }
 
-    /* 2. Reset the main layouts to stack neatly vertically */
+    /* Show the control buttons on phones */
+    .mobile-toggle-bar {
+        display: flex;
+        justify-content: space-around;
+        position: sticky;
+        top: 80px; /* Sits right under your navbar */
+    }
+
+    .m-btn {
+        background: none;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        font-family: var(--font-main);
+        font-size: 11px;
+        padding: 8px 16px;
+        flex: 1;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .m-btn.active {
+        background: var(--accent);
+        color: var(--bg);
+    }
+
+    /* By default, override desktop positions and hide things until active */
     .sidebar, .map-stage, .ai-sidebar {
         position: relative !important;
-        width: 100% !important;
-        height: auto !important;
+        inset: auto !important;
         left: auto !important;
         right: auto !important;
         top: auto !important;
         bottom: auto !important;
-        inset: auto !important; /* Disables your desktop inset: 80px 380px... */
-        padding: 20px !important;
-        border: none !important;
-        display: flex !important;
-        flex-direction: column !important;
-    }
-
-    /* 3. Give the sidebar summary cards room to breathe */
-    .summary-card {
-        width: 100% !important;
-        margin-top: 15px !important;
-    }
-
-    /* 4. Center your SVG Map container cleanly on the phone screen */
-    .interactive-container {
-        width: 100% !important;
-        max-width: 100% !important;
-        transform: none !important; /* Disables 3D matrix tilts that warp on phone screens */
-    }
-
-    #map-svg {
         width: 100% !important;
         height: auto !important;
-        max-height: 50vh !important;
+        display: none !important; /* Hides panels initially */
+        padding: 20px !important;
     }
 
-    /* 5. Untrap the Data HUD info card from overlapping the texts */
+    /* Display the active panel full screen */
+    .sidebar.mobile-active,
+    .map-stage.mobile-active,
+    .ai-sidebar.mobile-active {
+        display: flex !important;
+    }
+    
+    .interactive-container, #map-svg {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
     .data-hud {
         position: relative !important;
         left: auto !important;
         top: auto !important;
         width: 100% !important;
         margin-top: 20px !important;
-        box-shadow: none !important;
     }
 
-    /* 6. Untrap the AI chat section from squishing */
-    .ai-chat-body {
-        max-height: 300px !important;
-        overflow-y: auto !important;
-    }
-
-    /* 7. Hide the custom desktop pointer dots so they don't block mobile finger taps */
-    #c, #cr {
-        display: none !important;
-    }
+    #c, #cr { display: none !important; }
 }
     </style>
 </head>
