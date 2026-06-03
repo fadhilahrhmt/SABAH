@@ -115,7 +115,7 @@
             padding-left: 20px;
         }
 
-        /* Hamburger Menu Elements (Hidden on Desktop) */
+        /* Hamburger Menu Elements */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -233,9 +233,9 @@
             font-family: 'Space Mono'; outline: none; margin-bottom: 20px; font-size: 12px;
         }
 
-        /* TARGETED RESPONSIVE OVERRIDES (Keeps desktop 100% untouched) */
+        /* TARGETED RESPONSIVE OVERRIDES */
         @media (max-width: 1100px) {
-            * { cursor: auto !important; } /* Restore native touch interactions on mobile */
+            * { cursor: auto !important; } 
             #custom-cursor, #cursor-follower { display: none !important; }
 
             body {
@@ -244,22 +244,11 @@
                 min-height: 100vh;
             }
 
-            .site-nav { 
-                padding: 0 20px; 
-            }
-            
-            .logo-box { 
-                display: block; 
-            }
-            .logo-box h1 {
-                font-size: 11px;
-                letter-spacing: 2px;
-            }
+            .site-nav { padding: 0 20px; }
+            .logo-box { display: block; }
+            .logo-box h1 { font-size: 11px; letter-spacing: 2px; }
 
-            /* Responsive Hamburger Menu Transformation */
-            .hamburger {
-                display: flex;
-            }
+            .hamburger { display: flex; }
             
             .nav-menu {
                 display: flex;
@@ -278,37 +267,16 @@
                 gap: 40px;
             }
             
-            .nav-menu.mobile-open {
-                right: 0;
-            }
+            .nav-menu.mobile-open { right: 0; }
+            .nav-menu a { font-size: 16px; letter-spacing: 3px; }
 
-            .nav-menu a {
-                font-size: 16px;
-                letter-spacing: 3px;
-            }
+            .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+            .hamburger.open span:nth-child(2) { opacity: 0; }
+            .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-            /* Animated Hamburger State Changes */
-            .hamburger.open span:nth-child(1) {
-                transform: translateY(6px) rotate(45deg);
-            }
-            .hamburger.open span:nth-child(2) {
-                opacity: 0;
-            }
-            .hamburger.open span:nth-child(3) {
-                transform: translateY(-6px) rotate(-45deg);
-            }
-
-            .nav-right {
-                gap: 15px;
-            }
-            .swap-mode-btn {
-                padding: 4px 10px;
-                font-size: 9px;
-            }
-            #digital-clock {
-                padding-left: 12px;
-                font-size: 11px;
-            }
+            .nav-right { gap: 15px; }
+            .swap-mode-btn { padding: 4px 10px; font-size: 9px; }
+            #digital-clock { padding-left: 12px; font-size: 11px; }
 
             .game-container { 
                 grid-template-columns: 1fr; 
@@ -318,38 +286,22 @@
                 flex: none;
             }
             
-            .marks-board { 
-                display: none; 
-            }
+            .marks-board { display: none; }
 
-            /* Fit matching grid elegantly on standard small viewports */
+            /* Balanced 3x3 Grid For Mobile Viewports */
             .game-grid {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 10px;
                 height: auto;
-                min-height: 65vh;
+                min-height: 55vh;
             }
             
-            .card {
-                aspect-ratio: 1 / 1;
-            }
-
-            .panel {
-                padding: 30px;
-                margin: 20px;
-                width: 100%;
-            }
+            .card { aspect-ratio: 1 / 1; }
+            .panel { padding: 30px; margin: 20px; width: 100%; }
         }
 
-        /* Additional tuning for exceptionally narrow screens */
         @media (max-width: 480px) {
-            .game-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
-            .swap-mode-btn {
-                display: none; /* Saves important status-bar viewport space */
-            }
+            .swap-mode-btn { display: none; }
         }
     </style>
 </head>
@@ -418,14 +370,13 @@
 
     <main class="game-area">
         <div class="stats-bar">
-            SYS_TIMER: <span id="timer">0.00</span>S // MATCHED: <span id="matches">0</span>/12
+            SYS_TIMER: <span id="timer">0.00</span>S // MATCHED: <span id="matches">0</span>/<span id="total-matches-label">12</span>
         </div>
         <div class="game-grid" id="grid"></div>
     </main>
 </div>
 
 <script>
-    /* MOBILE NAVIGATION TOGGLE INTERFACE */
     function toggleMobileMenu() {
         const menu = document.getElementById('navMenu');
         const btn = document.getElementById('hamburgerBtn');
@@ -433,7 +384,6 @@
         btn.classList.toggle('open');
     }
 
-    // Auto close mobile navbar when custom menu anchors are tapped
     document.querySelectorAll('.nav-menu a').forEach(link => {
         link.addEventListener('click', () => {
             document.getElementById('navMenu').classList.remove('mobile-open');
@@ -441,7 +391,6 @@
         });
     });
 
-    /* LIVE CLOCK INTERFACE */
     function runLiveClock() {
         const now = new Date();
         const display = document.getElementById('digital-clock');
@@ -452,7 +401,6 @@
     setInterval(runLiveClock, 1000);
     runLiveClock();
 
-    /* AUDIO ARCHIVE MANAGEMENT */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let musicInterval;
 
@@ -473,7 +421,6 @@
 
     function initBackgroundMusic() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        
         const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]; 
         let step = 0;
 
@@ -500,7 +447,6 @@
         musicInterval = setInterval(playNextNote, 450);
     }
 
-    /* 1. SECURE GLOBAL CURSOR TRACKING */
     const cursor = document.getElementById('custom-cursor');
     const follower = document.getElementById('cursor-follower');
     
@@ -513,7 +459,6 @@
         }
     });
 
-    // Smart Hover Listener using Event Delegation (Supports old & newly added cards seamlessly)
     document.addEventListener('mouseover', (e) => {
         if (window.innerWidth <= 1100) return;
         const target = e.target.closest('.nav-menu a, button, .card, .action-btn, input');
@@ -534,13 +479,11 @@
         }
     });
 
-    /* 2. THEME SYSTEM */
     function toggleTheme() {
         const current = document.documentElement.getAttribute('data-theme');
         document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
 
-    /* 3. GAME LOGIC */
     const items = [
         { n: 'sinuangga.png', i: 'sinuangga.png' }, { n: 'himpogot.png', i: 'himpogot.jpg' },
         { n: 'gaung.png', i: 'gaung.png' }, { n: 'sigar.jpg', i: 'sigar.jpg' },
@@ -550,7 +493,7 @@
         { n: 'badu sampit.jpg', i: 'badu sampit.jpg' }, { n: 'babaru puputul.png', i: 'babaru puputul.png' }
     ];
 
-    let flipped = [], matched = 0, startTime, timerInt, active = false, musicInitialized = false;
+    let flipped = [], matched = 0, targetMatches = 12, startTime, timerInt, active = false, musicInitialized = false;
 
     function startQuest() {
         if (!musicInitialized) {
@@ -569,10 +512,32 @@
         document.getElementById('matches').innerText = "0";
 
         let deck = [];
-        items.forEach(x => {
-            deck.push({ name: x.n, val: `<img src="${x.i}">` });
-            deck.push({ name: x.n, val: `<img src="${x.i}">` });
-        });
+        const isMobile = window.innerWidth <= 1100;
+
+        if (isMobile) {
+            targetMatches = 4; // 4 pairs = 8 cards. 1 extra spoiler card completes the 9-card configuration.
+            document.getElementById('total-matches-label').innerText = "4";
+            
+            // Randomize and slice down variables for the round
+            let shuffledItems = [...items].sort(() => Math.random() - 0.5);
+            let roundPairs = shuffledItems.slice(0, 4);
+            let singleSpoiler = shuffledItems[4];
+
+            roundPairs.forEach(x => {
+                deck.push({ name: x.n, val: `<img src="${x.i}">` });
+                deck.push({ name: x.n, val: `<img src="${x.i}">` });
+            });
+            // Single rogue element to complete the 3x3 layout
+            deck.push({ name: singleSpoiler.n, val: `<img src="${singleSpoiler.i}">` });
+        } else {
+            targetMatches = 12;
+            document.getElementById('total-matches-label').innerText = "12";
+            items.forEach(x => {
+                deck.push({ name: x.n, val: `<img src="${x.i}">` });
+                deck.push({ name: x.n, val: `<img src="${x.i}">` });
+            });
+        }
+        
         deck.sort(() => Math.random() - 0.5);
 
         deck.forEach(item => {
@@ -607,7 +572,7 @@
             matched++;
             document.getElementById('matches').innerText = matched;
             flipped = [];
-            if (matched === 12) victory();
+            if (matched === targetMatches) victory();
         } else {
             setTimeout(() => { a.classList.remove('flipped'); b.classList.remove('flipped'); flipped = []; }, 600);
         }
