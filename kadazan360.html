@@ -358,13 +358,14 @@
 
       .nav-right { display: none; } /* Hide theme switches into compact responsive flows if unneeded */
 
-      /* Convert animated CSS marquees back into fluid smart auto-scroll areas */
+      /* Convert automated CSS marquees back into fluid smart touch auto-scroll areas */
       .wardrobe-scroll-container, .pattern-scroll-container {
         mask-image: none !important;
         -webkit-mask-image: none !important;
-        overflow-x: hidden !important; /* Managed by JS mouse/hover engine */
+        overflow-x: auto !important; /* Managed by native mobile touch swipe gestures */
         padding-bottom: 15px;
         position: relative;
+        -webkit-overflow-scrolling: touch;
       }
 
       .wardrobe-track, .pattern-track {
@@ -493,36 +494,6 @@
         navMenu.classList.remove('open');
       });
     });
-
-    /* MOBILE HOVER DIRECTION SCROLL IMPLEMENTATION */
-    function setupHoverScroll(containerId) {
-      const container = document.getElementById(containerId);
-      if(!container) return;
-
-      container.addEventListener('mousemove', (e) => {
-        // Run only on mobile screen layout rules
-        if (!window.matchMedia("(max-width: 1100px)").matches) return;
-
-        const rect = container.getBoundingClientRect();
-        const x = e.clientX - rect.left; // position inside element.
-        const width = rect.width;
-        
-        // Define edge regions (30% threshold left/right boundaries)
-        const leftThreshold = width * 0.35;
-        const rightThreshold = width * 0.65;
-
-        if (x < leftThreshold) {
-          // Hover left side -> scroll left
-          container.scrollLeft -= 6;
-        } else if (x > rightThreshold) {
-          // Hover right side -> scroll right
-          container.scrollLeft += 6;
-        }
-      });
-    }
-
-    setupHoverScroll('gearScrollContainer');
-    setupHoverScroll('assetScrollContainer');
   </script>
 
   <script type="module">
