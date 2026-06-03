@@ -171,7 +171,7 @@
 
         .grain { position: fixed; inset: 0; z-index: 99; background: url('https://grainy-gradients.vercel.app/noise.svg'); opacity: 0.02; pointer-events: none; }
 
-        /* SITE UI INTERFACE HEADER - UNTOUCHED FOR DESKTOP */
+        /* SITE UI INTERFACE HEADER - UNIFIED ACROSS MOBILE & DESKTOP */
         .site-header {
             position: fixed;
             top: 0;
@@ -188,7 +188,7 @@
         }
 
         .logo-box { font-family: var(--font-heading); font-size: clamp(9px, 2vw, 11px); letter-spacing: 0.6em; line-height: 2; }
-        .nav-links { display: flex; flex-direction: column; gap: 10px; text-align: right; }
+        .nav-links { display: flex; flex-direction: column; gap: 10px; text-align: right; pointer-events: auto; }
         
         .nav-links a { 
             font-size: clamp(8px, 1.8vw, 9px); 
@@ -200,6 +200,7 @@
             position: relative; 
             transition: opacity 0.3s ease, color 0.3s ease, letter-spacing 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
         }
+        
         .nav-links a::before { 
             content: ''; 
             position: absolute; 
@@ -219,24 +220,14 @@
         }
         .nav-links a.active::before { width: 100%; }
         
-        /* Mobile Toggle Button (Hidden on Desktop) */
-        .menu-toggle-btn {
-            display: none;
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: var(--text-color);
-            font-family: var(--font-main);
-            font-size: 10px;
-            letter-spacing: 2px;
-            padding: 8px 16px;
-            pointer-events: auto;
-            transition: 0.3s ease;
+        /* Unified Hover Action Triggers */
+        .nav-links a:hover { 
+            opacity: 1; 
+            color: var(--accent-color); 
+            letter-spacing: 10px; 
+            text-shadow: 0 0 15px rgba(197, 160, 89, 0.6); 
         }
-
-        @media (pointer: fine) {
-            .nav-links a:hover { opacity: 1; color: var(--accent-color); letter-spacing: 10px; text-shadow: 0 0 15px rgba(197, 160, 89, 0.6); }
-            .nav-links a:hover::before { width: 100%; }
-        }
+        .nav-links a:hover::before { width: 100%; }
 
         /* HERO PANEL CORE ENGINE */
         .hero-main {
@@ -336,50 +327,10 @@
             pointer-events: none; 
         }
 
-        /* --- MOBILE CONDITIONAL INTERCEPT RULES --- */
+        /* --- MOBILE INTERCEPT RULES --- */
         @media (max-width: 768px) {
             html, body, a, button { cursor: auto !important; }
             #cursor-dot, #cursor-hud { display: none !important; }
-
-            .site-header {
-                align-items: center;
-                padding: 20px;
-                background: rgba(9, 10, 15, 0.7);
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-            }
-
-            .menu-toggle-btn {
-                display: block;
-            }
-
-            /* Shift exact styling on mobile into an absolute vertical grid panel */
-            .nav-links {
-                position: absolute;
-                top: 100%;
-                right: 20px;
-                background: #0d0e14;
-                border: 1px solid rgba(197, 160, 89, 0.2);
-                padding: 15px;
-                gap: 5px;
-                text-align: left;
-                display: none; /* Controlled by Javascript toggle */
-                box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .nav-links a {
-                font-size: 10px;
-                padding: 10px 15px;
-                display: block;
-            }
-
-            .nav-links a::before {
-                display: none; /* Kill horizontal desktop bars on mobile panels */
-            }
 
             .video-player-mask {
                 transform: translate(-50%, -50%) scale(1.6); /* Sharper mask zoom scale for vertical viewports */
@@ -416,7 +367,6 @@
 
     <header class="site-header">
         <div class="logo-box">SABAH<br>HERITAGE<br></div>
-        <button class="menu-toggle-btn" id="menu-toggle" onclick="toggleNavMenu()">MENU_</button>
         <nav class="nav-links" id="navigation-bar">
             <a href="#" class="active">HOME</a>
             <a href="explore.html">EXPLORE</a>
@@ -460,28 +410,11 @@
         const audioUnlocker = document.getElementById('audio-unlocker');
         const unlockTrigger = document.getElementById('unlock-trigger');
         const navigationBar = document.getElementById('navigation-bar');
-        const menuToggle = document.getElementById('menu-toggle');
 
         let mouse = { x: 0, y: 0, targetX: window.innerWidth / 2, targetY: window.innerHeight / 2 };
         let hyperSpeed = 0.02;
         let isWarping = false;
         let isTouchScreen = false;
-
-        // --- RESPONSIVE MOBILE ACCORDION INTERACTION ---
-        function toggleNavMenu() {
-            navigationBar.classList.toggle('active');
-            menuToggle.innerText = navigationBar.classList.contains('active') ? "CLOSE_" : "MENU_";
-        }
-
-        // Hide navigation drop box automatically when links are tapped on tiny screens
-        document.querySelectorAll('.nav-links a').forEach(linkItem => {
-            linkItem.addEventListener('click', () => {
-                if(window.innerWidth <= 768) {
-                    navigationBar.classList.remove('active');
-                    menuToggle.innerText = "MENU_";
-                }
-            });
-        });
 
         // --- YOUTUBE IFRAME API LAYER ---
         const tag = document.createElement('script');
@@ -497,18 +430,20 @@
                 videoId: 'P5zfmgTXf5Y', 
                 playerVars: {
                     'autoplay': 0,
-                    'controls': 0,          // Removes basic pause/scrub buttons completely
-                    'disablekb': 1,         // Kills keyboard shortcut intercept functions
+                    'controls': 0,          
+                    'disablekb': 1,         
                     'rel': 0,
                     'showinfo': 0,
-                    'modestbranding': 1,    // Disables persistent bottom icon branding
+                    'modestbranding': 1,    
                     'loop': 1,
                     'playlist': 'P5zfmgTXf5Y',
                     'playsinline': 1,
-                    'fs': 0                 // Removes standard fullscreen triggers
+                    'fs': 0                 
                 },
                 events: {
-                    'onReady': (e) => { e.target.mute(); } // Essential default to loop continuously without browser locks
+                    'onReady': (e) => { 
+                        e.target.setVolume(20); 
+                    }
                 }
             });
         }
@@ -596,22 +531,6 @@
             gain.connect(audioCtx.destination);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.8);
-        }
-
-        function playInterfaceLockSound() {
-            if (!audioCtx) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(620, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(1250, audioCtx.currentTime + 0.08); 
-            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.25);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.25);
         }
 
         // --- DISMISS SYSTEM SPLASH GATEWAY ---
@@ -715,7 +634,6 @@
                             setTimeout(() => {
                                 document.getElementById('glitch-loader').remove();
                                 document.body.classList.add('interface-active');
-                                playInterfaceLockSound();
                             }, 1200);
                         }, 400);
                     }
@@ -774,36 +692,26 @@
             if(isWarping) return;
             isWarping = true;
             
-            playWarpSweep(); 
+            playWarpSweep();
             
-            lineMaterial.opacity = 0.9;
-            partMaterial.size = 0.55;
-            heroNode.style.opacity = "0";
-
-            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+            if (ytPlayer && typeof ytPlayer.unMute === 'function') {
+                ytPlayer.unMute();
                 ytPlayer.playVideo();
             }
 
-            setTimeout(() => {
-                videoSection.scrollIntoView({ behavior: 'smooth' });
-                setTimeout(() => {
-                    lineMaterial.opacity = 0.55;
-                    partMaterial.size = 0.25;
-                    heroNode.style.opacity = "1";
-                    isWarping = false;
-                }, 1000);
-            }, 250); 
-        });
+            heroNode.style.transition = "opacity 0.6s ease, filter 0.6s ease";
+            heroNode.style.opacity = "0";
+            heroNode.style.filter = "blur(10px)";
+            
+            document.getElementById('webgl-container').style.transition = "opacity 0.8s ease";
+            document.getElementById('webgl-container').style.opacity = "0.3";
 
-        function runOsdClock() {
-            const dateObj = new Date();
-            document.getElementById('timer').innerText = "DATA_LOG: " + 
-                dateObj.getHours().toString().padStart(2, '0') + ":" + 
-                dateObj.getMinutes().toString().padStart(2, '0') + ":" + 
-                dateObj.getSeconds().toString().padStart(2, '0') + ":" + 
-                Math.floor(Math.random() * 99).toString().padStart(2, '0');
-        }
-        setInterval(runOsdClock, 40);
+            setTimeout(() => {
+                heroNode.remove();
+                videoSection.scrollIntoView({ behavior: 'smooth' });
+                isWarping = false;
+            }, 600);
+        });
     </script>
 </body>
 </html>
