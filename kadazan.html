@@ -26,9 +26,10 @@
             --glass-border: rgba(0, 0, 0, 0.1);
         }
 
-        /* HOMEPAGE SCROLLBAR ENGINE IMPLEMENTATION */
+        /* SCROLLBAR CONFIGURATION */
         ::-webkit-scrollbar { 
             width: 4px; 
+            height: 4px;
         }
         ::-webkit-scrollbar-track { 
             background: #090a0f; 
@@ -38,7 +39,6 @@
             box-shadow: 0 0 15px #c5a059; 
         }
 
-        /* Firefox Support Engine */
         * {
             scrollbar-width: thin;
             scrollbar-color: #c5a059 #090a0f;
@@ -59,7 +59,7 @@
             overflow-x: hidden;
         }
 
-        /* CURSOR SYSTEM */
+        /* CURSOR HARDWARE ENGINE */
         #custom-cursor {
             width: 10px; height: 10px;
             background-color: var(--accent-gold);
@@ -85,41 +85,57 @@
             #custom-cursor, #cursor-follower { display: block; }
         }
 
-        /* NAVIGATION SYSTEM MATCHED */
+        /* NAVIGATION SYSTEM MATCHED & CONTAINER RESPONSIVE CORE */
         .site-nav {
             position: fixed; top: 0; width: 100%; height: 80px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 50px; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
+            padding: 0 clamp(16px, 4vw, 50px); 
+            background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
             z-index: 5000;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
         }
 
-        .logo-box h1 { font-family: var(--font-heading); font-size: 14px; letter-spacing: 4px; }
+        .logo-box h1 { 
+            font-family: var(--font-heading); 
+            font-size: clamp(10px, 1.4vw, 14px); 
+            letter-spacing: clamp(2px, 0.4vw, 4px); 
+            white-space: nowrap;
+        }
         
-        .nav-menu { display: flex; gap: 30px; list-style: none; }
+        .nav-menu { 
+            display: flex; 
+            gap: clamp(10px, 2.5vw, 30px); 
+            list-style: none; 
+            align-items: center;
+        }
         .nav-menu a { 
-            color: var(--text-color); text-decoration: none; font-size: 11px; 
+            color: var(--text-color); text-decoration: none; 
+            font-size: clamp(9px, 1.1vw, 11px); 
             opacity: 0.6; transition: 0.3s; text-transform: uppercase; font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: clamp(1px, 0.2vw, 2px);
+            white-space: nowrap;
         }
         .nav-menu a.active, .nav-menu a:hover { opacity: 1; color: var(--accent-gold); }
 
-        .nav-right { display: flex; align-items: center; gap: 25px; }
-        #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent-gold); border-left: 1px solid var(--glass-border); padding-left: 20px; }
-
-        /* Mobile Hamburger Icon Element (Hidden on desktop layout viewports) */
-        .mobile-hamburger {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text-color);
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 5002;
+        .nav-right { display: flex; align-items: center; gap: clamp(10px, 2vw, 25px); }
+        
+        .nav-right button {
+            background: none; border: 1px solid var(--accent-gold); color: var(--accent-gold); 
+            padding: 5px clamp(8px, 1.5vw, 15px); font-size: clamp(8px, 0.9vw, 10px); 
+            font-family: var(--font-main); white-space: nowrap;
         }
 
-        /* CONTENT Layout Framework */
+        #digital-clock { 
+            font-size: clamp(10px, 1.2vw, 12px); 
+            font-weight: 700; 
+            color: var(--accent-gold); 
+            border-left: 1px solid var(--glass-border); 
+            padding-left: clamp(10px, 2vw, 20px); 
+            white-space: nowrap;
+        }
+
+        /* CONTENT ENGINE CONTAINER */
         .content {
             max-width: 1300px;
             margin: 0 auto;
@@ -128,28 +144,28 @@
 
         .tribe-title {
             font-family: 'Cinzel', serif;
-            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-size: clamp(2rem, 7vw, 5rem);
             text-align: center;
-            letter-spacing: 15px;
-            margin-bottom: 80px;
+            letter-spacing: clamp(6px, 1.5vw, 15px);
+            margin-bottom: clamp(40px, 8vw, 80px);
             color: var(--accent-gold);
             text-transform: uppercase;
         }
 
-        /* SHARED GRID STYLE */
+        /* RESPONSIVE LAYOUT GRID SYSTEM */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            margin-bottom: 120px;
+            gap: clamp(30px, 5vw, 60px);
+            margin-bottom: clamp(60px, 10vw, 120px);
             align-items: center;
         }
 
         .text-box {
-            padding: 40px;
-            border-left: 1px solid var(--accent-gold);
+            padding: clamp(20px, 4vw, 40px);
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
+            border-left: 2px solid var(--accent-gold);
             position: relative;
         }
 
@@ -164,7 +180,7 @@
 
         .text-box h2 {
             font-family: 'Cinzel', serif;
-            font-size: 2rem;
+            font-size: clamp(1.4rem, 3vw, 2rem);
             margin-bottom: 20px;
             color: var(--text-color);
         }
@@ -180,7 +196,7 @@
 
         .visual-frame {
             width: 100%;
-            height: 450px;
+            height: clamp(280px, 40vw, 450px);
             overflow: hidden;
             border: 1px solid var(--glass-border);
             position: relative;
@@ -200,15 +216,16 @@
             }
         }
 
-        /* ATTIRE EXPLANATION BOXES */
+        /* ATTIRE HOUSINGS */
         .attire-specs {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 60px;
+            gap: clamp(20px, 3vw, 30px);
+            margin-bottom: clamp(60px, 10vw, 120px);
         }
+        
         .spec-box {
-            padding: 30px;
+            padding: clamp(20px, 3vw, 30px);
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-top: 3px solid var(--accent-gold);
@@ -232,19 +249,19 @@
             text-justify: inter-word;
         }
 
-        /* SLIDERS Framework */
+        /* TIMELINE/SLIDERS MODULES */
         .slider-section-label {
             font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
             text-align: center;
-            letter-spacing: 8px;
+            letter-spacing: clamp(4px, 1vw, 8px);
             margin-bottom: 40px;
             color: var(--accent-gold);
         }
 
         .slider-area {
             position: relative;
-            margin-bottom: 120px;
+            margin-bottom: clamp(60px, 10vw, 120px);
         }
 
         .gallery-viewport {
@@ -260,7 +277,6 @@
             transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        /* ARTIFACT CARDS */
         .item-card {
             flex: 0 0 300px;
             background: var(--glass-bg);
@@ -270,11 +286,6 @@
             transition: 0.4s;
         }
 
-        @media (pointer: fine) {
-            .item-card:hover { border-color: var(--accent-gold); transform: translateY(-10px); }
-            .item-card:hover img { filter: grayscale(0); transform: scale(1.1); }
-        }
-
         .item-frame {
             width: 100%; height: 300px;
             overflow: hidden; background: #000;
@@ -282,8 +293,19 @@
         }
 
         .item-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: 0.5s; }
+        
+        @media (pointer: fine) {
+            .item-card:hover { border-color: var(--accent-gold); transform: translateY(-10px); }
+            .item-card:hover img { filter: grayscale(0); transform: scale(1.1); }
+        }
 
-        /* VIDEO CARDS */
+        .oval-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-color);
+        }
+
         .video-card {
             flex: 0 0 450px;
             aspect-ratio: 16/9;
@@ -302,7 +324,7 @@
         .arrow-left { left: -70px; }
         .arrow-right { right: -70px; }
 
-        .bottom-area { text-align: center; padding: 60px 0; }
+        .bottom-area { text-align: center; padding: 40px 0; }
         .action-btn {
             background: transparent; color: var(--accent-gold);
             padding: 20px 50px; border: 1px solid var(--accent-gold);
@@ -311,51 +333,23 @@
         }
         .action-btn:hover { background: var(--accent-gold); color: #000; }
 
-        /* --- MOBILE INTERCEPT RESPONSIVE DESIGN RULES --- */
+        /* --- MOBILE BREAKPOINT SYSTEM INTERCEPT --- */
         @media (max-width: 1100px) {
-            .info-grid { grid-template-columns: 1fr; gap: 40px; margin-bottom: 80px; }
+            .info-grid { grid-template-columns: 1fr; gap: 35px; }
             .info-grid[style*="direction: rtl"] { direction: ltr !important; }
             .info-grid[style*="direction: rtl"] .visual-frame { direction: ltr !important; }
             .info-grid[style*="direction: rtl"] .text-box { direction: ltr !important; }
             
             .arrow { display: none; }
-            .content { padding: 120px 24px 60px; }
+            .content { padding: 130px 20px 60px; }
             .attire-specs { grid-template-columns: 1fr; gap: 20px; }
             
-            /* Enable Touch Scrolling on Swiper viewports */
+            /* Native Touch Swiping Mechanics for Mobile viewports */
             .gallery-viewport { overflow-x: auto; scroll-behavior: smooth; mask-image: none; -webkit-mask-image: none; }
             .gallery-track { transform: none !important; }
             .video-card { flex: 0 0 85vw; }
-            .item-card { flex: 0 0 260px; }
-            .visual-frame { height: 320px; }
+            .item-card { flex: 0 0 270px; }
             .visual-frame img, .item-frame img { filter: grayscale(0) brightness(1); }
-
-            /* Mobile Dropdown Header Logic Isolation */
-            .mobile-hamburger { display: block; }
-            .site-nav { padding: 0 24px; }
-            .nav-right #digital-clock { display: none; }
-            .nav-right button { font-size: 9px; padding: 4px 10px; }
-
-            .nav-menu {
-                position: fixed;
-                top: 80px;
-                left: 0;
-                width: 100%;
-                background: var(--nav-bg);
-                border-bottom: 1px solid var(--glass-border);
-                flex-direction: column;
-                padding: 30px 24px;
-                gap: 20px;
-                transform: translateY(-150%);
-                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                pointer-events: none;
-                z-index: 4999;
-            }
-
-            .nav-menu.mobile-open {
-                transform: translateY(0);
-                pointer-events: auto;
-            }
         }
     </style>
 </head>
@@ -366,7 +360,7 @@
 
 <nav class="site-nav">
     <div class="logo-box"><h1>SABAH_HERITAGE</h1></div>
-    <ul class="nav-menu" id="nav-links-container">
+    <ul class="nav-menu">
         <li><a href="index.html">Home</a></li>
         <li><a href="explore.html">Explore</a></li>
         <li><a href="gallery.html">Gallery</a></li>
@@ -374,9 +368,8 @@
         <li><a href="about.html">About</a></li>
     </ul>
     <div class="nav-right">
-        <button onclick="toggleTheme()" style="background:none; border:1px solid var(--accent-gold); color:var(--accent-gold); padding:5px 15px; font-size:10px; cursor:pointer; font-family: var(--font-main);">MODE_SWAP</button>
+        <button onclick="toggleTheme()">MODE_SWAP</button>
         <div id="digital-clock">00:00:00</div>
-        <button class="mobile-hamburger" id="hamburger-trigger" onclick="toggleMobileMenu()">≡</button>
     </div>
 </nav>
 
@@ -470,7 +463,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    /* CURSOR LOGIC */
+    /* CURSOR HARDWARE TRACKER */
     const cursor = document.getElementById('custom-cursor');
     const follower = document.getElementById('cursor-follower');
     
@@ -485,39 +478,21 @@
         }
     });
 
-    /* MOBILE NAVIGATION ENGINE INTERCEPT */
-    const navMenu = document.getElementById('nav-links-container');
-    const hamburgerTrigger = document.getElementById('hamburger-trigger');
-
-    function toggleMobileMenu() {
-        navMenu.classList.toggle('mobile-open');
-        hamburgerTrigger.innerText = navMenu.classList.contains('mobile-open') ? "✕" : "≡";
-    }
-
-    // Close the dropdown whenever a links is tapped
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('mobile-open');
-            hamburgerTrigger.innerText = "≡";
-        });
-    });
-
-    /* THEME TOGGLE */
+    /* THEME SYSTEM ENGINE */
     function toggleTheme() {
         const root = document.documentElement;
         root.setAttribute('data-theme', root.getAttribute('data-theme') === 'light' ? '' : 'light');
     }
 
-    /* SLIDER LOGIC */
+    /* SLIDER LOOPS */
     const indices = { 'artifact-track': 0, 'video-track': 0 };
 
     function moveSlide(trackId, direction) {
-        // Disallow tracking calculations on touch mobile architecture (native momentum used instead)
-        if (window.innerWidth <= 1100) return;
+        if (window.innerWidth <= 1100) return; // Prevent calculations on mobile swipes
 
         const track = document.getElementById(trackId);
         const cards = track.children;
-        const cardWidth = cards[0].offsetWidth + 20; // width + gap
+        const cardWidth = cards[0].offsetWidth + 20; 
         const maxScroll = cards.length - 1;
 
         indices[trackId] += direction;
@@ -528,7 +503,7 @@
         track.style.transform = `translateX(${-indices[trackId] * cardWidth}px)`;
     }
 
-    // Hover scales for cursor
+    /* CURSOR SCALE REACTIVITY */
     document.querySelectorAll('a, button, .item-card, .video-card').forEach(el => {
         el.addEventListener('mouseenter', () => {
             if (window.matchMedia("(pointer: fine)").matches) {
