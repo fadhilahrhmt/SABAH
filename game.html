@@ -46,14 +46,14 @@
             position: fixed; 
             top: 0; 
             width: 100%; 
-            min-height: 80px;
+            height: 80px;
             display: flex; 
             justify-content: space-between; 
             align-items: center;
             padding: 0 50px; 
             background: var(--nav-bg); 
             border-bottom: 1px solid var(--glass-border);
-            z-index: 9999; /* Forces navbar completely above gallery containers */
+            z-index: 9999;
         }
 
         .logo-box h1 { font-family: var(--font-heading); font-size: 14px; letter-spacing: 4px; }
@@ -84,7 +84,7 @@
 
         #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent-color); border-left: 1px solid var(--glass-border); padding-left: 20px; }
 
-        /* MOBILE MENU TOGGLE ICON BUTTON */
+        /* MOBILE MENU TOGGLE BUTTON */
         .mobile-menu-toggle {
             display: none;
             background: none;
@@ -93,6 +93,7 @@
             font-family: var(--font-main);
             font-size: 16px;
             padding: 5px 12px;
+            z-index: 10000;
         }
 
         /* GALLERY INTRO */
@@ -191,32 +192,37 @@
             #cursor, #cursor-follower { display: none !important; }
             
             .site-nav { 
-                padding: 15px 24px; 
-                height: auto;
+                padding: 0 24px; 
             }
             
             .mobile-menu-toggle { 
                 display: block; 
             }
             
-            /* Responsive Dropdown Menu Block */
+            /* Converts navigation links into a clean, hidden mobile drawer */
             .nav-menu {
-                position: absolute;
-                top: 100%; /* Spawns exactly below header box border line */
+                position: fixed;
+                top: 80px; 
                 left: 0;
                 width: 100%;
+                height: calc(100vh - 80px);
                 background: var(--nav-bg);
-                border-bottom: 1px solid var(--glass-border);
                 flex-direction: column;
+                justify-content: flex-start;
+                align-items: flex-start;
                 gap: 0;
-                padding: 0;
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.3s ease-out;
+                padding: 20px 0;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+                border-top: 1px solid var(--glass-border);
             }
             
             .nav-menu.mobile-active { 
-                max-height: 400px; /* Expands dynamically smoothly */
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
             }
             
             .nav-menu li { 
@@ -225,19 +231,22 @@
             
             .nav-menu a { 
                 display: block; 
-                padding: 16px 24px; 
+                padding: 20px 30px; 
+                font-size: 14px;
+                letter-spacing: 2px;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
                 width: 100%;
             }
             
-            #digital-clock { display: none; } /* Drop clock framework on tablet viewports */
+            #digital-clock { display: none; }
             .gallery-container { padding: 0 24px; grid-template-columns: 1fr; }
             .zone-img { opacity: 0.7; filter: grayscale(20%); }
         }
         
         @media (max-width: 480px) {
-            .site-nav { padding: 12px 16px; }
-            .logo-box h1 { font-size: 11px; letter-spacing: 2px; }
+            .site-nav { padding: 0 16px; }
+            .logo-box h1 { font-size: 11px; letter-spacing: 1px; }
+            .swap-mode-btn { padding: 4px 10px; font-size: 9px; }
             .gallery-intro { padding: 140px 16px 40px; }
             .gallery-intro h1 { font-size: 22px; letter-spacing: 4px; }
         }
@@ -324,8 +333,11 @@
             menu.classList.toggle('mobile-active');
             if(menu.classList.contains('mobile-active')) {
                 btn.innerText = '✕';
+                // Prevents backpage movement when checking links on smaller screens
+                document.body.style.overflow = 'hidden'; 
             } else {
                 btn.innerText = '☰';
+                document.body.style.overflow = 'auto';
             }
         }
 
