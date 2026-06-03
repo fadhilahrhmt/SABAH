@@ -204,39 +204,73 @@
         .compass-btn:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--nav-hover-accent); color: var(--nav-hover-accent); }
 
         @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
-        /* --- MOBILE FIX: ONLY activates on screens smaller than a desktop (less than 992px wide) --- */
+       /* ==========================================
+   MOBILE SCREEN REPAIR OVERRIDE
+   Only applies to screens under 992px wide.
+   ========================================== */
 @media (max-width: 991px) {
-    body { 
-        overflow-y: auto !important; /* Allows scrolling down on mobile */
-        height: auto !important; 
+    /* 1. Allow the body wrapper to expand and scroll down naturally */
+    body {
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        display: block !important;
     }
-    
-    /* Turn off rigid desktop positioning so elements don't crash into each other */
-    .sidebar, .map-stage, .ai-sidebar { 
-        position: relative !important; 
-        width: 100% !important; 
-        height: auto !important; 
-        inset: auto !important;
+
+    /* 2. Reset the main layouts to stack neatly vertically */
+    .sidebar, .map-stage, .ai-sidebar {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
         left: auto !important;
         right: auto !important;
         top: auto !important;
         bottom: auto !important;
-        border: none !important;
+        inset: auto !important; /* Disables your desktop inset: 80px 380px... */
         padding: 20px !important;
+        border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
-    /* Fix the HUD infobox so it displays nicely under the map on phones */
+    /* 3. Give the sidebar summary cards room to breathe */
+    .summary-card {
+        width: 100% !important;
+        margin-top: 15px !important;
+    }
+
+    /* 4. Center your SVG Map container cleanly on the phone screen */
+    .interactive-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        transform: none !important; /* Disables 3D matrix tilts that warp on phone screens */
+    }
+
+    #map-svg {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 50vh !important;
+    }
+
+    /* 5. Untrap the Data HUD info card from overlapping the texts */
     .data-hud {
         position: relative !important;
         left: auto !important;
         top: auto !important;
         width: 100% !important;
         margin-top: 20px !important;
+        box-shadow: none !important;
     }
-    
-    /* Auto-hide the desktop cursor circles on touchscreens so they don't glitch */
-    #c, #cr { 
-        display: none !important; 
+
+    /* 6. Untrap the AI chat section from squishing */
+    .ai-chat-body {
+        max-height: 300px !important;
+        overflow-y: auto !important;
+    }
+
+    /* 7. Hide the custom desktop pointer dots so they don't block mobile finger taps */
+    #c, #cr {
+        display: none !important;
     }
 }
     </style>
