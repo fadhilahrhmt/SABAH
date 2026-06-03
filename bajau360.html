@@ -71,7 +71,7 @@
       position: fixed; top: 0; width: 100%; height: 80px;
       display: flex; justify-content: space-between; align-items: center;
       padding: 0 50px; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
-      z-index: 5500;
+      z-index: 5000;
       backdrop-filter: blur(20px);
       transition: background 0.4s, border-color 0.4s;
     }
@@ -132,7 +132,7 @@
       overflow: hidden;
       position: relative;
       padding-bottom: 5px;
-      margin-top: 10px;
+      margin-top: 15px;
       mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
       -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
     }
@@ -140,17 +140,18 @@
     .wardrobe-track {
       display: inline-flex;
       white-space: nowrap;
-      animation: gearSwipe 15s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+      animation: gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
     }
     
-    .wardrobe-scroll-container:hover .wardrobe-track { 
+    .wardrobe-scroll-container:hover .wardrobe-track,
+    .wardrobe-scroll-container:active .wardrobe-track { 
       animation-play-state: paused !important; 
     }
 
     .wardrobe-item {
       flex-shrink: 0;
-      width: 180px;  
-      height: 140px; 
+      width: 240px;  
+      height: 280px; 
       margin-right: 18px;
       position: relative;
       border: 1px solid var(--ui-border);
@@ -175,8 +176,8 @@
       bottom: 0; left: 0; right: 0;
       background: rgba(3, 3, 3, 0.85);
       color: var(--accent);
-      font-size: 0.55rem;
-      padding: 6px;
+      font-size: 0.65rem;
+      padding: 8px;
       text-align: center;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -189,10 +190,10 @@
 
     @keyframes gearSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 25vw)); }
+      100% { transform: translateX(calc(-100% + 310px)); }
     }
 
-    /* --- TEXTILE SWIPING GALLERY (BOTTOM SIDE) --- */
+    /* --- TEXTILE SWIPING GALLERY (RIGHT SIDE) --- */
     .pattern-archive-label {
       font-size: 0.6rem;
       color: var(--accent);
@@ -212,19 +213,24 @@
     .pattern-track {
       display: inline-flex;
       white-space: nowrap;
-      animation: scanSwipe 15s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+      animation: scanSwipe 12s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
     }
-    .pattern-scroll-container:hover .pattern-track { animation-play-state: paused !important; }
+    .pattern-scroll-container:hover .pattern-track,
+    .pattern-scroll-container:active .pattern-track { 
+      animation-play-state: paused !important; 
+    }
 
     .pattern-item {
       flex-shrink: 0;
       width: 140px;
-      height: 100px;
+      height: 180px;
       margin-right: 15px;
       position: relative;
       border: 1px solid var(--ui-border);
       background: #111;
       overflow: hidden;
+      mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
     }
 
     .pattern-img {
@@ -244,17 +250,16 @@
 
     @keyframes scanSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 25vw)); }
+      100% { transform: translateX(calc(-100% + 250px)); }
     }
 
-    /* --- VIEWPORT DASHBOARD REDESIGN --- */
+    /* --- VIEWPORT GRID --- */
     .viewer-container {
       display: grid; 
-      grid-template-columns: 320px 1fr 320px; 
-      grid-template-rows: 1fr auto;
+      grid-template-columns: 380px 1fr 340px; 
       height: 100vh; 
-      padding: 100px 40px 40px; 
-      gap: 24px;
+      padding: 110px 40px 40px; 
+      gap: 20px;
     }
 
     .panel { 
@@ -269,95 +274,133 @@
       transition: background 0.3s, border-color 0.3s;
     }
 
-    .panel-left-wrapper {
-      grid-column: 1;
-      grid-row: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    /* Separate standalone wrapper created specifically for structural mobile layout lifting */
+    .mobile-gear-wrapper {
+      display: none;
     }
 
-    .panel-right-wrapper {
-      grid-column: 3;
-      grid-row: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .panel-header { font-size: 0.65rem; color: var(--accent); border-bottom: 1px solid var(--ui-border); padding-bottom: 8px; margin-bottom: 15px; letter-spacing: 3px; }
+    .panel-header { font-size: 0.6rem; color: var(--accent); border-bottom: 1px solid var(--ui-border); padding-bottom: 8px; margin-bottom: 15px; letter-spacing: 3px; }
 
     .terminal-btn {
       display: block; width: 100%; background: transparent; border: 1px solid var(--accent);
-      color: var(--accent); padding: 12px; font-family: 'Space Mono'; font-size: 0.65rem;
-      text-align: center; text-decoration: none; margin-bottom: 12px; transition: 0.3s;
+      color: var(--accent); padding: 10px; font-family: 'Space Mono'; font-size: 0.65rem;
+      text-align: center; text-decoration: none; margin-bottom: 10px; transition: 0.3s;
     }
     .terminal-btn:hover, .terminal-btn.active { background: var(--accent); color: var(--bg); box-shadow: 0 0 10px var(--accent); }
 
     .metadata-desc {
-      font-size: 0.65rem; 
+      font-size: 0.6rem; 
       color: var(--text-dim); 
-      line-height: 1.7; 
+      margin-top: 10px; 
+      line-height: 1.8; 
       text-transform: uppercase;
       text-align: justify;
     }
 
-    /* Centered Canvas Container Layout */
     .model-stage { 
-      grid-column: 2;
-      grid-row: 1;
       position: relative; 
       border: 1px solid var(--ui-border);
       background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
       transition: border-color 0.3s;
-      height: 100%;
-      min-height: 400px;
+      min-height: 350px;
     }
-    #realModelCanvas { width: 100% !important; height: 100% !important; display: block; }
+    #realModelCanvas { width: 100% !important; height: 100% !important; }
     .status-overlay { position: absolute; bottom: 15px; left: 15px; font-size: 0.55rem; color: var(--accent); }
 
-    /* Bottom dynamic horizontal gallery */
-    .bottom-showcase-panel {
-      grid-column: 1 / -1;
-      grid-row: 2;
-    }
-
-    /* --- RESPONSIVE OPTIMIZATIONS --- */
+    /* --- ENGINE BREAKPOINT OPTIMIZATIONS --- */
     @media (max-width: 1100px) {
-      body { overflow-y: auto; }
-      .hud-frame { display: none; }
-      .site-nav { padding: 0 24px; height: 70px; }
-      #digital-clock { display: none; }
-      .hamburger-toggle { display: flex; }
-
-      .nav-menu {
-        position: fixed; top: 0; right: -100%; width: 100%; height: 100vh;
-        background: var(--bg); flex-direction: column; justify-content: center; align-items: center;
-        gap: 35px; padding: 80px 24px; transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 5000; backdrop-filter: blur(20px); border-left: 1px solid var(--glass-border);
+      body {
+        overflow-y: auto;
       }
-      .nav-menu.is-active { right: 0; }
-      .nav-menu a { font-size: 15px; letter-spacing: 4px; padding: 12px; }
+      .hud-frame {
+        display: none;
+      }
+      .site-nav {
+        padding: 0 24px;
+        height: 70px;
+      }
+      #digital-clock {
+        display: none;
+      }
+      .hamburger-toggle {
+        display: flex;
+      }
 
+      /* Transform navigation architecture into mobile structural drawer */
+      .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 100%;
+        height: 100vh;
+        background: var(--bg);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 35px;
+        padding: 80px 24px;
+        transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 5500;
+        backdrop-filter: blur(20px);
+        border-left: 1px solid var(--glass-border);
+      }
+      .nav-menu.is-active {
+        right: 0;
+      }
+      .nav-menu a {
+        font-size: 15px;
+        letter-spacing: 4px;
+        padding: 12px;
+      }
+
+      /* Hide native inside-panel gear elements on small viewports */
+      .panel .desktop-gear-target {
+        display: none;
+      }
+
+      /* Structural display activation of top gear box row */
+      .mobile-gear-wrapper {
+        display: block;
+        order: 1; /* Elevates component to absolute row peak index */
+      }
+
+      /* Stack structural responsive components clean layout */
       .viewer-container { 
-        grid-template-columns: 1fr; 
-        grid-template-rows: auto;
+        display: flex;
+        flex-direction: column;
         height: auto; 
-        padding: 100px 16px 40px; 
+        padding: 90px 16px 40px; 
         gap: 16px;
       }
-      .panel-left-wrapper, .panel-right-wrapper, .model-stage, .bottom-showcase-panel {
-        grid-column: 1;
-        grid-row: auto;
-      }
-      .panel { gap: 16px; justify-content: flex-start; }
-      .model-stage { height: 380px; }
+      
+      /* Order Assignments across view components */
+      .viewer-container .panel:nth-of-type(1) { order: 2; } /* Node Selection Control Panel */
+      .model-stage { order: 3; height: 400px; }            /* Three.JS Canvas Rendering Arena */
+      .viewer-container .panel:nth-of-type(2) { order: 4; } /* Asset Metadata Base Panel */
 
-      .wardrobe-scroll-container, .pattern-scroll-container {
-        mask-image: none; -webkit-mask-image: none; overflow-x: auto;
+      .panel {
+        gap: 16px;
+        justify-content: flex-start;
       }
-      .wardrobe-scroll-container::-webkit-scrollbar, .pattern-scroll-container::-webkit-scrollbar { display: none; }
-      .wardrobe-track, .pattern-track { animation: none !important; padding: 0 4px; }
+
+      /* Configure track mechanics for touch hardware while retaining loop animations on hover */
+      .wardrobe-scroll-container, .pattern-scroll-container {
+        mask-image: none;
+        -webkit-mask-image: none;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .wardrobe-scroll-container::-webkit-scrollbar, .pattern-scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .wardrobe-track {
+        animation: gearSwipe 14s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+      }
+      .pattern-track {
+        animation: scanSwipe 14s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+        padding: 0 4px;
+      }
     }
   </style>
 </head>
@@ -390,67 +433,62 @@
 
   <main class="viewer-container">
     
-    <div class="panel-left-wrapper">
-      <aside class="panel">
-        <div>
-          <div class="panel-header" data-glitch="NODE_SELECTION">NODE_SELECTION</div>
-          <button id="loadFemale" class="terminal-btn active" data-glitch="[ BAJAU_FEMALE ]">[ BAJAU_FEMALE ]</button>
-          <button id="loadMale" class="terminal-btn" data-glitch="[ BAJAU_MALE ]">[ BAJAU_MALE ]</button>
+    <div class="panel mobile-gear-wrapper">
+      <div class="panel-header" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
+      <div class="wardrobe-scroll-container mobile-scroll-target">
         </div>
-      </aside>
-
-      <aside class="panel">
-        <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
-          <div>
-            <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 1rem; letter-spacing: 2px;">MOTIFS</h2>
-            <p class="metadata-desc" style="margin-top: 10px;">
-              Bajau Samah traditional attire is known for floral embroidery, geometric motifs, and gold thread embellishments.
-            </p>
-          </div>
-          <a href="bajau.html" class="terminal-btn" style="margin-top: 20px; margin-bottom: 0;" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
-        </div>
-      </aside>
     </div>
+
+    <aside class="panel">
+      <div>
+        <div class="panel-header" data-glitch="NODE_SELECTION">NODE_SELECTION</div>
+        <button id="loadFemale" class="terminal-btn active" data-glitch="[ BAJAU_FEMALE ]">[ BAJAU_FEMALE ]</button>
+        <button id="loadMale" class="terminal-btn" data-glitch="[ BAJAU_MALE ]">[ BAJAU_MALE ]</button>
+        
+        <div class="desktop-gear-target">
+          <div class="panel-header" style="margin-top:25px;" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
+          <div class="wardrobe-scroll-container desktop-scroll-target">
+            <div id="wardrobeTrack" class="wardrobe-track"></div>
+          </div>
+        </div>
+      </div>
+    </aside>
 
     <section class="model-stage" id="stageContainer">
       <canvas id="realModelCanvas"></canvas>
       <div class="status-overlay">RENDER_MODE: <span id="modelStatus">IDLE</span></div>
     </section>
 
-    <div class="panel-right-wrapper">
-      <aside class="panel">
-        <div>
-          <div class="panel-header" data-glitch="ASSET_METADATA">ASSET_METADATA</div>
-          <div class="pattern-archive-label">TEXTILE_PATTERNS // SCAN_04</div>
-          
-          <div class="pattern-scroll-container">
-            <div class="pattern-track">
-              <div class="pattern-item">
-                <img src="https://images.openai.com/static-rsc-4/udopBj9xhIqMhtSatuyl7FP_vTKv-xBcd_1Mfb-zWbye-TDE2_9x9DpLAZMGR47kjWxtlkqWLG_dh9II-S8p9SpgnYRDZiaz1mxLgBqkmtyzRUAajcHlg44cgfjg9tpjIfQhyA_UoLlXc3GlzmxcflJREvVmYw7Vla5ou6TA6sOHT91jld-Gd03ZDruYrjHm?purpose=fullsize" class="pattern-img">
-              </div>
-              <div class="pattern-item">
-                <img src="https://images.openai.com/static-rsc-4/_d0lFC8NMIo2HhiPDSiKR7JK3THVhXLhdJPTd8BT-yJcMPA1l5rKMCI1jkA3CRNiWAI3ZJv-CwEQC66nUf4YoxxIcNm9wl0h--9YGvqENfCyJ1648CBCsoVTyR9cx0HOjrP-r0CwNBdjEkN2N6MG54UApGZ8s0BpvFroPpnnAy9YYLk--ZO1xs6Uepxsxkae?purpose=fullsize" class="pattern-img">
-              </div>
-              <div class="pattern-item">
-                <img src="https://sabahnewstoday.net/wp-content/uploads/2024/09/fbbe2adf-83cd-46ba-a4ac-b2492554f1b5-300x212.jpeg" class="pattern-img">
-              </div>
+    <aside class="panel">
+      <div>
+        <div class="panel-header" data-glitch="ASSET_METADATA">ASSET_METADATA</div>
+        
+        <div class="pattern-archive-label">TEXTILE_PATTERNS // SCAN_04</div>
+        
+        <div class="pattern-scroll-container">
+          <div class="pattern-track">
+            <div class="pattern-item">
+              <img src="https://images.openai.com/static-rsc-4/udopBj9xhIqMhtSatuyl7FP_vTKv-xBcd_1Mfb-zWbye-TDE2_9x9DpLAZMGR47kjWxtlkqWLG_dh9II-S8p9SpgnYRDZiaz1mxLgBqkmtyzRUAajcHlg44cgfjg9tpjIfQhyA_UoLlXc3GlzmxcflJREvVmYw7Vla5ou6TA6sOHT91jld-Gd03ZDruYrjHm?purpose=fullsize" class="pattern-img">
+            </div>
+            <div class="pattern-item">
+              <img src="https://images.openai.com/static-rsc-4/_d0lFC8NMIo2HhiPDSiKR7JK3THVhXLhdJPTd8BT-yJcMPA1l5rKMCI1jkA3CRNiWAI3ZJv-CwEQC66nUf4YoxxIcNm9wl0h--9YGvqENfCyJ1648CBCsoVTyR9cx0HOjrP-r0CwNBdjEkN2N6MG54UApGZ8s0BpvFroPpnnAy9YYLk--ZO1xs6Uepxsxkae?purpose=fullsize" class="pattern-img">
+            </div>
+            <div class="pattern-item">
+              <img src="https://sabahnewstoday.net/wp-content/uploads/2024/09/fbbe2adf-83cd-46ba-a4ac-b2492554f1b5-300x212.jpeg" class="pattern-img">
             </div>
           </div>
         </div>
-      </aside>
-    </div>
 
-    <div class="bottom-showcase-panel">
-      <aside class="panel">
-        <div>
-          <div class="panel-header" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
-          <div class="wardrobe-scroll-container">
-            <div id="wardrobeTrack" class="wardrobe-track"></div>
-          </div>
-        </div>
-      </aside>
-    </div>
-
+        <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 1.2rem; margin-top: 15px;">MOTIFS</h2>
+        <p class="metadata-desc">
+          ARCHIVAL TEXTILE ANALYSIS:<br>
+          Bajau Samah do not have a single widely recognized traditional pattern name that represents the entire ethnic group.<br>
+          Instead, Bajau Sama traditional attire is known for its floral embroidery, geometric motifs, gold thread decoration, and intricate embellishments.<br>
+          Bajau Samah pattern detected.
+        </p>
+      </div>
+      <a href="bajau.html" class="terminal-btn" style="margin-top: 15px;" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
+    </aside>
   </main>
 
   <script>
@@ -472,7 +510,7 @@
     import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
     import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
 
-    /* WARDROBE DATA STRUCTS */
+    /* WARDROBE HORIZONTAL TRACK CONFIGURATION (BAJAU PROFILES) */
     const costumeData = {
       female: [
         { name: "Badu Sipak", img: "b1.png" },
@@ -495,11 +533,12 @@
     function updateWardrobeDisplay(gender) {
       wardrobeTrack.innerHTML = '';
       
-      if (window.innerWidth > 1100) {
-        wardrobeTrack.style.animation = 'none';
-        wardrobeTrack.offsetHeight; 
-        wardrobeTrack.style.animation = 'gearSwipe 15s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
-      }
+      // Handle programmatic styling transitions smoothly
+      wardrobeTrack.style.animation = 'none';
+      wardrobeTrack.offsetHeight; 
+      
+      const speedSetting = window.innerWidth <= 1100 ? '14s' : '10s';
+      wardrobeTrack.style.animation = `gearSwipe ${speedSetting} cubic-bezier(0.45, 0, 0.55, 1) infinite alternate`;
 
       costumeData[gender].forEach(item => {
         const div = document.createElement('div');
@@ -525,9 +564,15 @@
         wardrobeTrack.appendChild(div);
       });
 
-      refreshCursorBoundaries();
+      // Synchronize shared DOM nodes inside the mobile wrapper container view natively
+      const mobileTarget = document.querySelector('.mobile-scroll-target');
+      if (mobileTarget) {
+        mobileTarget.innerHTML = '';
+        mobileTarget.appendChild(wardrobeTrack.cloneNode(true));
+      }
     }
 
+    // Initialize Content Components
     updateWardrobeDisplay('female');
 
     /* INTERACTIVE TEXT GLITCH ENGINE */
@@ -557,7 +602,7 @@
       el.addEventListener('mouseenter', () => triggerGlitch(el));
     });
 
-    /* CURSOR LOGIC SYSTEM */
+    /* GALLERY MOUSE LOGIC SYNC & PARALLAX TRACKERS */
     const cursor = document.getElementById('cursor');
     let mouseX = 0, mouseY = 0;
 
@@ -573,30 +618,28 @@
         }
     });
 
-    function refreshCursorBoundaries() {
-      document.querySelectorAll('.nav-menu a, button, .terminal-btn, .pattern-item, .wardrobe-item, .mode-swap').forEach(item => {
-          item.addEventListener('mouseenter', () => {
-              if (follower && window.getComputedStyle(follower).display !== 'none') {
-                follower.style.transform = 'scale(1.5)';
-                follower.style.borderColor = 'var(--text-main)';
-                if (item.classList.contains('mode-swap')) {
-                    follower.style.background = 'rgba(212, 175, 55, 0.2)';
-                    cursor.style.background = 'var(--text-main)';
-                }
+    document.querySelectorAll('.nav-menu a, button, .terminal-btn, .pattern-item, .mode-swap').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            if (follower && window.getComputedStyle(follower).display !== 'none') {
+              follower.style.transform = 'scale(1.5)';
+              follower.style.borderColor = 'var(--text-main)';
+              if (item.classList.contains('mode-swap')) {
+                  follower.style.background = 'rgba(212, 175, 55, 0.2)';
+                  cursor.style.background = 'var(--text-main)';
               }
-          });
-          item.addEventListener('mouseleave', () => {
-              if (follower && window.getComputedStyle(follower).display !== 'none') {
-                follower.style.transform = 'scale(1)';
-                follower.style.borderColor = 'var(--accent)';
-                follower.style.background = 'transparent';
-                cursor.style.background = 'var(--accent)';
-              }
-          });
-      });
-    }
+            }
+        });
+        item.addEventListener('mouseleave', () => {
+            if (follower && window.getComputedStyle(follower).display !== 'none') {
+              follower.style.transform = 'scale(1)';
+              follower.style.borderColor = 'var(--accent)';
+              follower.style.background = 'transparent';
+              cursor.style.background = 'var(--accent)';
+            }
+        });
+    });
 
-    /* CLOCK ENGINE */
+    /* CLOCK COMPONENT ENGINE */
     function updateClock() {
       const clockEl = document.getElementById('digital-clock');
       if (clockEl && window.getComputedStyle(clockEl).display !== 'none') {
@@ -607,7 +650,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    /* THREE.JS FIELD ENGINE */
+    /* THREE.JS ENGINE */
     const stage = document.getElementById('stageContainer');
     const canvas = document.getElementById('realModelCanvas');
     const status = document.getElementById('modelStatus');
@@ -632,11 +675,12 @@
     controls.dampingFactor = 0.05;
     camera.position.set(0, 0, 3);
 
-    /* PROCEDURAL HOLOGRAM MATRIX FIELD */
+    /* INTERACTIVE PROCEDURAL HOLOGRAM MATRIX */
     const particleCount = 1500;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
+
     const colorAccent = new THREE.Color('#d4af37');
 
     for (let i = 0; i < particleCount * 3; i += 3) {
@@ -676,7 +720,7 @@
     const particleSystem = new THREE.Points(geometry, material);
     scene.add(particleSystem);
 
-    /* MODEL MANAGER CORE */
+    /* MODEL LOADER CORE */
     let loadedMesh = null;
     const gltfLoader = new GLTFLoader();
 
@@ -702,6 +746,7 @@
         filename, 
         (gltf) => {
           loadedMesh = gltf.scene;
+
           const box = new THREE.Box3().setFromObject(loadedMesh);
           const center = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
@@ -711,7 +756,7 @@
           loadedMesh.position.z += (loadedMesh.position.z - center.z);
           
           const maxDim = Math.max(size.x, size.y, size.z);
-          const scale = 1.4 / maxDim;
+          const scale = 1.6 / maxDim;
           loadedMesh.scale.set(scale, scale, scale);
 
           scene.add(loadedMesh);
@@ -724,7 +769,7 @@
           }
         },
         (error) => {
-          console.warn('GLB asset link bypassed. Displaying holographic matrix fallback.');
+          console.warn('GLB asset link bypassed. Displaying holographic matrix field fallback.');
           status.innerText = "MATRIX_ACTIVE";
           material.opacity = 0.5;
         }
@@ -756,9 +801,10 @@
       }
     };
 
-    /* RENDERING RUNTIME ENGINE LOOP */
+    /* ANIMATION LOOP & PARALLAX TRACKING */
     function animate() {
       requestAnimationFrame(animate);
+      
       particleSystem.rotation.y += 0.001;
       particleSystem.rotation.x += 0.0005;
 
@@ -781,11 +827,9 @@
       camera.updateProjectionMatrix();
       renderer.setSize(stage.clientWidth, stage.clientHeight);
       
-      if (window.innerWidth <= 1100) {
-        wardrobeTrack.style.animation = 'none';
-      } else {
-        wardrobeTrack.style.animation = 'gearSwipe 15s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
-      }
+      // Synchronize dynamic loops explicitly during system layout updates
+      const speedSetting = window.innerWidth <= 1100 ? '14s' : '10s';
+      wardrobeTrack.style.animation = `gearSwipe ${speedSetting} cubic-bezier(0.45, 0, 0.55, 1) infinite alternate`;
     });
   </script>
 </body>
