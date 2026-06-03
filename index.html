@@ -25,8 +25,13 @@
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        /* Desktop Default: Hide Native Cursor */
+        @media (pointer: fine) {
+            * { cursor: none; }
+        }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -55,6 +60,7 @@
             align-items: center;
             justify-content: center;
             transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 20px;
         }
 
         .unlock-btn {
@@ -66,6 +72,7 @@
             font-size: 11px;
             letter-spacing: 6px;
             transition: 0.4s ease;
+            text-align: center;
         }
         .unlock-btn:hover {
             border-color: var(--accent-color);
@@ -85,14 +92,15 @@
             opacity: 1;
             transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
+            padding: 20px;
         }
 
-        .loader-content { text-align: center; }
+        .loader-content { text-align: center; width: 100%; max-width: 340px; }
         .loader-title {
             font-family: var(--font-heading);
-            font-size: clamp(1.2rem, 4vw, 2.2rem);
+            font-size: clamp(1rem, 4vw, 2.2rem);
             font-weight: 700;
-            letter-spacing: 12px;
+            letter-spacing: 6px;
             color: #fff;
             margin-bottom: 30px;
             min-height: 40px;
@@ -105,11 +113,11 @@
         }
         @keyframes blink { 0% { opacity: 0; } 100% { opacity: 1; } }
 
-        .bar-frame { width: 340px; height: 2px; background: rgba(255, 255, 255, 0.05); margin: 0 auto; position: relative; }
+        .bar-frame { width: 100%; height: 2px; background: rgba(255, 255, 255, 0.05); margin: 0 auto; position: relative; }
         .bar-fill { height: 100%; width: 0%; background: var(--accent-color); box-shadow: 0 0 20px var(--accent-color); }
 
         /* HUD CURSOR RETICLE STYLES */
-        #cursor-dot { width: 4px; height: 4px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 100001; }
+        #cursor-dot { width: 4px; height: 4px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 100001; display: none; }
         #cursor-hud {
             width: 46px;
             height: 46px;
@@ -118,11 +126,17 @@
             position: fixed;
             pointer-events: none;
             z-index: 100000;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, background-color 0.3s ease;
         }
+        
+        /* Only enable HUD Custom Cursors on desktop environments */
+        @media (pointer: fine) {
+            #cursor-dot, #cursor-hud { display: flex; }
+        }
+
         #cursor-hud::before { content: ''; position: absolute; width: 100%; height: 100%; border: 1px dashed rgba(255, 255, 255, 0.25); border-radius: 50%; animation: spinHUD 8s linear infinite; }
         #cursor-hud.target-locked { width: 26px; height: 26px; border-color: #ffffff; background-color: rgba(197, 160, 89, 0.35); box-shadow: 0 0 25px rgba(197, 160, 89, 0.7); }
         @keyframes spinHUD { to { transform: rotate(360deg); } }
@@ -147,9 +161,9 @@
             position: fixed;
             inset: 0;
             background: radial-gradient(
-                circle 700px at var(--mouse-x) var(--mouse-y), 
+                circle clamp(300px, 50vw, 700px) at var(--mouse-x) var(--mouse-y), 
                 rgba(9, 10, 15, 0) 0%, 
-                rgba(9, 10, 15, 0.65) 100%
+                rgba(9, 10, 15, 0.75) 100%
             ); 
             z-index: 3;
             pointer-events: none;
@@ -162,9 +176,10 @@
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 60px;
+            padding: clamp(20px, 5vw, 60px);
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
             z-index: 100;
             opacity: 0;
             transform: translateY(-30px);
@@ -172,11 +187,11 @@
             pointer-events: none;
         }
 
-        .logo-box { font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.6em; line-height: 2; }
-        .nav-links { display: flex; flex-direction: column; gap: 15px; text-align: right; }
+        .logo-box { font-family: var(--font-heading); font-size: clamp(9px, 2vw, 11px); letter-spacing: 0.6em; line-height: 2; }
+        .nav-links { display: flex; flex-direction: column; gap: 10px; text-align: right; }
         
         .nav-links a { 
-            font-size: 9px; 
+            font-size: clamp(8px, 1.8vw, 9px); 
             text-decoration: none; 
             color: var(--text-color); 
             letter-spacing: 4px; 
@@ -203,8 +218,12 @@
             text-shadow: 0 0 15px rgba(197, 160, 89, 0.6);
         }
         .nav-links a.active::before { width: 100%; }
-        .nav-links a:hover { opacity: 1; color: var(--accent-color); letter-spacing: 10px; text-shadow: 0 0 15px rgba(197, 160, 89, 0.6); }
-        .nav-links a:hover::before { width: 100%; }
+        
+        /* Disable expansive hover expansions on touch screens to prevent sticky-state text stretching */
+        @media (pointer: fine) {
+            .nav-links a:hover { opacity: 1; color: var(--accent-color); letter-spacing: 10px; text-shadow: 0 0 15px rgba(197, 160, 89, 0.6); }
+            .nav-links a:hover::before { width: 100%; }
+        }
 
         /* HERO PANEL CORE ENGINE */
         .hero-main {
@@ -217,13 +236,14 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
+            padding: 0 20px;
         }
 
-        .hero-title { font-family: var(--font-heading); font-size: clamp(3.5rem, 13vw, 9.5rem); font-weight: 700; line-height: 0.9; margin-bottom: 30px; letter-spacing: -2px; text-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        .hero-title { font-family: var(--font-heading); font-size: clamp(2rem, 8vw, 9.5rem); font-weight: 700; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; text-shadow: 0 0 40px rgba(0,0,0,0.5); }
         .hero-title span { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); display: block; opacity: 0; filter: blur(20px); }
-        .hero-title .title-lower { opacity: 0; filter: blur(20px); }
-        .hero-description { max-width: 520px; margin: 0 auto; font-size: 11px; line-height: 2.5; letter-spacing: 2px; opacity: 0; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .cta-wrapper { margin-top: 60px; opacity: 0; transform: scale(0.9); }
+        .hero-title .title-lower { opacity: 0; filter: blur(20px); letter-spacing: 4px; }
+        .hero-description { max-width: 520px; margin: 0 auto; font-size: clamp(9px, 2vw, 11px); line-height: 2.2; letter-spacing: 2px; opacity: 0; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .cta-wrapper { margin-top: 40px; opacity: 0; transform: scale(0.9); }
 
         /* INTRO REVEAL SEQUENCES */
         .interface-active .site-header { opacity: 1; transform: translateY(0); pointer-events: auto; }
@@ -232,23 +252,24 @@
         .interface-active .hero-description { animation: fadeUpIn 2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards; }
         .interface-active .cta-wrapper { animation: fadeUpIn 2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards; pointer-events: auto; }
 
-        @keyframes driftLeft { 0% { transform: translateX(-120px); opacity: 0; filter: blur(15px); } 100% { transform: translateX(0); opacity: 1; filter: blur(0px); } }
-        @keyframes driftRight { 0% { transform: translateX(120px); opacity: 0; filter: blur(15px); } 100% { transform: translateX(0); opacity: 1; filter: blur(0px); } }
+        @keyframes driftLeft { 0% { transform: translateX(-40px); opacity: 0; filter: blur(15px); } 100% { transform: translateX(0); opacity: 1; filter: blur(0px); } }
+        @keyframes driftRight { 0% { transform: translateX(40px); opacity: 0; filter: blur(15px); } 100% { transform: translateX(0); opacity: 1; filter: blur(0px); } }
         @keyframes fadeUpIn { 0% { transform: translateY(25px); opacity: 0; } 100% { transform: translateY(0); opacity: 0.8; } }
 
         .cta-btn {
             background: rgba(9, 10, 15, 0.4);
             border: 1px solid rgba(255,255,255,0.4);
-            padding: 22px 55px;
+            padding: 18px 40px;
             color: white;
             font-family: var(--font-main);
-            font-size: 10px;
-            letter-spacing: 6px;
+            font-size: clamp(9px, 2vw, 10px);
+            letter-spacing: 4px;
             text-transform: uppercase;
             transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             z-index: 101; 
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         .cta-btn:hover { background: white; color: black; border-color: white; transform: scale(1.05); box-shadow: 0 0 40px rgba(197, 160, 89, 0.6); }
 
@@ -275,7 +296,19 @@
             background-color: #000;
         }
 
-        .bottom-ui { position: fixed; bottom: 40px; width: calc(100% - 100px); left: 50px; display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 4px; opacity: 0.5; z-index: 100; pointer-events: none; }
+        .bottom-ui { 
+            position: fixed; 
+            bottom: clamp(20px, 4vw, 40px); 
+            width: calc(100% - clamp(40px, 8vw, 100px)); 
+            left: clamp(20px, 4vw, 50px); 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: clamp(7px, 1.8vw, 9px); 
+            letter-spacing: 2px; 
+            opacity: 0.5; 
+            z-index: 100; 
+            pointer-events: none; 
+        }
     </style>
 </head>
 <body>
@@ -351,7 +384,7 @@
         const unlockTrigger = document.getElementById('unlock-trigger');
         const bgVideo = document.getElementById('bg-video');
 
-        let mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+        let mouse = { x: 0, y: 0, targetX: window.innerWidth / 2, targetY: window.innerHeight / 2 };
         let hyperSpeed = 0.02;
         let isWarping = false;
 
@@ -490,7 +523,7 @@
         const tunnelMesh = new THREE.LineSegments(wireframeGeo, lineMaterial);
         scene.add(tunnelMesh);
 
-        const extraParticles = 800;
+        const extraParticles = window.innerWidth < 768 ? 400 : 800; // Optimization for mobile frame rates
         const particleGeo = new THREE.BufferGeometry();
         const positions = new Float32Array(extraParticles * 3);
         for(let i=0; i<extraParticles*3; i+=3) {
@@ -564,20 +597,40 @@
             }
         }
 
-        // --- ACTIVE INTERACTION REVEAL LIGHTS & RADAR ---
-        document.addEventListener('mousemove', (e) => {
-            mouse.targetX = e.clientX; mouse.targetY = e.clientY;
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = (e.clientY / window.innerHeight) * 2 - 1;
+        // --- UNIFIED INPUT PROCESSING (Desktop Mouse + Mobile Touch) ---
+        function updateCoordinates(clientX, clientY) {
+            mouse.targetX = clientX; 
+            mouse.targetY = clientY;
+            mouse.x = (clientX / window.innerWidth) * 2 - 1; 
+            mouse.y = (clientY / window.innerHeight) * 2 - 1;
             
             flashlight.style.setProperty('--mouse-x', mouse.targetX + 'px');
             flashlight.style.setProperty('--mouse-y', mouse.targetY + 'px');
             
-            dot.style.left = mouse.targetX + 'px'; dot.style.top = mouse.targetY + 'px';
-            hudXy.innerText = `LOC_X: ${mouse.targetX.toString().padStart(4, '0')} // LOC_Y: ${mouse.targetY.toString().padStart(4, '0')}`;
+            dot.style.left = mouse.targetX + 'px'; 
+            dot.style.top = mouse.targetY + 'px';
+            hudXy.innerText = `LOC_X: ${Math.round(mouse.targetX).toString().padStart(4, '0')} // LOC_Y: ${Math.round(mouse.targetY).toString().padStart(4, '0')}`;
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            updateCoordinates(e.clientX, e.clientY);
         });
 
+        document.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                updateCoordinates(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchstart', (e) => {
+            if(e.touches.length > 0) {
+                updateCoordinates(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
         function runCursorEaser() {
-            let currentX = parseFloat(hud.style.left) || 0; let currentY = parseFloat(hud.style.top) || 0;
+            let currentX = parseFloat(hud.style.left) || 0; 
+            let currentY = parseFloat(hud.style.top) || 0;
             let targetOffset = hud.classList.contains('target-locked') ? 13 : 23;
             hud.style.left = currentX + ((mouse.targetX - targetOffset) - currentX) * 0.15 + 'px';
             hud.style.top = currentY + ((mouse.targetY - targetOffset) - currentY) * 0.15 + 'px';
