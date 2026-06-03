@@ -171,7 +171,7 @@
 
         .grain { position: fixed; inset: 0; z-index: 99; background: url('https://grainy-gradients.vercel.app/noise.svg'); opacity: 0.02; pointer-events: none; }
 
-        /* SITE UI INTERFACE HEADER */
+        /* SITE UI INTERFACE HEADER - UNTOUCHED FOR DESKTOP */
         .site-header {
             position: fixed;
             top: 0;
@@ -219,7 +219,20 @@
         }
         .nav-links a.active::before { width: 100%; }
         
-        /* Disable expansive hover expansions on touch screens to prevent sticky-state text stretching */
+        /* Mobile Toggle Button (Hidden on Desktop) */
+        .menu-toggle-btn {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            font-size: 10px;
+            letter-spacing: 2px;
+            padding: 8px 16px;
+            pointer-events: auto;
+            transition: 0.3s ease;
+        }
+
         @media (pointer: fine) {
             .nav-links a:hover { opacity: 1; color: var(--accent-color); letter-spacing: 10px; text-shadow: 0 0 15px rgba(197, 160, 89, 0.6); }
             .nav-links a:hover::before { width: 100%; }
@@ -273,28 +286,40 @@
         }
         .cta-btn:hover { background: white; color: black; border-color: white; transform: scale(1.05); box-shadow: 0 0 40px rgba(197, 160, 89, 0.6); }
 
-        /* CINEMATIC EMBEDDED YOUTUBE VIDEO SECTION */
+        /* CINEMATIC PREMIUM WATERMARKLESS YOUTUBE WRAPPER */
         .video-section {
             width: 100vw;
             height: 100vh;
             background: #000;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
             z-index: 10;
         }
 
-        /* Making iframe completely fluid and covering screen space */
-        .video-section iframe {
+        /* 1.25x Upscale-Cropping System: This hides YouTube's header title and footer branding completely */
+        .video-player-mask {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
             width: 100%;
             height: 100%;
-            pointer-events: auto; /* Enable controls inside YouTube window */
+            transform: translate(-50%, -50%) scale(1.25);
+            pointer-events: none; /* Disables accidental text highlights or native pausing clicks */
+        }
+
+        .video-player-mask iframe {
+            width: 100%;
+            height: 100%;
             border: none;
+        }
+
+        /* Unified Grade Layer to color-match YouTube back to your dark theme palette */
+        .video-tint-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, transparent 25%, rgba(9, 10, 15, 0.8) 100%);
+            z-index: 2;
+            pointer-events: none;
         }
 
         .bottom-ui { 
@@ -309,6 +334,56 @@
             opacity: 0.5; 
             z-index: 100; 
             pointer-events: none; 
+        }
+
+        /* --- MOBILE CONDITIONAL INTERCEPT RULES --- */
+        @media (max-width: 768px) {
+            html, body, a, button { cursor: auto !important; }
+            #cursor-dot, #cursor-hud { display: none !important; }
+
+            .site-header {
+                align-items: center;
+                padding: 20px;
+                background: rgba(9, 10, 15, 0.7);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+
+            .menu-toggle-btn {
+                display: block;
+            }
+
+            /* Shift exact styling on mobile into an absolute vertical grid panel */
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                right: 20px;
+                background: #0d0e14;
+                border: 1px solid rgba(197, 160, 89, 0.2);
+                padding: 15px;
+                gap: 5px;
+                text-align: left;
+                display: none; /* Controlled by Javascript toggle */
+                box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                font-size: 10px;
+                padding: 10px 15px;
+                display: block;
+            }
+
+            .nav-links a::before {
+                display: none; /* Kill horizontal desktop bars on mobile panels */
+            }
+
+            .video-player-mask {
+                transform: translate(-50%, -50%) scale(1.6); /* Sharper mask zoom scale for vertical viewports */
+            }
         }
     </style>
 </head>
@@ -341,7 +416,8 @@
 
     <header class="site-header">
         <div class="logo-box">SABAH<br>HERITAGE<br></div>
-        <nav class="nav-links">
+        <button class="menu-toggle-btn" id="menu-toggle" onclick="toggleNavMenu()">MENU_</button>
+        <nav class="nav-links" id="navigation-bar">
             <a href="#" class="active">HOME</a>
             <a href="explore.html">EXPLORE</a>
             <a href="gallery.html">GALLERY</a>
@@ -362,7 +438,10 @@
     </main>
 
     <section class="video-section" id="video-experience">
-        <div id="youtube-player"></div>
+        <div class="video-tint-overlay"></div>
+        <div class="video-player-mask">
+            <div id="youtube-player"></div>
+        </div>
     </section>
 
     <div class="bottom-ui">
@@ -380,13 +459,31 @@
         const videoSection = document.getElementById('video-experience');
         const audioUnlocker = document.getElementById('audio-unlocker');
         const unlockTrigger = document.getElementById('unlock-trigger');
+        const navigationBar = document.getElementById('navigation-bar');
+        const menuToggle = document.getElementById('menu-toggle');
 
         let mouse = { x: 0, y: 0, targetX: window.innerWidth / 2, targetY: window.innerHeight / 2 };
         let hyperSpeed = 0.02;
         let isWarping = false;
+        let isTouchScreen = false;
+
+        // --- RESPONSIVE MOBILE ACCORDION INTERACTION ---
+        function toggleNavMenu() {
+            navigationBar.classList.toggle('active');
+            menuToggle.innerText = navigationBar.classList.contains('active') ? "CLOSE_" : "MENU_";
+        }
+
+        // Hide navigation drop box automatically when links are tapped on tiny screens
+        document.querySelectorAll('.nav-links a').forEach(linkItem => {
+            linkItem.addEventListener('click', () => {
+                if(window.innerWidth <= 768) {
+                    navigationBar.classList.remove('active');
+                    menuToggle.innerText = "MENU_";
+                }
+            });
+        });
 
         // --- YOUTUBE IFRAME API LAYER ---
-        // Load API asynchronously
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName('script')[0];
@@ -397,16 +494,21 @@
             ytPlayer = new YT.Player('youtube-player', {
                 height: '100%',
                 width: '100%',
-                videoId: 'P5zfmgTXf5Y', // Parsed out from your URL string
+                videoId: 'P5zfmgTXf5Y', 
                 playerVars: {
                     'autoplay': 0,
-                    'controls': 1,
+                    'controls': 0,          // Removes basic pause/scrub buttons completely
+                    'disablekb': 1,         // Kills keyboard shortcut intercept functions
                     'rel': 0,
                     'showinfo': 0,
-                    'modestbranding': 1,
+                    'modestbranding': 1,    // Disables persistent bottom icon branding
                     'loop': 1,
                     'playlist': 'P5zfmgTXf5Y',
-                    'playsinline': 1
+                    'playsinline': 1,
+                    'fs': 0                 // Removes standard fullscreen triggers
+                },
+                events: {
+                    'onReady': (e) => { e.target.mute(); } // Essential default to loop continuously without browser locks
                 }
             });
         }
@@ -547,7 +649,7 @@
         const tunnelMesh = new THREE.LineSegments(wireframeGeo, lineMaterial);
         scene.add(tunnelMesh);
 
-        const extraParticles = window.innerWidth < 768 ? 400 : 800; 
+        const extraParticles = window.innerWidth < 768 ? 350 : 800; 
         const particleGeo = new THREE.BufferGeometry();
         const positions = new Float32Array(extraParticles * 3);
         for(let i=0; i<extraParticles*3; i+=3) {
@@ -579,7 +681,7 @@
                 if(dustPositions[i] > 40) { dustPositions[i] = -110; }
             }
             dynamicDust.geometry.attributes.position.needsUpdate = true;
-            if(!isWarping) {
+            if(!isWarping && !isTouchScreen && window.innerWidth > 768) {
                 camera.position.x += (mouse.x * 6 - camera.position.x) * 0.05;
                 camera.position.y += (-mouse.y * 6 - camera.position.y) * 0.05;
                 tunnelMesh.position.x = mouse.x * -2;
@@ -621,8 +723,16 @@
             }
         }
 
-        // --- UNIFIED INPUT PROCESSING (Desktop Mouse + Mobile Touch) ---
+        // Touch intercept safety loops
+        window.addEventListener('touchstart', function initiateTouchFlag() {
+            isTouchScreen = true;
+            window.removeEventListener('touchstart', initiateTouchFlag, false);
+        }, false);
+
+        // --- UNIFIED INPUT PROCESSING ---
         function updateCoordinates(clientX, clientY) {
+            if(isTouchScreen || window.innerWidth <= 768) return;
+
             mouse.targetX = clientX; 
             mouse.targetY = clientY;
             mouse.x = (clientX / window.innerWidth) * 2 - 1; 
@@ -642,31 +752,21 @@
             updateCoordinates(e.clientX, e.clientY);
         });
 
-        document.addEventListener('touchmove', (e) => {
-            if(e.touches.length > 0) {
-                updateCoordinates(e.touches[0].clientX, e.touches[0].clientY);
-            }
-        }, { passive: true });
-
-        document.addEventListener('touchstart', (e) => {
-            if(e.touches.length > 0) {
-                updateCoordinates(e.touches[0].clientX, e.touches[0].clientY);
-            }
-        }, { passive: true });
-
         function runCursorEaser() {
-            let currentX = parseFloat(hud.style.left) || 0; 
-            let currentY = parseFloat(hud.style.top) || 0;
-            let targetOffset = hud.classList.contains('target-locked') ? 13 : 23;
-            hud.style.left = currentX + ((mouse.targetX - targetOffset) - currentX) * 0.15 + 'px';
-            hud.style.top = currentY + ((mouse.targetY - targetOffset) - currentY) * 0.15 + 'px';
+            if(!isTouchScreen && window.innerWidth > 768) {
+                let currentX = parseFloat(hud.style.left) || 0; 
+                let currentY = parseFloat(hud.style.top) || 0;
+                let targetOffset = hud.classList.contains('target-locked') ? 13 : 23;
+                hud.style.left = currentX + ((mouse.targetX - targetOffset) - currentX) * 0.15 + 'px';
+                hud.style.top = currentY + ((mouse.targetY - targetOffset) - currentY) * 0.15 + 'px';
+            }
             requestAnimationFrame(runCursorEaser);
         }
         runCursorEaser();
 
         document.querySelectorAll('button, a').forEach(element => {
-            element.onmouseenter = () => hud.classList.add('target-locked');
-            element.onmouseleave = () => hud.classList.remove('target-locked');
+            element.onmouseenter = () => { if(!isTouchScreen) hud.classList.add('target-locked'); };
+            element.onmouseleave = () => { if(!isTouchScreen) hud.classList.remove('target-locked'); };
         });
 
         // --- EXPERIENCE STREAM CONTROLLER SEQUENCE ---
@@ -680,7 +780,6 @@
             partMaterial.size = 0.55;
             heroNode.style.opacity = "0";
 
-            // Trigger YouTube Video playback explicitly on CTA click action
             if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
                 ytPlayer.playVideo();
             }
