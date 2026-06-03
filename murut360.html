@@ -91,19 +91,18 @@
     }
     .nav-menu a.active, .nav-menu a:hover { opacity: 1; color: var(--accent); }
 
-    .nav-right { display: flex; align-items: center; gap: 25px; }
+    .nav-right { display: flex; align-items: center; gap: 20px; }
     
-    /* Updated Mode Swap Styles for inside the stage */
+    /* Global Mode Swap Design Elements */
     .mode-swap {
-      position: absolute;
-      bottom: 15px;
-      right: 15px;
       background: none; 
       border: 1px solid var(--accent); 
       color: var(--accent); 
-      padding: 5px 15px; 
+      padding: 6px 15px; 
       font-size: 10px; 
       font-family: var(--font-main);
+      text-transform: uppercase;
+      letter-spacing: 1px;
       transition: background 0.3s, color 0.3s;
       z-index: 20;
     }
@@ -112,7 +111,14 @@
       color: var(--bg);
     }
 
-    #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent); border-left: 1px solid var(--glass-border); padding-left: 20px; }
+    /* Separate Mobile Native Action Toggles */
+    .mobile-mode-container {
+      display: none;
+      margin-top: 15px;
+      width: 100%;
+    }
+
+    #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent); border-left: 1px solid var(--glass-border); padding-left: 20px; height: 24px; display: flex; align-items: center; }
 
     /* Mobile Menu Toggle Button */
     .menu-toggle {
@@ -124,31 +130,6 @@
       font-family: var(--font-main);
       font-size: 11px;
       letter-spacing: 1px;
-    }
-
-    /* --- MOBILE RESPONSIVE NAV OVERRIDES --- */
-    @media (max-width: 1024px) {
-      .site-nav { padding: 0 20px; }
-      .menu-toggle { display: block; }
-      
-      .nav-menu {
-        position: fixed;
-        top: 80px;
-        left: 0;
-        width: 100%;
-        background: var(--nav-bg);
-        border-bottom: 1px solid var(--glass-border);
-        flex-direction: column;
-        gap: 0;
-        padding: 10px 0;
-        display: none; /* Controlled via active class toggle */
-      }
-      
-      .nav-menu.mobile-active { display: flex; }
-      
-      .nav-menu li { width: 100%; text-align: center; }
-      .nav-menu a { display: block; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
-      #digital-clock { display: none; } /* Saved space on mobile headers */
     }
 
     /* --- FIXED HOVER-STOP SCROLL CONTAINER --- */
@@ -309,21 +290,66 @@
       border: 1px solid var(--ui-border);
       background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
       transition: border-color 0.3s;
-      min-height: 450px; /* Enhanced canvas container sizing on dynamic screens */
+      min-height: 400px;
     }
-    #realModelCanvas { width: 100% !important; height: 100% !important; display: block; pointer-events: auto; }
+    #realModelCanvas { width: 100% !important; height: 100% !important; display: block; pointer-events: auto;}
     .status-overlay { position: absolute; bottom: 15px; left: 15px; font-size: 0.55rem; color: var(--accent); }
 
-    /* --- GLOBAL MEDIA RESPONSIVENESS OVERRIDES --- */
+    /* --- MOBILE RESPONSIVE NAV & STACK OVERRIDES (BAJAU360 CLEAN BLUEPRINT) --- */
     @media (max-width: 1024px) {
-      .viewer-container { 
-        grid-template-columns: 1fr; 
-        padding: 100px 20px 30px; 
-        gap: 30px;
+      .site-nav { padding: 0 25px; height: 70px; }
+      .menu-toggle { display: block; }
+      
+      .nav-menu {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: var(--nav-bg);
+        border-bottom: 1px solid var(--glass-border);
+        flex-direction: column;
+        gap: 0;
+        padding: 5px 0;
+        display: none;
       }
-      .panel { gap: 20px; }
-      .hud-frame { inset: 10px; }
-      .logo-box h1 { font-size: 12px; letter-spacing: 2px; }
+      
+      .nav-menu.mobile-active { display: flex; }
+      .nav-menu li { width: 100%; text-align: center; }
+      .nav-menu a { display: block; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
+      
+      /* Hide Header Actions on Small Displays to Minimize UI Noise */
+      .site-nav .mode-swap, #digital-clock { display: none !important; }
+
+      /* Reordered Layout Stack Following Modern Fluid Card Schemes */
+      .viewer-container { 
+        display: flex;
+        flex-direction: column;
+        padding: 90px 15px 20px; 
+        gap: 20px;
+      }
+
+      .model-stage {
+        order: 1; /* Main interactive stage prioritised on top */
+        min-height: 380px;
+        height: 50vh;
+      }
+
+      .viewer-container > aside:nth-of-type(1) { order: 2; } /* Interaction Engine */
+      .viewer-container > aside:nth-of-type(2) { order: 3; } /* Metadata Cards */
+
+      .panel {
+        padding: 15px;
+        gap: 15px;
+        background: var(--panel-bg);
+        border: 1px solid var(--ui-border);
+      }
+
+      .mobile-mode-container {
+        display: block;
+      }
+
+      .hud-frame { inset: 8px; }
+      .logo-box h1 { font-size: 11px; letter-spacing: 2px; }
     }
   </style>
 </head>
@@ -344,6 +370,7 @@
       <li><a href="about.html">About</a></li>
     </ul>
     <div class="nav-right">
+        <button onclick="toggleTheme()" class="mode-swap" data-glitch="MODE_SWAP">MODE_SWAP</button>
         <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggleBtn">MENU</button>
         <div id="digital-clock">00:00:00</div>
     </div>
@@ -356,6 +383,10 @@
         <button id="loadFemale" class="terminal-btn active" data-glitch="[ MURUT_FEMALE ]">[ MURUT_FEMALE ]</button>
         <button id="loadMale" class="terminal-btn" data-glitch="[ MURUT_MALE ]">[ MURUT_MALE ]</button>
         
+        <div class="mobile-mode-container">
+          <button onclick="toggleTheme()" class="terminal-btn" style="border-color: var(--accent); color: var(--accent);" data-glitch="TOGGLE_THEME">TOGGLE_THEME</button>
+        </div>
+
         <div class="panel-header" style="margin-top:25px;" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
         <div class="wardrobe-scroll-container">
           <div id="wardrobeTrack" class="wardrobe-track"></div>
@@ -366,7 +397,6 @@
     <section class="model-stage" id="stageContainer">
       <canvas id="realModelCanvas"></canvas>
       <div class="status-overlay">RENDER_MODE: <span id="modelStatus">IDLE</span></div>
-      <button id="themeToggle" onclick="toggleTheme()" class="mode-swap" data-glitch="MODE_SWAP">MODE_SWAP</button>
     </section>
 
     <aside class="panel">
@@ -418,7 +448,6 @@
     import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
     import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
 
-    /* WARDROBE HORIZONTAL TRACK CONFIGURATION (MURUT PROFILES) */
     const costumeData = {
       female: [
         { name: "Pinongkoloh", img: "k4.png" },
@@ -439,7 +468,6 @@
 
     function updateWardrobeDisplay(gender) {
       wardrobeTrack.innerHTML = '';
-      
       wardrobeTrack.style.animation = 'none';
       wardrobeTrack.offsetHeight; 
       wardrobeTrack.style.animation = 'gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
@@ -465,7 +493,6 @@
       });
     }
 
-    // Initialize Content
     updateWardrobeDisplay('female');
 
     /* INTERACTIVE TEXT GLITCH ENGINE */
@@ -563,12 +590,11 @@
     controls.dampingFactor = 0.05;
     camera.position.set(0, 0, 3);
 
-    /* INTERACTIVE PROCEDURAL HOLOGRAM MATRIX (EXACTLY REPLICATED) */
+    /* INTERACTIVE PROCEDURAL MATRIX */
     const particleCount = 1500;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
-
     const colorAccent = new THREE.Color('#d4af37');
 
     for (let i = 0; i < particleCount * 3; i += 3) {
@@ -608,7 +634,6 @@
     const particleSystem = new THREE.Points(geometry, material);
     scene.add(particleSystem);
 
-    /* MODEL LOADER CORE (TARGETING MURUT ASSETS) */
     let loadedMesh = null;
     const gltfLoader = new GLTFLoader();
 
@@ -634,7 +659,6 @@
         filename, 
         (gltf) => {
           loadedMesh = gltf.scene;
-
           const box = new THREE.Box3().setFromObject(loadedMesh);
           const center = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
@@ -657,7 +681,7 @@
           }
         },
         (error) => {
-          console.warn('GLB asset link bypassed. Displaying holographic matrix field fallback.');
+          console.warn('GLB asset fallback active.');
           status.innerText = "MATRIX_ACTIVE";
           material.opacity = 0.5;
         }
@@ -689,10 +713,8 @@
       }
     };
 
-    /* ANIMATION LOOP & PARALLAX TRACKING */
     function animate() {
       requestAnimationFrame(animate);
-      
       particleSystem.rotation.y += 0.001;
       particleSystem.rotation.x += 0.0005;
 
@@ -708,7 +730,6 @@
     }
     animate();
 
-    // Adjusted window resizing behavior to correctly sample mobile dimensions after rendering updates
     window.addEventListener('resize', () => {
       requestAnimationFrame(() => {
         camera.aspect = stage.clientWidth / stage.clientHeight;
