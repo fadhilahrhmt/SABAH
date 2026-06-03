@@ -82,7 +82,7 @@
         .map-stage { position: fixed; inset: 80px 380px 0 340px; display: flex; align-items: center; justify-content: center; perspective: 1500px; padding: 0px 20px; overflow: hidden; }
         .interactive-container { width: 100%; height: 100%; display: grid; grid-template-columns: 1fr; align-items: center; justify-content: center; transform-style: preserve-3d; transition: transform 0.15s ease-out; position: relative; touch-action: none; }
         
-        #map-svg { width: 100%; height: 92vh; max-height: 92vh; overflow: visible; justify-self: center; }
+        #map-svg { width: 100%; height: 92vh; max-height: 92vh; overflow: visible; justify-self: center; transition: transform 0.1s ease-out; }
         .region { fill: rgba(255,255,255,0.02); stroke: var(--map-stroke); stroke-width: 5; transition: 0.3s; pointer-events: all; }
         .region:hover { fill: rgba(212, 175, 55, 0.2); stroke: var(--accent); stroke-width: 10; filter: drop-shadow(0 0 20px var(--accent)); }
 
@@ -181,8 +181,8 @@
         .ai-guidance-card { background: rgba(255,255,255,0.02); border: 1px dashed var(--border); padding: 12px; font-size: 9px; color: var(--text); opacity: 0.85; border-radius: 2px; }
         .ai-guidance-card strong { color: var(--accent); }
 
-        .ai-input-wrapper { position: relative; display: flex; flex-direction: column; gap: 10px; }
-        .ai-input { width: 100%; background: var(--ai-input-bg); border: 1px solid var(--border); color: var(--text); font-family: var(--font-main); font-size: 11px; padding: 12px; outline: none; transition: border-color 0.2s, background 0.4s, color 0.4s; }
+        .ai-input-wrapper { position: relative; display: flex; flex-direction: column; gap: 10px; pointer-events: auto !important; }
+        .ai-input { width: 100%; background: var(--ai-input-bg); border: 1px solid var(--border); color: var(--text); font-family: var(--font-main); font-size: 11px; padding: 12px; outline: none; transition: border-color 0.2s, background 0.4s, color 0.4s; -webkit-user-select: text; user-select: text; }
         .ai-input:focus { border-color: var(--accent); }
         
         .ai-actions { display: flex; justify-content: space-between; align-items: center; }
@@ -208,14 +208,14 @@
 
         @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
 
-        /* MOBILE OVERLAY INTERFACES */
-        .mobile-nav-toggle { display: none; background: none; border: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 1100; }
-        .mobile-nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text); transition: 0.3s; }
-        .mobile-nav-toggle.is-active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        /* MOBILE OVERLAY INTERFACES AND STANDARDIZED HAMBURGER */
+        .mobile-nav-toggle { display: none; background: none; border: none; flex-direction: column; justify-content: center; gap: 4px; cursor: pointer; width: 24px; height: 24px; z-index: 1100; }
+        .mobile-nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text); transition: 0.3s; transform-origin: center; }
+        .mobile-nav-toggle.is-active span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
         .mobile-nav-toggle.is-active span:nth-child(2) { opacity: 0; }
-        .mobile-nav-toggle.is-active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        .mobile-nav-toggle.is-active span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-        .mobile-nav-right-container { display: none; align-items: center; gap: 12px; }
+        .mobile-nav-right-container { display: none; align-items: center; gap: 15px; }
         .mobile-hud-buttons { display: none; position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 900; gap: 10px; width: calc(100% - 30px); justify-content: center; }
         .mobile-trigger-btn { flex: 1; max-width: 160px; background: var(--bg); border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-main); font-size: 10px; font-weight: bold; padding: 12px; text-align: center; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .ai-close-container { display: none; width: 100%; justify-content: flex-end; margin-bottom: 5px; }
@@ -225,25 +225,28 @@
             #c, #cr { display: none !important; }
             body { position: relative; height: 100vh; overflow: hidden; }
 
-            .site-nav { padding: 0 15px; height: 70px; }
-            .logo-box h1 { font-size: 11px; letter-spacing: 1px; }
+            .site-nav { padding: 0 20px; height: 80px; }
+            .logo-box h1 { font-size: 12px; letter-spacing: 2px; }
             
             .mobile-nav-right-container { display: flex; }
-            .site-nav .nav-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 30px; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1050; }
-            .site-nav .nav-menu.is-active { right: 0; }
-            .site-nav .nav-menu a { font-size: 16px; }
+            
+            /* Standardized Fullscreen Mobile Dropdown Overlapping Panel */
+            .site-nav .nav-menu { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 35px; transform: translateY(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1050; }
+            .site-nav .nav-menu.is-active { transform: translateY(0); }
+            .site-nav .nav-menu a { font-size: 18px; letter-spacing: 2px; opacity: 0.8; }
             .site-nav div[style*="display:flex"] { display: none !important; }
 
-            /* On mobile, keep sidebar fixed under map panel layout */
+            /* Keep compass fixed visible in bottom-left layout workspace edge */
             .sidebar { position: fixed; top: auto; bottom: 75px; left: 15px; width: 150px; height: 150px; padding: 0; background: none; border: none; z-index: 400; display: flex; justify-content: center; align-items: center; pointer-events: none; }
             .sidebar .compass-wrapper { pointer-events: auto; }
             .sidebar .compass-btn, .sidebar .summary-card, .sidebar div[style*="margin-top:auto"] { display: none !important; }
 
-            .map-stage { inset: 70px 0 0 0; padding: 10px; padding-bottom: 80px; }
-            #map-svg { height: 60vh; max-height: 65vh; width: 100%; transform: scale(1.1); }
+            .map-stage { inset: 80px 0 0 0; padding: 10px; padding-bottom: 80px; }
+            #map-svg { height: 65vh; max-height: 65vh; width: 100%; transform: scale(1); }
             .data-hud { left: 5%; top: 10px; width: 90%; max-width: 340px; }
 
-            .ai-sidebar { transform: translateX(100%); transition: transform 0.3s ease; top: 70px; left: 0; width: 100%; border-left: none; background: var(--bg); z-index: 960; padding: 20px; bottom: 0; }
+            /* Fixed AI Input interaction blocks across touch targets */
+            .ai-sidebar { transform: translateX(100%); transition: transform 0.3s ease; top: 80px; left: 0; width: 100%; border-left: none; background: var(--bg); z-index: 960; padding: 20px; bottom: 0; }
             .ai-sidebar.mobile-open { transform: translateX(0); }
             .ai-close-container { display: flex; }
 
@@ -271,7 +274,7 @@
         </div>
         
         <div class="mobile-nav-right-container">
-            <button onclick="toggleTheme()" class="swap-btn" style="padding: 6px 10px; font-size: 9px;">SWAP_MODE</button>
+            <button onclick="toggleTheme()" class="swap-btn">SWAP_MODE</button>
             <button class="mobile-nav-toggle" id="menuToggleBtn" onclick="toggleMobileMenu()">
                 <span></span>
                 <span></span>
@@ -364,12 +367,12 @@
             <div class="chat-msg bot">Systems online. Click directly on any sector of the map to open up its parameters and play its localized audio recording.</div>
         </div>
         <div class="ai-input-wrapper">
-            <input type="text" class="ai-input" id="aiInput" placeholder="Query Kadazan outfit, zones, districts..." onkeydown="if(event.key === 'Enter') executeAIQuery()">
+            <input type="text" class="ai-input" id="aiInput" placeholder="Query Kadazan outfit, zones, districts...">
             <div class="ai-actions">
                 <span class="ai-hint">[ENTER TO SCAN]</span>
                 <div class="ai-btn-group">
                     <button class="new-session-btn nav-item" onclick="resetAISession()">NEW_SESSION</button>
-                    <button class="ai-execute-btn nav-item" onclick="executeAIQuery()">EXECUTE</button>
+                    <button class="ai-execute-btn nav-item" id="executeBtn">EXECUTE</button>
                 </div>
             </div>
         </div>
@@ -381,7 +384,6 @@
         const hud = document.getElementById('hud');
         const clock = document.getElementById('clock');
         const audioUiStatus = document.getElementById('audio-ui-status');
-        let standardDeviceGyro = false;
         
         let activeAudioEngine = null;
         let currentAudioFile = ""; 
@@ -394,7 +396,7 @@
             document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         }
 
-        /* MOBILE CONTROL ACTIONS */
+        /* STANDARDIZED MOBILE NAVIGATION DROPDOWN TOGGLE */
         function toggleMobileMenu() {
             document.getElementById('navMenu').classList.toggle('is-active');
             document.getElementById('menuToggleBtn').classList.toggle('is-active');
@@ -480,12 +482,12 @@
                 "rungus": {
                     outfit: "Sukub: Hand-woven black warp-cotton textiles dominated by elaborate, geometric multi-layer beadworks ('Pinakol' cross-bands) and heavy brass heavy rings coiled around their arms and necks.",
                     food: "Tinamba: Local wild yams and hill rice steamed slowly inside local aromatic jungle leaves along with wild river crabs.",
-                    celebration: "Pesta Gendang Rungus: Celebrated inside traditional communal Longhouses with traditional gong sets to mark a prosperous agricultural cycle."
+                    celebration: "Pesta Gendang Rungus: Celebrated inside traditional communal Longhouses with traditional gongs to mark a prosperous agricultural cycle."
                 }
             }
         };
 
-        // --- INTELLIGENT ROUTING PARSING ENGINE ---
+        // --- FULLY FIXED MOBILE COMPATIBLE AI ENGINE INTERACTIVE CORE ---
         function executeAIQuery() {
             const input = document.getElementById('aiInput');
             const chatBody = document.getElementById('aiChatBody');
@@ -517,7 +519,6 @@
             setTimeout(() => {
                 let responseText = "";
 
-                // Evaluate Direct Targets
                 let matchedDistrict = null;
                 for (let district in CULTURAL_DATABASE.districts) {
                     if (q.includes(district)) { matchedDistrict = district; break; }
@@ -548,7 +549,15 @@
             }, 800);
         }
 
-        /* HARD AUDIO AUDIO ENGINE PIPELINE HANDLER */
+        // Attach event listeners for input fields explicitly to cover both event trees
+        document.getElementById('aiInput').addEventListener('keydown', function(event) {
+            if(event.key === 'Enter') {
+                executeAIQuery();
+            }
+        });
+        document.getElementById('executeBtn').addEventListener('click', executeAIQuery);
+
+        /* PHYSICAL SOUND ENGINE DISPATCH HANDLING */
         function handlePlayAudio() {
             if (!currentAudioFile) return;
             
@@ -559,14 +568,12 @@
                 return;
             }
 
-            // Fallback generation using standard format if direct asset is missing
             activeAudioEngine = new Audio(currentAudioFile);
             activeAudioEngine.play().then(() => {
                 audioUiStatus.classList.add('playing');
                 document.getElementById('hud-play-btn').innerText = "PAUSE SECTOR AUDIO";
             }).catch(err => {
-                console.warn("Audio file path pointer load failure: " + currentAudioFile);
-                // Visual simulation feedback mechanism if sound clip file is physically absent
+                console.warn("Audio processing fallback: " + currentAudioFile);
                 audioUiStatus.classList.add('playing');
                 document.getElementById('hud-play-btn').innerText = "SIMULATING AUDIO REEL...";
                 setTimeout(() => {
@@ -581,55 +588,35 @@
             };
         }
 
-        /* RESPONSIVE MOVE EVENT ENGINE (MOUSE PARALLAX + MOBILE TOUCH DRAG) */
-        let isDragging = false;
-        let startX, startY;
-        let transformX = 0, transformY = 0;
+        /* 3D PARALLAX INTERACTION PATTERNS (UNIFIED DESKTOP + MOBILE MIRRORED MOVEMENT) */
+        function applyMapParallax(clientX, clientY) {
+            const xAxis = (window.innerWidth / 2 - clientX) / 30;
+            const yAxis = (window.innerHeight / 2 - clientY) / 30;
+            containerFrame.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            
+            const compass = document.querySelector('.compass').getBoundingClientRect();
+            const compassCenterX = compass.left + (compass.width / 2);
+            const compassCenterY = compass.top + (compass.height / 2);
+            const angle = Math.atan2(clientY - compassCenterY, clientX - compassCenterX);
+            const degree = angle * (180 / Math.PI) + 90;
+            
+            needleBox.style.transform = `rotate(${degree}deg)`;
+        }
 
-        // Desktop Mouse Processing Engine
+        // Desktop Pointer Engine
         document.addEventListener('mousemove', (e) => {
             if(window.innerWidth > 1100) {
-                const xAxis = (window.innerWidth / 2 - e.clientX) / 45;
-                const yAxis = (window.innerHeight / 2 - e.clientY) / 45;
-                containerFrame.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-                
-                const compass = document.querySelector('.compass').getBoundingClientRect();
-                const compassCenterX = compass.left + (compass.width / 2);
-                const compassCenterY = compass.top + (compass.height / 2);
-                const angle = Math.atan2(e.clientY - compassCenterY, e.clientX - compassCenterX);
-                const degree = angle * (180 / Math.PI) + 90;
-                
-                needleBox.style.transform = `rotate(${degree}deg)`;
+                applyMapParallax(e.clientX, e.clientY);
             }
         });
 
-        // Touch Processing Engine for Dragging Map Panel Content smoothly on Mobile viewports
-        containerFrame.addEventListener('touchstart', (e) => {
-            if(window.innerWidth <= 1100) {
-                isDragging = true;
-                startX = e.touches[0].clientX - transformX;
-                startY = e.touches[0].clientY - transformY;
+        // Mobile Touch Engine - Replicates Desktop Tilting & Rotation Physics Automatically
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                applyMapParallax(touch.clientX, touch.clientY);
             }
-        });
-
-        containerFrame.addEventListener('touchmove', (e) => {
-            if(window.innerWidth <= 1100 && isDragging) {
-                transformX = e.touches[0].clientX - startX;
-                transformY = e.touches[0].clientY - startY;
-                
-                // Keep movement within reasonable constraints
-                transformX = Math.max(-120, Math.min(120, transformX));
-                transformY = Math.max(-120, Math.min(120, transformY));
-                
-                document.getElementById('map-svg').style.transform = `translate(${transformX}px, ${transformY}px) scale(1.1)`;
-                
-                // Rotate needle along with touch vector path changes dynamically
-                const angleDegree = Math.atan2(transformY, transformX) * (180 / Math.PI) + 90;
-                needleBox.style.transform = `rotate(${angleDegree}deg)`;
-            }
-        });
-
-        containerFrame.addEventListener('touchend', () => { isDragging = false; });
+        }, { passive: true });
 
         // Desktop Reticles Track Setup
         const mouseCursor = document.getElementById('c');
