@@ -71,7 +71,7 @@
       position: fixed; top: 0; width: 100%; height: 80px;
       display: flex; justify-content: space-between; align-items: center;
       padding: 0 50px; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
-      z-index: 5000;
+      z-index: 5500;
       backdrop-filter: blur(20px);
       transition: background 0.4s, border-color 0.4s;
     }
@@ -189,7 +189,7 @@
 
     @keyframes gearSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 50vw)); }
+      100% { transform: translateX(calc(-100% + 25vw)); }
     }
 
     /* --- TEXTILE SWIPING GALLERY (BOTTOM SIDE) --- */
@@ -244,40 +244,23 @@
 
     @keyframes scanSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 50vw)); }
+      100% { transform: translateX(calc(-100% + 25vw)); }
     }
 
-    /* --- VIEWPORT GRID REDESIGN --- */
+    /* --- VIEWPORT DASHBOARD REDESIGN --- */
     .viewer-container {
       display: grid; 
-      grid-template-columns: 300px 1fr; 
-      grid-template-rows: auto 1fr auto;
+      grid-template-columns: 320px 1fr 320px; 
+      grid-template-rows: 1fr auto;
       height: 100vh; 
       padding: 100px 40px 40px; 
-      gap: 20px;
-    }
-
-    /* Top Horizontal Panel spans across the layout rows */
-    .top-panel {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 20px;
-    }
-
-    /* Bottom Horizontal Panel spans across the layout rows */
-    .bottom-panel {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 20px;
-      align-items: end;
+      gap: 24px;
     }
 
     .panel { 
       background: var(--panel-bg); 
       border: 1px solid var(--ui-border); 
-      padding: 16px; 
+      padding: 20px; 
       display: flex; 
       flex-direction: column; 
       justify-content: space-between;
@@ -286,35 +269,58 @@
       transition: background 0.3s, border-color 0.3s;
     }
 
-    .panel-header { font-size: 0.6rem; color: var(--accent); border-bottom: 1px solid var(--ui-border); padding-bottom: 6px; margin-bottom: 12px; letter-spacing: 3px; }
+    .panel-left-wrapper {
+      grid-column: 1;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .panel-right-wrapper {
+      grid-column: 3;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .panel-header { font-size: 0.65rem; color: var(--accent); border-bottom: 1px solid var(--ui-border); padding-bottom: 8px; margin-bottom: 15px; letter-spacing: 3px; }
 
     .terminal-btn {
       display: block; width: 100%; background: transparent; border: 1px solid var(--accent);
-      color: var(--accent); padding: 10px; font-family: 'Space Mono'; font-size: 0.65rem;
-      text-align: center; text-decoration: none; margin-bottom: 10px; transition: 0.3s;
+      color: var(--accent); padding: 12px; font-family: 'Space Mono'; font-size: 0.65rem;
+      text-align: center; text-decoration: none; margin-bottom: 12px; transition: 0.3s;
     }
     .terminal-btn:hover, .terminal-btn.active { background: var(--accent); color: var(--bg); box-shadow: 0 0 10px var(--accent); }
 
     .metadata-desc {
-      font-size: 0.6rem; 
+      font-size: 0.65rem; 
       color: var(--text-dim); 
-      line-height: 1.6; 
+      line-height: 1.7; 
       text-transform: uppercase;
       text-align: justify;
     }
 
     /* Centered Canvas Container Layout */
     .model-stage { 
-      grid-column: 1 / -1;
+      grid-column: 2;
+      grid-row: 1;
       position: relative; 
       border: 1px solid var(--ui-border);
       background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
       transition: border-color 0.3s;
-      min-height: 250px;
       height: 100%;
+      min-height: 400px;
     }
-    #realModelCanvas { width: 100% !important; height: 100% !important; }
+    #realModelCanvas { width: 100% !important; height: 100% !important; display: block; }
     .status-overlay { position: absolute; bottom: 15px; left: 15px; font-size: 0.55rem; color: var(--accent); }
+
+    /* Bottom dynamic horizontal gallery */
+    .bottom-showcase-panel {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
 
     /* --- RESPONSIVE OPTIMIZATIONS --- */
     @media (max-width: 1100px) {
@@ -328,7 +334,7 @@
         position: fixed; top: 0; right: -100%; width: 100%; height: 100vh;
         background: var(--bg); flex-direction: column; justify-content: center; align-items: center;
         gap: 35px; padding: 80px 24px; transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 5500; backdrop-filter: blur(20px); border-left: 1px solid var(--glass-border);
+        z-index: 5000; backdrop-filter: blur(20px); border-left: 1px solid var(--glass-border);
       }
       .nav-menu.is-active { right: 0; }
       .nav-menu a { font-size: 15px; letter-spacing: 4px; padding: 12px; }
@@ -340,11 +346,12 @@
         padding: 100px 16px 40px; 
         gap: 16px;
       }
-      .top-panel, .bottom-panel {
-        grid-template-columns: 1fr;
+      .panel-left-wrapper, .panel-right-wrapper, .model-stage, .bottom-showcase-panel {
+        grid-column: 1;
+        grid-row: auto;
       }
       .panel { gap: 16px; justify-content: flex-start; }
-      .model-stage { height: 350px; }
+      .model-stage { height: 380px; }
 
       .wardrobe-scroll-container, .pattern-scroll-container {
         mask-image: none; -webkit-mask-image: none; overflow-x: auto;
@@ -383,7 +390,7 @@
 
   <main class="viewer-container">
     
-    <div class="top-panel">
+    <div class="panel-left-wrapper">
       <aside class="panel">
         <div>
           <div class="panel-header" data-glitch="NODE_SELECTION">NODE_SELECTION</div>
@@ -393,11 +400,14 @@
       </aside>
 
       <aside class="panel">
-        <div>
-          <div class="panel-header" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
-          <div class="wardrobe-scroll-container">
-            <div id="wardrobeTrack" class="wardrobe-track"></div>
+        <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+          <div>
+            <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 1rem; letter-spacing: 2px;">MOTIFS</h2>
+            <p class="metadata-desc" style="margin-top: 10px;">
+              Bajau Samah traditional attire is known for floral embroidery, geometric motifs, and gold thread embellishments.
+            </p>
           </div>
+          <a href="bajau.html" class="terminal-btn" style="margin-top: 20px; margin-bottom: 0;" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
         </div>
       </aside>
     </div>
@@ -407,7 +417,7 @@
       <div class="status-overlay">RENDER_MODE: <span id="modelStatus">IDLE</span></div>
     </section>
 
-    <div class="bottom-panel">
+    <div class="panel-right-wrapper">
       <aside class="panel">
         <div>
           <div class="panel-header" data-glitch="ASSET_METADATA">ASSET_METADATA</div>
@@ -428,16 +438,15 @@
           </div>
         </div>
       </aside>
+    </div>
 
+    <div class="bottom-showcase-panel">
       <aside class="panel">
-        <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
-          <div>
-            <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 1rem;">MOTIFS</h2>
-            <p class="metadata-desc" style="margin-top: 5px;">
-              Bajau Samah traditional attire is known for floral embroidery, geometric motifs, and gold thread embellishments.
-            </p>
+        <div>
+          <div class="panel-header" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
+          <div class="wardrobe-scroll-container">
+            <div id="wardrobeTrack" class="wardrobe-track"></div>
           </div>
-          <a href="bajau.html" class="terminal-btn" style="margin-top: 10px; margin-bottom: 0;" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
         </div>
       </aside>
     </div>
@@ -516,7 +525,6 @@
         wardrobeTrack.appendChild(div);
       });
 
-      // Synchronize dynamic mouse cursor events with new DOM items
       refreshCursorBoundaries();
     }
 
@@ -775,7 +783,6 @@
       
       if (window.innerWidth <= 1100) {
         wardrobeTrack.style.animation = 'none';
-        document.getElementById('patternTrack')?.style.setProperty('animation', 'none');
       } else {
         wardrobeTrack.style.animation = 'gearSwipe 15s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
       }
