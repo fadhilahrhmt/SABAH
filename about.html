@@ -45,7 +45,10 @@
             scrollbar-color: #c5a059 #090a0f;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body { cursor: none; }
+        a, button { cursor: none; }
         
         body {
             background-color: var(--bg-color);
@@ -58,15 +61,22 @@
 
         /* 1. UNIFIED NAVIGATION BAR */
         .site-nav {
-            position: fixed; top: 0; width: 100%; height: 80px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 50px; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
-            z-index: 5000;
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            height: 80px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 0 50px; 
+            background: var(--nav-bg); 
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 9999;
         }
 
         .logo-box h1 { font-family: var(--font-heading); font-size: 14px; letter-spacing: 4px; }
         
-        .nav-menu { display: flex; gap: 30px; list-style: none; }
+        .nav-menu { display: flex; gap: 30px; list-style: none; align-items: center; }
         .nav-menu a { 
             color: var(--text-color); text-decoration: none; font-size: 11px; 
             opacity: 0.6; transition: 0.3s; text-transform: uppercase; font-weight: 700;
@@ -83,8 +93,8 @@
             padding: 5px 15px;
             font-size: 10px;
             font-family: var(--font-main);
-            cursor: pointer;
             transition: background 0.3s ease, color 0.3s ease;
+            white-space: nowrap;
         }
 
         .swap-mode-btn:hover {
@@ -93,6 +103,18 @@
         }
 
         #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent-color); border-left: 1px solid var(--glass-border); padding-left: 20px; }
+
+        /* MOBILE MENU TOGGLE ICON BUTTON */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-family: var(--font-main);
+            font-size: 16px;
+            padding: 5px 12px;
+            line-height: 1;
+        }
 
         /* 2. MISSION CONTENT */
         .mission-container {
@@ -211,13 +233,73 @@
             opacity: 0.3;
         }
 
-        #cursor { width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 6000; }
-        #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 5999; transition: 0.1s ease-out; }
+        #cursor { width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 6000; transform: translate3d(0,0,0); }
+        #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 5999; transition: 0.1s ease-out; transform: translate3d(0,0,0); }
 
-        @media (max-width: 900px) {
+        /* --- RESPONSIVE OVERRIDES --- */
+        @media (max-width: 991px) {
+            html, body, a, button { cursor: auto !important; }
+            #cursor, #cursor-follower { display: none !important; }
+            
             .info-grid { grid-template-columns: 1fr; }
-            .site-nav { padding: 0 20px; }
-            .nav-menu { display: none; }
+            .mission-container { margin-top: 140px; padding: 0 24px; }
+            .mission-title { margin-bottom: 50px; }
+            .info-card { padding: 40px 30px; }
+
+            .site-nav { 
+                padding: 0 24px; 
+                height: 80px;
+            }
+            
+            .mobile-menu-toggle { 
+                display: block; 
+            }
+
+            .nav-right {
+                gap: 15px;
+            }
+            
+            /* Full-Width Mobile Dropdown Container Styling */
+            .nav-menu {
+                position: absolute;
+                top: 80px; 
+                left: 0;
+                width: 100%;
+                background: var(--nav-bg);
+                border-bottom: 1px solid var(--glass-border);
+                flex-direction: column;
+                gap: 0;
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-out;
+            }
+            
+            .nav-menu.mobile-active { 
+                max-height: 300px;
+            }
+            
+            .nav-menu li { 
+                width: 100%; 
+            }
+            
+            .nav-menu a { 
+                display: block; 
+                padding: 16px 24px; 
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+                width: 100%;
+            }
+            
+            #digital-clock { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .site-nav { padding: 0 16px; }
+            .logo-box h1 { font-size: 10px; letter-spacing: 1.5px; }
+            .swap-mode-btn { padding: 4px 10px; font-size: 9px; }
+            .mobile-menu-toggle { padding: 4px 10px; font-size: 14px; }
+            .mission-container { margin-top: 120px; padding: 0 16px; }
+            .archive-footer { padding: 60px 16px; }
         }
     </style>
 </head>
@@ -230,7 +312,7 @@
 
     <nav class="site-nav">
         <div class="logo-box"><h1>SABAH_HERITAGE</h1></div>
-        <ul class="nav-menu">
+        <ul class="nav-menu" id="navMenu">
             <li><a href="index.html">Home</a></li>
             <li><a href="explore.html">Explore</a></li>
             <li><a href="gallery.html">Gallery</a></li>
@@ -240,6 +322,7 @@
         <div class="nav-right">
             <button onclick="toggleTheme()" class="swap-mode-btn">MODE_SWAP</button>
             <div id="digital-clock">00:00:00</div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" id="menuToggleBtn">☰</button>
         </div>
     </nav>
 
@@ -260,7 +343,7 @@
                 <p>Home to over 30 ethnic groups. From Kinabalu's sacred peaks to the Bajau seas, every pattern and rhythm is a vital data point worth protecting.</p>
             </div>
 
-            <div class="info-card" style="grid-column: span 1;">
+            <div class="info-card">
                 <span class="card-num">03</span>
                 <h3>THE GUARDIAN</h3>
                 <p>You are the architect of memory. Every interaction within this archive strengthens the survival of Sabah's unique cultural identity.</p>
@@ -283,7 +366,10 @@
         // CLOCK SYSTEM
         function updateClock() {
             const now = new Date();
-            document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            const clockEl = document.getElementById('digital-clock');
+            if (clockEl) {
+                clockEl.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            }
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -294,26 +380,52 @@
             document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         }
 
-        // CURSOR SYSTEM
+        // MOBILE MENU TOGGLE SYSTEM
+        function toggleMobileMenu() {
+            const menu = document.getElementById('navMenu');
+            const btn = document.getElementById('menuToggleBtn');
+            menu.classList.toggle('mobile-active');
+            if(menu.classList.contains('mobile-active')) {
+                btn.innerText = '✕';
+            } else {
+                btn.innerText = '☰';
+            }
+        }
+
+        // CURSOR SYSTEM WITH TOUCH FALLBACK
         const cursor = document.getElementById('cursor');
         const follower = document.getElementById('cursor-follower');
+        let isTouchDevice = false;
+
+        window.addEventListener('touchstart', function onFirstTouch() {
+            isTouchDevice = true;
+            if(cursor) cursor.style.display = 'none';
+            if(follower) follower.style.display = 'none';
+            window.removeEventListener('touchstart', onFirstTouch, false);
+        }, false);
 
         document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            follower.style.left = (e.clientX - 20) + 'px';
-            follower.style.top = (e.clientY - 20) + 'px';
+            if (!isTouchDevice && window.innerWidth > 991) {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                follower.style.left = (e.clientX - 20) + 'px';
+                follower.style.top = (e.clientY - 20) + 'px';
+            }
         });
 
-        // HOVER EFFECTS
+        // HOVER EFFECTS (Desktop Only)
         document.querySelectorAll('.info-card, .nav-menu a, button').forEach(el => {
             el.addEventListener('mouseenter', () => {
-                follower.style.transform = 'scale(1.8)';
-                follower.style.background = 'rgba(212, 175, 89, 0.1)';
+                if(!isTouchDevice && window.innerWidth > 991) {
+                    follower.style.transform = 'scale(1.8)';
+                    follower.style.background = 'rgba(212, 175, 55, 0.1)';
+                }
             });
             el.addEventListener('mouseleave', () => {
-                follower.style.transform = 'scale(1)';
-                follower.style.background = 'transparent';
+                if(!isTouchDevice && window.innerWidth > 991) {
+                    follower.style.transform = 'scale(1)';
+                    follower.style.background = 'transparent';
+                }
             });
         });
     </script>
