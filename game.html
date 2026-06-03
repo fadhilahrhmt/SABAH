@@ -75,6 +75,7 @@
             font-size: 10px; 
             font-family: var(--font-main);
             transition: background 0.3s ease, color 0.3s ease;
+            white-space: nowrap;
         }
         
         .swap-mode-btn:hover {
@@ -84,7 +85,7 @@
 
         #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent-color); border-left: 1px solid var(--glass-border); padding-left: 20px; }
 
-        /* MOBILE MENU TOGGLE BUTTON */
+        /* MOBILE MENU TOGGLE ICON BUTTON */
         .mobile-menu-toggle {
             display: none;
             background: none;
@@ -93,7 +94,7 @@
             font-family: var(--font-main);
             font-size: 16px;
             padding: 5px 12px;
-            z-index: 10000;
+            line-height: 1;
         }
 
         /* GALLERY INTRO */
@@ -193,36 +194,35 @@
             
             .site-nav { 
                 padding: 0 24px; 
+                height: 80px;
             }
             
             .mobile-menu-toggle { 
                 display: block; 
             }
+
+            .nav-right {
+                gap: 15px;
+            }
             
-            /* Converts navigation links into a clean, hidden mobile drawer */
+            /* Clean Full-Width Dropdown Setup */
             .nav-menu {
-                position: fixed;
+                position: absolute;
                 top: 80px; 
                 left: 0;
                 width: 100%;
-                height: calc(100vh - 80px);
                 background: var(--nav-bg);
+                border-bottom: 1px solid var(--glass-border);
                 flex-direction: column;
-                justify-content: flex-start;
-                align-items: flex-start;
                 gap: 0;
-                padding: 20px 0;
-                opacity: 0;
-                visibility: hidden;
-                transform: translateY(-10px);
-                transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-                border-top: 1px solid var(--glass-border);
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-out;
             }
             
             .nav-menu.mobile-active { 
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0);
+                max-height: 300px;
             }
             
             .nav-menu li { 
@@ -231,9 +231,7 @@
             
             .nav-menu a { 
                 display: block; 
-                padding: 20px 30px; 
-                font-size: 14px;
-                letter-spacing: 2px;
+                padding: 16px 24px; 
                 border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
                 width: 100%;
             }
@@ -245,8 +243,9 @@
         
         @media (max-width: 480px) {
             .site-nav { padding: 0 16px; }
-            .logo-box h1 { font-size: 11px; letter-spacing: 1px; }
+            .logo-box h1 { font-size: 10px; letter-spacing: 1.5px; }
             .swap-mode-btn { padding: 4px 10px; font-size: 9px; }
+            .mobile-menu-toggle { padding: 4px 10px; font-size: 14px; }
             .gallery-intro { padding: 140px 16px 40px; }
             .gallery-intro h1 { font-size: 22px; letter-spacing: 4px; }
         }
@@ -333,11 +332,8 @@
             menu.classList.toggle('mobile-active');
             if(menu.classList.contains('mobile-active')) {
                 btn.innerText = '✕';
-                // Prevents backpage movement when checking links on smaller screens
-                document.body.style.overflow = 'hidden'; 
             } else {
                 btn.innerText = '☰';
-                document.body.style.overflow = 'auto';
             }
         }
 
