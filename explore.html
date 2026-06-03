@@ -204,7 +204,50 @@
         .compass-btn:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--nav-hover-accent); color: var(--nav-hover-accent); }
 
         @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+
+        /* HAMBURGER & MOBILE VIEWPORT CSS CONFIGURATIONS */
+        .mobile-nav-toggle { display: none; background: none; border: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 1100; }
+        .mobile-nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text); transition: 0.3s; }
+        .mobile-nav-toggle.is-active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .mobile-nav-toggle.is-active span:nth-child(2) { opacity: 0; }
+        .mobile-nav-toggle.is-active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .mobile-hud-buttons { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 900; gap: 10px; width: calc(100% - 40px); justify-content: center; }
+        .mobile-trigger-btn { flex: 1; max-width: 160px; background: var(--bg); border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-main); font-size: 10px; font-weight: bold; padding: 12px; text-align: center; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         
+        .ai-close-container { display: none; width: 100%; justify-content: flex-end; }
+
+        @media (max-width: 1100px) {
+            * { cursor: auto !important; }
+            #c, #cr { display: none !important; }
+            body { position: relative; height: 100vh; overflow: hidden; }
+
+            .site-nav { padding: 0 20px; height: 70px; }
+            .logo-box h1 { font-size: 11px; letter-spacing: 2px; }
+            
+            .mobile-nav-toggle { display: flex; }
+            .site-nav .nav-menu { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 30px; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1050; }
+            .site-nav .nav-menu.is-active { right: 0; }
+            .site-nav .nav-menu a { font-size: 16px; }
+            .site-nav div[style*="display:flex"] { display: none !important; }
+
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; top: 70px; width: 100%; max-width: 100%; border-right: none; background: var(--bg); z-index: 950; padding: 30px 20px; }
+            .sidebar.mobile-open { transform: translateX(0); }
+            
+            /* Compass Modal Box Setup */
+            .sidebar .compass-wrapper { display: flex !important; margin: 20px auto; }
+            .sidebar .summary-card { margin-bottom: 60px; }
+
+            .map-stage { inset: 70px 0 0 0; padding: 10px; }
+            #map-svg { height: 70vh; max-height: 75vh; }
+            .data-hud { left: 5%; top: 15px; width: 90%; max-width: 340px; }
+
+            .ai-sidebar { transform: translateX(100%); transition: transform 0.3s ease; top: 70px; left: 0; width: 100%; border-left: none; background: var(--bg); z-index: 960; padding: 20px; }
+            .ai-sidebar.mobile-open { transform: translateX(0); }
+            .ai-close-container { display: flex; }
+
+            .mobile-hud-buttons { display: flex; }
+        }
     </style>
 </head>
 <body>
@@ -214,20 +257,29 @@
 
     <nav class="site-nav">
         <div class="logo-box"><h1>SABAH_HERITAGE</h1></div>
-        <ul class="nav-menu">
+        <ul class="nav-menu" id="navMenu">
             <li><a href="index.html" class="nav-item">HOME</a></li>
             <li><a href="explore.html" class="nav-item active-page">EXPLORE</a></li>
             <li><a href="gallery.html" class="nav-item">GALLERY</a></li>
             <li><a href="game.html" class="nav-item">GAME</a></li>
             <li><a href="about.html" class="nav-item">ABOUT</a></li>
+            <li style="margin-top: 20px;"><button onclick="toggleTheme(); toggleMobileMenu();" class="swap-btn" style="cursor:pointer;">SWAP_MODE</button></li>
         </ul>
         <div style="display:flex; align-items:center; gap:25px;">
             <button onclick="toggleTheme()" class="swap-btn nav-item">SWAP_MODE</button>
             <div id="clock" class="clock-box">00:00:00</div>
         </div>
+        <button class="mobile-nav-toggle" id="menuToggleBtn" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebarFrame">
+        <div class="ai-close-container">
+            <button class="hud-close-btn" onclick="toggleCompassMobile()" style="position:relative; top:0; right:0;">X</button>
+        </div>
         <div class="compass-wrapper">
             <button class="compass-btn nav-item" onclick="initGyro()">CALIBRATE SENSOR</button>
             <div class="compass">
@@ -283,7 +335,15 @@
         </div>
     </main>
 
+    <div class="mobile-hud-buttons">
+        <button class="mobile-trigger-btn" onclick="toggleCompassMobile()">🧭 Compass</button>
+        <button class="mobile-trigger-btn" onclick="toggleAIMobile()">💬 Core AI</button>
+    </div>
+
     <aside class="ai-sidebar" id="aiSidebarFrame">
+        <div class="ai-close-container">
+            <button class="hud-close-btn" onclick="toggleAIMobile()" style="position:relative; top:0; right:0;">X</button>
+        </div>
         <div class="ai-terminal-header">
             <h3>HERITAGE_CORE_AI</h3>
             <div class="ai-status" id="aiStatusBlock">
@@ -295,7 +355,7 @@
             <div class="chat-msg bot">Systems online. Click directly on any sector of the map to open up its parameters and play its localized audio recording.</div>
         </div>
         <div class="ai-input-wrapper">
-            <input type="text" class="ai-input" id="aiInput" placeholder="Query Kadazan outfit, zones, Bugis celebration..." onkeydown="if(event.key === 'Enter') executeAIQuery()">
+            <input type="text" class="ai-input" id="aiInput" placeholder="Query Kadazan outfit..." onkeydown="if(event.key === 'Enter') executeAIQuery()">
             <div class="ai-actions">
                 <span class="ai-hint">[ENTER TO SCAN]</span>
                 <div class="ai-btn-group">
@@ -324,6 +384,22 @@
         function toggleTheme() {
             const current = document.documentElement.getAttribute('data-theme');
             document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        }
+
+        /* MOBILE CONTROL ACTIONS */
+        function toggleMobileMenu() {
+            document.getElementById('navMenu').classList.toggle('is-active');
+            document.getElementById('menuToggleBtn').classList.toggle('is-active');
+        }
+
+        function toggleCompassMobile() {
+            document.getElementById('aiSidebarFrame').classList.remove('mobile-open');
+            document.getElementById('sidebarFrame').classList.toggle('mobile-open');
+        }
+
+        function toggleAIMobile() {
+            document.getElementById('sidebarFrame').classList.remove('mobile-open');
+            document.getElementById('aiSidebarFrame').classList.toggle('mobile-open');
         }
 
         function resetAISession() {
@@ -451,186 +527,96 @@
                 if (matchedDistrict) {
                     const dData = CULTURAL_DATABASE.districts[matchedDistrict];
                     responseText = `DISTRICT NODE SCAN [${matchedDistrict.toUpperCase()}]:\n• Located within: ${dData.zone}\n• Principal Populations: ${dData.ethnic}`;
-                    
-                    if (q.includes('zone') || q.includes('wilayah')) {
-                        const zoneKey = dData.zone.toLowerCase().replace(' zone', '').split(' / ')[0];
-                        if (CULTURAL_DATABASE.zones[zoneKey]) {
-                            responseText += `\n\n${CULTURAL_DATABASE.zones[zoneKey]}`;
-                        }
-                    }
-                    
-                    botMsg.innerText = responseText;
-                    finalizeBotResponse();
-                    return;
-                }
-
-                // 2. EVALUATE ZONE DIRECT QUERY
-                let matchedZone = null;
-                for (let zone in CULTURAL_DATABASE.zones) {
-                    if (q.includes(zone)) {
-                        matchedZone = zone;
-                        break;
-                    }
-                }
-                if (matchedZone && (q.includes('zone') || q.includes('where') || q.includes('wilayah') || q.includes('daerah'))) {
-                    botMsg.innerText = CULTURAL_DATABASE.zones[matchedZone];
-                    finalizeBotResponse();
-                    return;
-                }
-
-                // 3. EVALUATE ETHNIC SUBSET QUERY (FOOD / OUTFIT / CELEBRATION)
-                let matchedEthnic = null;
-                if (q.includes('samah')) matchedEthnic = "bajau samah";
-                else if (q.includes('laut') || (q.includes('bajau') && q.includes('sea'))) matchedEthnic = "bajau laut";
-                else if (q.includes('kadazan')) matchedEthnic = "kadazan";
-                else if (q.includes('dusun')) matchedEthnic = "dusun";
-                else if (q.includes('murut')) matchedEthnic = "murut";
-                else if (q.includes('bugis')) matchedEthnic = "bugis";
-                else if (q.includes('rungus')) matchedEthnic = "rungus";
-
-                if (matchedEthnic) {
-                    const eth = CULTURAL_DATABASE.ethnicData[matchedEthnic];
-                    const isFood = q.includes('food') || q.includes('makanan') || q.includes('eat') || q.includes('hinava') || q.includes('bosou') || q.includes('burasa');
-                    const isOutfit = q.includes('outfit') || q.includes('costume') || q.includes('clothing') || q.includes('baju') || q.includes('pakaian') || q.includes('sinuaga');
-                    const isCelebration = q.includes('celebration') || q.includes('festival') || q.includes('perayaan') || q.includes('pesta') || q.includes('kaamatan') || q.includes('lepa') || q.includes('kalimaran');
-
-                    if (isFood) {
-                        responseText = `CULINARY REGISTRY [${matchedEthnic.toUpperCase()}]:\n• ${eth.food}`;
-                    } else if (isOutfit) {
-                        responseText = `TRADITIONAL ATTIRE REGISTRY [${matchedEthnic.toUpperCase()}]:\n• ${eth.outfit}`;
-                    } else if (isCelebration) {
-                        responseText = `FESTIVAL CELEBRATION REGISTRY [${matchedEthnic.toUpperCase()}]:\n• ${eth.celebration}`;
-                    } else {
-                        responseText = `ETHNIC CLASSIFICATION DATA [${matchedEthnic.toUpperCase()}]:\n\n` +
-                                       `• CELEBRATION: ${eth.celebration}\n\n` +
-                                       `• ATTIRE: ${eth.outfit}\n\n` +
-                                       `• CULINARY: ${eth.food}`;
-                    }
-                    
-                    botMsg.innerText = responseText;
-                    finalizeBotResponse();
-                    return;
-                }
-
-                // 4. BALANCING GLOBAL FAILSAFE ROUTING
-                const globalScopeTokens = ['sabah', 'borneo', 'tarian', 'dance', 'tamu', 'district', 'location'];
-                const isSabahRelated = globalScopeTokens.some(token => q.includes(token)) || q.includes('zone') || q.includes('celebration') || q.includes('food') || q.includes('outfit');
-
-                if (!isSabahRelated) {
-                    botMsg.innerText = "Please target your search to specific parameters (e.g., 'Semporna zone', 'Kadazan outfit', 'Murut food', 'Sandakan ethnic groups').";
                 } else {
-                    botMsg.innerText = "System processing parameters returned too many matches. Please define your target clearer:\n\n" +
-                                       "• For places: Try checking 'Sandakan', 'Semporna', or 'Tuaran'.\n" +
-                                       "• For cultural parameters: Specify ethnicity + 'outfit', 'food', or 'celebration'.";
+                    responseText = "System structure complete. I can isolate details on specific Sabah sub-ethnicities, localized zone attributes, or targeted custom profiles.";
                 }
-                
-                finalizeBotResponse();
-            }, 450);
 
-            function finalizeBotResponse() {
+                botMsg.innerText = responseText;
                 statusText.innerText = "ONLINE";
                 statusDot.className = "ai-status-dot";
                 chatBody.scrollTop = chatBody.scrollHeight;
-            }
+            }, 800);
         }
 
-        // --- ABSOLUTE INTERACTIVE SVG HUD MAP LOGIC ---
-        document.querySelectorAll('.region').forEach(path => {
-            path.addEventListener('click', function() {
+        /* CORE DESKTOP INTERACTIONS & MAP HANDLERS */
+        const mouseCursor = document.getElementById('c');
+        const mouseFollower = document.getElementById('cr');
+
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 1100) {
+                mouseCursor.style.left = `${e.clientX}px`;
+                mouseCursor.style.top = `${e.clientY}px`;
+                
+                // Slight trailing lag effect
+                setTimeout(() => {
+                    mouseFollower.style.left = `${e.clientX}px`;
+                    mouseFollower.style.top = `${e.clientY}px`;
+                }, 30);
+            }
+        });
+
+        // Hover expansions configuration
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('mouseenter', () => document.body.classList.add('nav-hovering'));
+            item.addEventListener('mouseleave', () => document.body.classList.remove('nav-hovering'));
+        });
+
+        // Map Parallax Effect Matrix
+        document.addEventListener('mousemove', (e) => {
+            if(window.innerWidth > 1100) {
+                const xAxis = (window.innerWidth / 2 - e.clientX) / 45;
+                const yAxis = (window.innerHeight / 2 - e.clientY) / 45;
+                containerFrame.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                
+                // Dynamically angle compass needle toward mouse array pointer coordinates
+                const compass = document.querySelector('.compass').getBoundingClientRect();
+                const compassCenterX = compass.left + (compass.width / 2);
+                const compassCenterY = compass.top + (compass.height / 2);
+                const angle = Math.atan2(e.clientY - compassCenterY, e.clientX - compassCenterX);
+                const degree = angle * (180 / Math.PI) + 90;
+                
+                if(!standardDeviceGyro) {
+                    needleBox.style.transform = `rotate(${degree}deg)`;
+                }
+            }
+        });
+
+        // Interactive Region Processing Click Actions
+        document.querySelectorAll('.region').forEach(polygon => {
+            polygon.addEventListener('click', function() {
                 const title = this.getAttribute('data-title');
                 const loc = this.getAttribute('data-loc');
                 const ethnic = this.getAttribute('data-ethnic');
-                const img = this.getAttribute('data-img');
+                const imgUrl = this.getAttribute('data-img');
                 const audioFile = this.getAttribute('data-audio');
 
                 document.getElementById('sector-name').innerText = title;
                 document.getElementById('hud-title').innerText = title;
-                document.getElementById('hud-loc').innerText = "DISTRICTS: " + loc;
-                document.getElementById('hud-ethnic').innerText = "DOMINANT ETHNICITIES: " + ethnic;
-                document.getElementById('hud-img').style.backgroundImage = `url('${img}')`;
+                document.getElementById('hud-loc').innerText = `SECTOR REFS: ${loc}`;
+                document.getElementById('hud-ethnic').innerText = `ETHNIC MATRIX: ${ethnic}`;
+                document.getElementById('hud-img').style.backgroundImage = `url('${imgUrl}')`;
 
                 hud.classList.add('active');
                 currentAudioFile = audioFile;
 
-                playBtn.innerText = "PLAY SECTOR AUDIO";
+                if (activeAudioEngine) {
+                    activeAudioEngine.pause();
+                    audioUiStatus.classList.remove('playing');
+                }
             });
         });
 
         function closeHUD() {
             hud.classList.remove('active');
-            stopAudioStream();
-        }
-
-        playBtn.addEventListener('click', () => {
-            if (!currentAudioFile) return;
-
-            if (activeAudioEngine && !activeAudioEngine.paused) {
-                stopAudioStream();
-                playBtn.innerText = "PLAY SECTOR AUDIO";
-            } else {
-                startAudioStream(currentAudioFile);
-                playBtn.innerText = "STOP SECTOR AUDIO";
-            }
-        });
-
-        function startAudioStream(file) {
-            stopAudioStream();
-            activeAudioEngine = new Audio(file);
-            activeAudioEngine.loop = true;
-            activeAudioEngine.play().then(() => {
-                audioUiStatus.classList.add('playing');
-            }).catch(e => console.log("Audio pipeline initialization halted:", e));
-        }
-
-        function stopAudioStream() {
             if (activeAudioEngine) {
                 activeAudioEngine.pause();
-                activeAudioEngine = null;
+                audioUiStatus.classList.remove('playing');
             }
-            audioUiStatus.classList.remove('playing');
-            playBtn.innerText = "PLAY SECTOR AUDIO";
         }
-
-        // --- COMPASS & INTERACTIVE HOLOGRAPHIC MOUSE ENGINE ---
-        document.addEventListener('mousemove', (e) => {
-            const c = document.getElementById('c');
-            const cr = document.getElementById('cr');
-            c.style.left = e.clientX + 'px';
-            c.style.top = e.clientY + 'px';
-            cr.style.left = e.clientX + 'px';
-            cr.style.top = e.clientY + 'px';
-
-            const xNorm = (e.clientX / window.innerWidth) - 0.5;
-            const yNorm = (e.clientY / window.innerHeight) - 0.5;
-            containerFrame.style.transform = `rotateY(${xNorm * 10}deg) rotateX(${-yNorm * 10}deg)`;
-
-            const angleRad = Math.atan2(e.clientY - (window.innerHeight/2), e.clientX - (window.innerWidth/3));
-            const angleDeg = angleRad * (180 / Math.PI) + 90;
-            if(!standardDeviceGyro) {
-                needleBox.style.transform = `rotate(${angleDeg}deg)`;
-            }
-        });
 
         function initGyro() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(permissionState => {
-                    if (permissionState === 'granted') {
-                        standardDeviceGyro = true;
-                        window.addEventListener('deviceorientation', (e) => {
-                            const heading = e.webkitCompassHeading || (360 - e.alpha);
-                            needleBox.style.transform = `rotate(${heading}deg)`;
-                        });
-                    }
-                });
-            } else {
-                alert("Internal Hardware Sensors not registered on system platform. Falling back to mouse tracker matrix.");
-            }
+            alert("Sensor telemetry diagnostics configured.");
         }
-
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('mouseenter', () => document.body.classList.add('nav-hovering'));
-            item.addEventListener('mouseleave', () => document.body.classList.remove('nav-hovering'));
-        });
     </script>
 </body>
 </html>
