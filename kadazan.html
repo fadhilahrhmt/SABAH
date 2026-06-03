@@ -1,50 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SABAH HERITAGE // MURUT_HISTORY</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <title>Gallery | Sabah Heritage Archive</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-color: #0a0a0a;
+            --bg-color: #080808;
             --text-color: #ffffff;
-            --accent-gold: #d4af37;
-            --nav-bg: #0a0a0a;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-color: #d4af37;
+            --nav-bg: #080808;
+            --glass-border: rgba(255, 255, 255, 0.15);
             --font-main: 'Space Mono', monospace;
             --font-heading: 'Syncopate', sans-serif;
         }
 
         [data-theme="light"] {
-            --bg-color: #f2f2f2;
-            --text-color: #0a0a0a;
-            --nav-bg: #f2f2f2;
-            --glass-bg: rgba(0, 0, 0, 0.05);
+            --bg-color: #f9f7f2;
+            --text-color: #1a1a1a;
+            --accent-color: #8b6e3c;
+            --nav-bg: #f9f7f2;
             --glass-border: rgba(0, 0, 0, 0.1);
         }
 
-        /* SCROLLBAR CONFIGURATION */
-        ::-webkit-scrollbar { 
-            width: 4px; 
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track { 
-            background: #090a0f; 
-        }
-        ::-webkit-scrollbar-thumb { 
-            background: #c5a059; 
-            box-shadow: 0 0 15px #c5a059; 
-        }
-
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: #c5a059 #090a0f;
-            margin: 0; padding: 0; box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         /* Desktop Native Cursor Override Rule */
         @media (pointer: fine) {
             * { cursor: none !important; }
@@ -54,38 +38,12 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: var(--font-main);
-            line-height: 1.6;
-            transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.4s ease;
         }
 
-        /* CURSOR HARDWARE ENGINE */
-        #custom-cursor {
-            width: 10px; height: 10px;
-            background-color: var(--accent-gold);
-            border-radius: 50%;
-            position: fixed; pointer-events: none;
-            z-index: 99999; transform: translate(-50%, -50%);
-            mix-blend-mode: difference;
-            display: none;
-        }
-
-        #cursor-follower {
-            width: 40px; height: 40px;
-            border: 1px solid var(--accent-gold);
-            border-radius: 50%;
-            position: fixed; pointer-events: none;
-            z-index: 99998; transform: translate(-50%, -50%);
-            transition: transform 0.1s ease-out;
-            opacity: 0.5;
-            display: none;
-        }
-
-        @media (pointer: fine) {
-            #custom-cursor, #cursor-follower { display: block; }
-        }
-
-        /* NAVIGATION SYSTEM MATCHED & CONTAINER RESPONSIVE CORE */
+        /* NAVIGATION - SYNCHRONIZED FLUID STRUCTURAL SCALE */
         .site-nav {
             position: fixed; top: 0; width: 100%; height: 80px;
             display: flex; justify-content: space-between; align-items: center;
@@ -116,409 +74,235 @@
             letter-spacing: clamp(1px, 0.2vw, 2px);
             white-space: nowrap;
         }
-        .nav-menu a.active, .nav-menu a:hover { opacity: 1; color: var(--accent-gold); }
+        .nav-menu a.active, .nav-menu a:hover { opacity: 1; color: var(--accent-color); }
 
         .nav-right { display: flex; align-items: center; gap: clamp(10px, 2vw, 25px); }
         
-        .nav-right button {
-            background: none; border: 1px solid var(--accent-gold); color: var(--accent-gold); 
-            padding: 5px clamp(8px, 1.5vw, 15px); font-size: clamp(8px, 0.9vw, 10px); 
-            font-family: var(--font-main); white-space: nowrap;
+        /* MODE SWAP BUTTON STYLING */
+        .swap-mode-btn {
+            background: none; 
+            border: 1px solid var(--accent-color); 
+            color: var(--accent-color); 
+            padding: 5px clamp(8px, 1.5vw, 15px); 
+            font-size: clamp(8px, 0.9vw, 10px); 
+            font-family: var(--font-main);
+            transition: background 0.3s ease, color 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .swap-mode-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
         }
 
         #digital-clock { 
             font-size: clamp(10px, 1.2vw, 12px); 
             font-weight: 700; 
-            color: var(--accent-gold); 
+            color: var(--accent-color); 
             border-left: 1px solid var(--glass-border); 
             padding-left: clamp(10px, 2vw, 20px); 
             white-space: nowrap;
         }
 
-        /* CONTENT ENGINE CONTAINER */
-        .content {
-            max-width: 1300px;
+        /* GALLERY INTRO */
+        .gallery-intro {
+            text-align: center;
+            padding: 160px 20px 60px;
+        }
+        .gallery-intro h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+        .gallery-intro p {
+            font-size: 10px;
+            letter-spacing: 3px;
+            opacity: 0.5;
+            text-transform: uppercase;
+            max-width: 600px;
             margin: 0 auto;
-            padding: 160px 60px 80px;
         }
 
-        .tribe-title {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(2rem, 7vw, 5rem);
-            text-align: center;
-            letter-spacing: clamp(6px, 1.5vw, 15px);
-            margin-bottom: clamp(40px, 8vw, 80px);
-            color: var(--accent-gold);
-            text-transform: uppercase;
-        }
-
-        /* RESPONSIVE LAYOUT GRID SYSTEM */
-        .info-grid {
+        /* GALLERY GRID */
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto 100px;
+            padding: 0 40px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: clamp(30px, 5vw, 60px);
-            margin-bottom: clamp(60px, 10vw, 120px);
-            align-items: center;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            z-index: 5;
         }
 
-        .text-box {
-            padding: clamp(20px, 4vw, 40px);
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-left: 2px solid var(--accent-gold);
+        .gallery-item {
             position: relative;
-        }
-
-        .section-tag {
-            color: var(--accent-gold);
-            font-size: 9px;
-            letter-spacing: 5px;
-            display: block;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        .text-box h2 {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(1.4rem, 3vw, 2rem);
-            margin-bottom: 20px;
-            color: var(--text-color);
-        }
-
-        .text-box p {
-            font-size: 12px;
-            letter-spacing: 1px;
-            opacity: 0.8;
-            text-transform: uppercase;
-            text-align: justify;
-            text-justify: inter-word;
-        }
-
-        .visual-frame {
-            width: 100%;
-            height: clamp(280px, 40vw, 450px);
-            overflow: hidden;
-            border: 1px solid var(--glass-border);
-            position: relative;
-        }
-
-        .visual-frame img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            filter: grayscale(1) brightness(0.7);
-            transition: 1s cubic-bezier(0.2, 1, 0.3, 1);
-        }
-
-        @media (pointer: fine) {
-            .visual-frame:hover img {
-                filter: grayscale(0) brightness(1);
-                transform: scale(1.05);
-            }
-        }
-
-        /* ATTIRE HOUSINGS */
-        .attire-specs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: clamp(20px, 3vw, 30px);
-            margin-bottom: clamp(60px, 10vw, 120px);
-        }
-        
-        .spec-box {
-            padding: clamp(20px, 3vw, 30px);
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-top: 3px solid var(--accent-gold);
-        }
-
-        .spec-box h3 {
-            font-family: 'Cinzel', serif;
-            color: var(--accent-gold);
-            font-size: 14px;
-            letter-spacing: 4px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        .spec-box p {
-            font-size: 11px;
-            letter-spacing: 1px;
-            opacity: 0.7;
-            text-transform: uppercase;
-            text-align: justify;
-            text-justify: inter-word;
-        }
-
-        /* TIMELINE/SLIDERS MODULES */
-        .slider-section-label {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-            text-align: center;
-            letter-spacing: clamp(4px, 1vw, 8px);
-            margin-bottom: 40px;
-            color: var(--accent-gold);
-        }
-
-        .slider-area {
-            position: relative;
-            margin-bottom: clamp(60px, 10vw, 120px);
-        }
-
-        .gallery-viewport {
-            overflow: hidden;
-            padding: 20px 0;
-            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-        }
-
-        .gallery-track {
-            display: flex;
-            gap: 20px;
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .item-card {
-            flex: 0 0 300px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 20px;
-            text-align: center;
-            transition: 0.4s;
-        }
-
-        .item-frame {
-            width: 100%; height: 300px;
-            overflow: hidden; background: #000;
-            margin-bottom: 20px;
-        }
-
-        .item-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: 0.5s; }
-        
-        @media (pointer: fine) {
-            .item-card:hover { border-color: var(--accent-gold); transform: translateY(-10px); }
-            .item-card:hover img { filter: grayscale(0); transform: scale(1.1); }
-        }
-
-        .oval-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-color);
-        }
-
-        .video-card {
-            flex: 0 0 450px;
-            aspect-ratio: 16/9;
             background: #000;
+            overflow: hidden;
+            aspect-ratio: 16 / 10;
             border: 1px solid var(--glass-border);
+            transition: border-color 0.4s;
+            text-decoration: none;
+        }
+
+        .gallery-item:hover { border-color: var(--accent-color); }
+
+        .img-wrapper {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
             overflow: hidden;
         }
 
-        .arrow {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            width: 50px; height: 50px; background: transparent;
-            color: var(--accent-gold); border: 1px solid var(--accent-gold);
-            font-family: 'Space Mono'; z-index: 100;
+        /* HORIZONTAL PANNING EFFECT */
+        .zone-img {
+            width: 120%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            filter: grayscale(100%);
+            transform: translateX(-10%);
+            transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s, filter 0.6s;
         }
-        .arrow:hover { background: var(--accent-gold); color: #000; }
-        .arrow-left { left: -70px; }
-        .arrow-right { right: -70px; }
 
-        .bottom-area { text-align: center; padding: 40px 0; }
-        .action-btn {
-            background: transparent; color: var(--accent-gold);
-            padding: 20px 50px; border: 1px solid var(--accent-gold);
-            font-family: 'Space Mono'; letter-spacing: 5px;
-            text-transform: uppercase; font-size: 12px;
+        .gallery-item:hover .zone-img {
+            transform: translateX(0%) scale(1.1); 
+            opacity: 0.9;
+            filter: grayscale(0%);
         }
-        .action-btn:hover { background: var(--accent-gold); color: #000; }
 
-        /* --- MOBILE BREAKPOINT SYSTEM INTERCEPT --- */
+        .item-overlay {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 25px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%);
+            z-index: 10;
+        }
+
+        .item-overlay span { color: var(--accent-color); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+        .item-overlay h2 { font-family: var(--font-heading); color: #fff; font-size: 14px; letter-spacing: 2px; }
+
+        /* UI ELEMENTS */
+        .grid-bg {
+            position: fixed; inset: 0;
+            background-image: linear-gradient(var(--glass-border) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+            background-size: 60px 60px; z-index: -1; pointer-events: none;
+            opacity: 0.3;
+        }
+
+        #cursor { width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 6000; display: none; }
+        #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 5999; transition: 0.1s ease-out; display: none; }
+
+        @media (pointer: fine) {
+            #cursor, #cursor-follower { display: block; }
+        }
+
+        /* --- MOBILE GENERAL AREA ADJUSTMENTS --- */
         @media (max-width: 1100px) {
-            .info-grid { grid-template-columns: 1fr; gap: 35px; }
-            .info-grid[style*="direction: rtl"] { direction: ltr !important; }
-            .info-grid[style*="direction: rtl"] .visual-frame { direction: ltr !important; }
-            .info-grid[style*="direction: rtl"] .text-box { direction: ltr !important; }
-            
-            .arrow { display: none; }
-            .content { padding: 130px 20px 60px; }
-            .attire-specs { grid-template-columns: 1fr; gap: 20px; }
-            
-            /* Native Touch Swiping Mechanics for Mobile viewports */
-            .gallery-viewport { overflow-x: auto; scroll-behavior: smooth; mask-image: none; -webkit-mask-image: none; }
-            .gallery-track { transform: none !important; }
-            .video-card { flex: 0 0 85vw; }
-            .item-card { flex: 0 0 270px; }
-            .visual-frame img, .item-frame img { filter: grayscale(0) brightness(1); }
+            .gallery-container { padding: 0 20px; grid-template-columns: 1fr; }
+            .zone-img { filter: grayscale(0%) !important; opacity: 0.7 !important; transform: none !important; width: 100%; }
         }
     </style>
 </head>
 <body>
 
-<div id="custom-cursor"></div>
-<div id="cursor-follower"></div>
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+    <div class="grid-bg"></div>
 
-<nav class="site-nav">
-    <div class="logo-box"><h1>SABAH_HERITAGE</h1></div>
-    <ul class="nav-menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="explore.html">Explore</a></li>
-        <li><a href="gallery.html">Gallery</a></li>
-        <li><a href="game.html">Game</a></li>
-        <li><a href="about.html">About</a></li>
-    </ul>
-    <div class="nav-right">
-        <button onclick="toggleTheme()">MODE_SWAP</button>
-        <div id="digital-clock">00:00:00</div>
-    </div>
-</nav>
-
-<main class="content">
-    <h1 class="tribe-title">Kadazan_History</h1>
-
-    <div class="info-grid">
-        <div class="visual-frame">
-            <img src="https://www.mysabah.com/wordpress/wp-content/uploads/2009/04/Murut-Kalimaran-Festival.jpg" alt="Ancestral Roots">
+    <nav class="site-nav">
+        <div class="logo-box"><h1>SABAH_HERITAGE</h1></div>
+        <ul class="nav-menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="explore.html">Explore</a></li>
+            <li><a href="gallery.html" class="active">Gallery</a></li>
+            <li><a href="game.html">Game</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+        <div class="nav-right">
+            <button onclick="toggleTheme()" class="swap-mode-btn">MODE_SWAP</button>
+            <div id="digital-clock">00:00:00</div>
         </div>
-        <div class="text-box">
-            <span class="section-tag">Log_01 // Origins</span>
-            <h2>NUNUK RAGANG</h2>
-            <p>Deeply entwined with the mist-shrouded landscapes of Sabah, the Kadazan people the region's largest indigenous group, claim a lineage born from myth and soil. Their story begins at Nunuk Ragang, a legendary site near the Liwagu River where, beneath the sprawling canopy of a colossal banyan tree, their ancestors are said to have first flourished. This deep connection to the earth defined their history as master wet-paddy farmers in the fertile plains of Penampang and Papar, where every facet of life was dictated by the celestial rhythm of the moon and the life cycle of rice. More than just a means of survival, this agricultural heartbeat forged a society built on the pillars of communal labor and a profound, spiritual harmony with the natural world.</p>
-        </div>
+    </nav>
+
+    <div class="gallery-intro">
+        <h1>REGIONAL_DATA_LOG</h1>
+        <p>Tactical visual records of Sabah's 5 demographic zones. Hover to scan.</p>
     </div>
 
-    <div class="info-grid" style="direction: rtl;">
-        <div class="visual-frame" style="direction: ltr;">
-            <img src="https://sabahtravel-assets.s3.amazonaws.com/images/20220602-1pk4r-rurpoq-shutterstock-430194385-jpg" alt="Spiritual Rites">
-        </div>
-        <div class="text-box" style="direction: ltr;">
-            <span class="section-tag">Log_02 // Spiritual Heart</span>
-            <h2>UNDUK NGADAU</h2>
-            <p>Central to Kadazan history is their ancient belief system, which centers on a supreme creator known as Kinorohingan and the sacred rice spirit, Bambarayon. In the past, spiritual life was managed by the Bobohizan, a class of highly respected priestesses who acted as intermediaries between the physical and spirit worlds. These women were the custodians of oral history, memorizing and chanting the Rinait (sacred prayers) during rituals to heal the sick, protect the village, and ensure a bountiful harvest. Their role was vital in preserving the cultural identity of the people through centuries of change. Today, the legacy of the Kadazan is most vibrantly expressed through the Pesta Kaamatan (Harvest Festival) held every May. This celebration is a modern continuation of ancient rites of thanksgiving for the rice harvest. A significant highlight of this festival is the Unduk Ngadau pageant, which commemorates the legendary sacrifice of Huminodun, a maiden who gave her life to save her people from famine.</p>
-        </div>
-    </div>
-
-    <div class="attire-specs">
-        <div class="spec-box">
-            <h3>[ MENS_ATTIRE ]</h3>
-            <p>For the men, the ensemble is known as the Gaung, a long-sleeved black shirt adorned with gold buttons and trimmings, worn with matching trousers called Souva. A critical component of the male attire is the Sigar, a hand-woven headcloth made from dastar fabric. The Siga is not merely a hat; the intricate way it is folded indicates the wearer’s specific district of origin or social standing. Together, these garments and accessories—including the Tangkong (brass ring hip belts)—represent a sophisticated craftsmanship that has been passed down through generations to preserve the visual identity of the Kadazan.</p>
-        </div>
-        <div class="spec-box">
-            <h3>[ WOMENS_ATTIRE ]</h3>
-            <p>The traditional attire of the Kadazan is globally recognized for its elegant use of black velvet, a fabric choice that traditionally symbolized prestige and provided a stark, beautiful contrast against bright gold trimmings. For women, the attire typically consists of the Sinuangga, a short-sleeved blouse featuring a U-neck and gold embroidery (Siring) along the seams. This is paired with the Tapi, a long cylindrical wrap-around skirt. The most iconic accessory is the Himpogot, a belt made of antique silver coins (British trade dollars), which serves as both a decorative piece and a display of family wealth.</p>
-        </div>
-    </div>
-
-    <h2 class="slider-section-label">TRIBAL_ARCHIVE</h2>
-    <div class="slider-area">
-        <button class="arrow arrow-left" onclick="moveSlide('artifact-track', -1)">PREV</button>
-        <div class="gallery-viewport">
-            <div class="gallery-track" id="artifact-track">
-                <div class="item-card"><div class="item-frame"><img src="sinuangga.png"></div><div class="oval-label">sinuangga</div></div>
-                <div class="item-card"><div class="item-frame"><img src="gaung.png"></div><div class="oval-label">gaung</div></div>
-                <div class="item-card"><div class="item-frame"><img src="suar.png"></div><div class="oval-label">suar</div></div>
-                <div class="item-card"><div class="item-frame"><img src="sigar.jpg"></div><div class="oval-label">sigar</div></div>
-                <div class="item-card"><div class="item-frame"><img src="tapi.png"></div><div class="oval-label">tapi</div></div>
-                <div class="item-card"><div class="item-frame"><img src="siung.png"></div><div class="oval-label">siung</div></div>
+    <div class="gallery-container">
+        <a href="kadazan.html" class="gallery-item">
+            <div class="img-wrapper">
+                <img src="https://sabah.gov.my/sites/default/files/inline-images/traditional-attire-people.jpg" class="zone-img" alt="West Coast">
             </div>
-        </div>
-        <button class="arrow arrow-right" onclick="moveSlide('artifact-track', 1)">NEXT</button>
-    </div>
-
-    <h2 class="slider-section-label">VISUAL_JOURNEY</h2>
-    <div class="slider-area">
-        <button class="arrow arrow-left" onclick="moveSlide('video-track', -1)">PREV</button>
-        <div class="gallery-viewport">
-            <div class="gallery-track" id="video-track">
-                <div class="video-card">
-                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/iT9pXOV89tk" frameborder="0" allowfullscreen></iframe>
-                </div>
-                <div class="video-card">
-                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/FkXMv2_GPtE" frameborder="0" allowfullscreen></iframe>
-                </div>
-                <div class="video-card">
-                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/R1tnu5Jz8hA" frameborder="0" allowfullscreen></iframe>
-                </div>
+            <div class="item-overlay">
+                <span>ZONE_01 // KADAZAN-DUSUN</span>
+                <h2>WEST COAST ZONE</h2>
             </div>
-        </div>
-        <button class="arrow arrow-right" onclick="moveSlide('video-track', 1)">NEXT</button>
-    </div>
+        </a>
 
-    <div class="bottom-area">
-        <a href="kadazan360.html" style="text-decoration:none">
-            <button class="action-btn">view of 360</button>
+        <a href="murut.html" class="gallery-item">
+            <div class="img-wrapper">
+                <img src="https://www.mysabah.com/wordpress/wp-content/uploads/2009/04/Murut-Kalimaran-Festival.jpg" class="zone-img" alt="Interior">
+            </div>
+            <div class="item-overlay">
+                <span>ZONE_02 // MURUT</span>
+                <h2>INTERIOR ZONE</h2>
+            </div>
+        </a>
+
+        <a href="bajau.html" class="gallery-item">
+            <div class="img-wrapper">
+                <img src="https://media-perpaduan.com/wp-content/uploads/2023/11/img_1139-2-1.jpg" class="zone-img" alt="East Coast">
+            </div>
+            <div class="item-overlay">
+                <span>ZONE_03 // BAJAU</span>
+                <h2>EAST COAST ZONE</h2>
+            </div>
         </a>
     </div>
-</main>
 
-<script>
-    /* DIGITAL CLOCK LOGIC */
-    function updateClock() {
-        const now = new Date();
-        const clockEl = document.getElementById('digital-clock');
-        if (clockEl) {
-            clockEl.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const clockEl = document.getElementById('digital-clock');
+            if (clockEl) {
+                clockEl.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            }
         }
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+        setInterval(updateClock, 1000);
+        updateClock();
 
-    /* CURSOR HARDWARE TRACKER */
-    const cursor = document.getElementById('custom-cursor');
-    const follower = document.getElementById('cursor-follower');
-    
-    document.addEventListener('mousemove', (e) => {
-        if (window.matchMedia("(pointer: fine)").matches) {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            setTimeout(() => {
-                follower.style.left = e.clientX + 'px';
-                follower.style.top = e.clientY + 'px';
-            }, 50);
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         }
-    });
 
-    /* THEME SYSTEM ENGINE */
-    function toggleTheme() {
-        const root = document.documentElement;
-        root.setAttribute('data-theme', root.getAttribute('data-theme') === 'light' ? '' : 'light');
-    }
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
 
-    /* SLIDER LOOPS */
-    const indices = { 'artifact-track': 0, 'video-track': 0 };
-
-    function moveSlide(trackId, direction) {
-        if (window.innerWidth <= 1100) return; // Prevent calculations on mobile swipes
-
-        const track = document.getElementById(trackId);
-        const cards = track.children;
-        const cardWidth = cards[0].offsetWidth + 20; 
-        const maxScroll = cards.length - 1;
-
-        indices[trackId] += direction;
-
-        if (indices[trackId] > maxScroll) indices[trackId] = 0;
-        if (indices[trackId] < 0) indices[trackId] = maxScroll;
-
-        track.style.transform = `translateX(${-indices[trackId] * cardWidth}px)`;
-    }
-
-    /* CURSOR SCALE REACTIVITY */
-    document.querySelectorAll('a, button, .item-card, .video-card').forEach(el => {
-        el.addEventListener('mouseenter', () => {
+        document.addEventListener('mousemove', (e) => {
             if (window.matchMedia("(pointer: fine)").matches) {
-                follower.style.transform = 'translate(-50%, -50%) scale(1.8)';
-                follower.style.background = 'rgba(212, 175, 55, 0.1)';
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                follower.style.left = (e.clientX - 20) + 'px';
+                follower.style.top = (e.clientY - 20) + 'px';
             }
         });
-        el.addEventListener('mouseleave', () => {
-            if (window.matchMedia("(pointer: fine)").matches) {
-                follower.style.transform = 'translate(-50%, -50%) scale(1)';
-                follower.style.background = 'transparent';
-            }
-        });
-    });
-</script>
 
+        document.querySelectorAll('.gallery-item, a, button').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                if (window.matchMedia("(pointer: fine)").matches) {
+                    follower.style.transform = 'scale(1.5)';
+                }
+            });
+            item.addEventListener('mouseleave', () => {
+                if (window.matchMedia("(pointer: fine)").matches) {
+                    follower.style.transform = 'scale(1)';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
