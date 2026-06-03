@@ -108,6 +108,30 @@
 
     #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent); border-left: 1px solid var(--glass-border); padding-left: 20px; }
 
+    /* Hamburger Menu Button */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 22px;
+      height: 16px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 5001;
+    }
+    .menu-toggle span {
+      width: 100%;
+      height: 2px;
+      background-color: var(--accent);
+      transition: all 0.3s ease;
+    }
+
+    /* Active hamburger transformations */
+    .menu-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-toggle.open span:nth-child(2) { opacity: 0; }
+    .menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
     /* --- FIXED HOVER-STOP SCROLL CONTAINER --- */
     .wardrobe-scroll-container {
       width: 100%;
@@ -285,36 +309,62 @@
       .viewer-container { 
         grid-template-columns: 1fr; 
         height: auto; 
-        padding: 160px 15px 30px; 
+        padding: 100px 15px 30px; 
         gap: 20px; 
+        display: flex;
+        flex-direction: column;
       }
       
+      /* Reorder blocks to bring Gear Preview and Canvas straight to the top context */
+      .panel-node-selection { order: 2; }
+      .panel-gear-preview { order: 1; } /* Gear preview structure panel container pushed up top */
+      .model-stage { order: 3; height: 50vh; min-height: 300px; }
+      .panel-asset-metadata { order: 4; }
+
       .panel {
         gap: 20px;
         justify-content: flex-start;
       }
 
-      /* Synchronized adaptive mobile header */
+      /* Synchronized adaptive mobile header with active Hamburger Controls */
       .site-nav { 
-        padding: 15px; 
-        flex-direction: column; 
-        height: auto; 
-        gap: 12px; 
-        top: 0;
+        padding: 0 20px; 
+        flex-direction: row; 
+        height: 70px; 
+        justify-content: space-between;
       }
-      .logo-box h1 { font-size: 13px; letter-spacing: 2px; text-align: center; }
-      .nav-menu { gap: 12px; flex-wrap: wrap; justify-content: center; }
-      .nav-menu a { font-size: 10px; letter-spacing: 1px; }
-      .nav-right { width: 100%; justify-content: space-between; border-top: 1px solid var(--glass-border); padding-top: 10px; }
-      #digital-clock { padding-left: 12px; font-size: 11px; }
 
-      /* Convert animated CSS marquees back into fluid hardware touch swipe tracks */
+      .menu-toggle { display: flex; }
+
+      .nav-menu { 
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: var(--nav-bg);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        transition: left 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        border-bottom: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+
+      .nav-menu.open { left: 0; }
+      .nav-menu a { font-size: 14px; letter-spacing: 2px; }
+
+      .nav-right { display: none; } /* Hide theme switches into compact responsive flows if unneeded */
+
+      /* Convert animated CSS marquees back into fluid smart auto-scroll areas */
       .wardrobe-scroll-container, .pattern-scroll-container {
         mask-image: none !important;
         -webkit-mask-image: none !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
+        overflow-x: hidden !important; /* Managed by JS mouse/hover engine */
         padding-bottom: 15px;
+        position: relative;
       }
 
       .wardrobe-track, .pattern-track {
@@ -340,9 +390,6 @@
         filter: grayscale(0) !important;
         opacity: 0.9 !important;
       }
-      
-      /* Order layout positioning engine to bring 3D canvas up top */
-      .model-stage { order: -1; height: 50vh; min-height: 300px; }
     }
   </style>
 </head>
@@ -355,13 +402,21 @@
 
   <nav class="site-nav">
     <div class="logo-box"><h1 data-glitch="SABAH_HERITAGE">SABAH_HERITAGE</h1></div>
-    <ul class="nav-menu">
+    
+    <button class="menu-toggle" id="mobileMenuBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <ul class="nav-menu" id="navMenu">
       <li><a href="index.html">Home</a></li>
       <li><a href="explore.html">Explore</a></li>
       <li><a href="gallery.html">Gallery</a></li>
       <li><a href="game.html">Game</a></li>
       <li><a href="about.html">About</a></li>
     </ul>
+
     <div class="nav-right">
         <button id="themeToggle" onclick="toggleTheme()" class="mode-swap">MODE_SWAP</button>
         <div id="digital-clock">00:00:00</div>
@@ -369,14 +424,18 @@
   </nav>
 
   <main class="viewer-container">
-    <aside class="panel">
+    <aside class="panel panel-node-selection">
       <div>
         <div class="panel-header" data-glitch="NODE_SELECTION">NODE_SELECTION</div>
         <button id="loadFemale" class="terminal-btn active" data-glitch="[ KADAZAN_FEMALE ]">[ KADAZAN_FEMALE ]</button>
         <button id="loadMale" class="terminal-btn" data-glitch="[ KADAZAN_MALE ]">[ KADAZAN_MALE ]</button>
-        
-        <div class="panel-header" style="margin-top:25px;" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
-        <div class="wardrobe-scroll-container">
+      </div>
+    </aside>
+
+    <aside class="panel panel-gear-preview">
+      <div>
+        <div class="panel-header" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
+        <div class="wardrobe-scroll-container" id="gearScrollContainer">
           <div id="wardrobeTrack" class="wardrobe-track"></div>
         </div>
       </div>
@@ -387,13 +446,13 @@
       <div class="status-overlay">RENDER_MODE: <span id="modelStatus">IDLE</span></div>
     </section>
 
-    <aside class="panel">
+    <aside class="panel panel-asset-metadata">
       <div>
         <div class="panel-header" data-glitch="ASSET_METADATA">ASSET_METADATA</div>
         
         <div class="pattern-archive-label">TEXTILE_PATTERNS // SCAN_04</div>
         
-        <div class="pattern-scroll-container">
+        <div class="pattern-scroll-container" id="assetScrollContainer">
           <div class="pattern-track">
             <div class="pattern-item"><img src="g2.jpg" class="pattern-img" alt="Pattern 1"></div>
             <div class="pattern-item"><img src="g1.jpg" class="pattern-img" alt="Pattern 2"></div>
@@ -417,6 +476,53 @@
         const current = document.documentElement.getAttribute('data-theme');
         document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
+
+    // Mobile Hamburger functionality
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navMenu = document.getElementById('navMenu');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenuBtn.classList.toggle('open');
+      navMenu.classList.toggle('open');
+    });
+
+    // Close menu when clicking links
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenuBtn.classList.remove('open');
+        navMenu.classList.remove('open');
+      });
+    });
+
+    /* MOBILE HOVER DIRECTION SCROLL IMPLEMENTATION */
+    function setupHoverScroll(containerId) {
+      const container = document.getElementById(containerId);
+      if(!container) return;
+
+      container.addEventListener('mousemove', (e) => {
+        // Run only on mobile screen layout rules
+        if (!window.matchMedia("(max-width: 1100px)").matches) return;
+
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left; // position inside element.
+        const width = rect.width;
+        
+        // Define edge regions (30% threshold left/right boundaries)
+        const leftThreshold = width * 0.35;
+        const rightThreshold = width * 0.65;
+
+        if (x < leftThreshold) {
+          // Hover left side -> scroll left
+          container.scrollLeft -= 6;
+        } else if (x > rightThreshold) {
+          // Hover right side -> scroll right
+          container.scrollLeft += 6;
+        }
+      });
+    }
+
+    setupHoverScroll('gearScrollContainer');
+    setupHoverScroll('assetScrollContainer');
   </script>
 
   <script type="module">
