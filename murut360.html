@@ -35,11 +35,20 @@
       --glass-border: rgba(0, 0, 0, 0.1);
     }
 
-    /* --- CUSTOM CURSOR SYNC CONFIGURATION --- */
-    * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+    /* --- CURSOR CONFIGURATION AND POINTER CONTROLS --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    #cursor { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: background 0.2s; }
-    #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: transform 0.1s ease-out, background 0.2s, border-color 0.2s; }
+    /* Fine precision cursor styling rules for desktop layout engines */
+    @media (pointer: fine) {
+      * { cursor: none !important; }
+      #cursor { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: background 0.2s; }
+      #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: transform 0.1s ease-out, background 0.2s, border-color 0.2s; }
+    }
+
+    /* Fallback engine rule setup to bypass desktop cursor rules on touch/mobile screens */
+    @media (pointer: coarse) {
+      #cursor, #cursor-follower { display: none !important; }
+    }
 
     body {
       background-color: var(--bg);
@@ -49,20 +58,9 @@
       background-size: 40px 40px;
       color: var(--text-main);
       font-family: var(--font-main);
-      min-height: 100vh;
-      overflow-x: hidden;
-      overflow-y: auto;
+      height: 100vh;
+      overflow: hidden;
       transition: background-color 0.4s ease, color 0.4s ease;
-    }
-
-    @media (min-width: 1025px) {
-      body { height: 100vh; overflow: hidden; }
-    }
-
-    /* Disable custom cursor on touch devices */
-    @media (pointer: coarse) {
-      * { cursor: auto !important; }
-      #cursor, #cursor-follower { display: none !important; }
     }
 
     /* --- HUD FRAME --- */
@@ -78,6 +76,7 @@
       padding: 0 50px; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
       z-index: 5000;
       backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       transition: background 0.4s, border-color 0.4s;
     }
 
@@ -93,11 +92,7 @@
 
     .nav-right { display: flex; align-items: center; gap: 25px; }
     
-    /* Updated Mode Swap Styles for inside the stage */
     .mode-swap {
-      position: absolute;
-      bottom: 15px;
-      right: 15px;
       background: none; 
       border: 1px solid var(--accent); 
       color: var(--accent); 
@@ -105,7 +100,6 @@
       font-size: 10px; 
       font-family: var(--font-main);
       transition: background 0.3s, color 0.3s;
-      z-index: 20;
     }
     .mode-swap:hover {
       background: var(--accent);
@@ -114,42 +108,29 @@
 
     #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent); border-left: 1px solid var(--glass-border); padding-left: 20px; }
 
-    /* Mobile Menu Toggle Button */
+    /* Hamburger Menu Button */
     .menu-toggle {
       display: none;
-      background: none;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 8px 12px;
-      font-family: var(--font-main);
-      font-size: 11px;
-      letter-spacing: 1px;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 22px;
+      height: 16px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 5001;
+    }
+    .menu-toggle span {
+      width: 100%;
+      height: 2px;
+      background-color: var(--accent);
+      transition: all 0.3s ease;
     }
 
-    /* --- MOBILE RESPONSIVE NAV OVERRIDES --- */
-    @media (max-width: 1024px) {
-      .site-nav { padding: 0 35px; }
-      .menu-toggle { display: block; }
-      
-      .nav-menu {
-        position: fixed;
-        top: 80px;
-        left: 0;
-        width: 100%;
-        background: var(--nav-bg);
-        border-bottom: 1px solid var(--glass-border);
-        flex-direction: column;
-        gap: 0;
-        padding: 10px 0;
-        display: none; /* Controlled via active class toggle */
-      }
-      
-      .nav-menu.mobile-active { display: flex; }
-      
-      .nav-menu li { width: 100%; text-align: center; }
-      .nav-menu a { display: block; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
-      #digital-clock { display: none; } /* Saved space on mobile headers */
-    }
+    /* Active hamburger transformations */
+    .menu-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-toggle.open span:nth-child(2) { opacity: 0; }
+    .menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     /* --- FIXED HOVER-STOP SCROLL CONTAINER --- */
     .wardrobe-scroll-container {
@@ -214,7 +195,7 @@
 
     @keyframes gearSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 240px)); }
+      100% { transform: translateX(calc(-100% + 310px)); }
     }
 
     /* --- TEXTILE SWIPING GALLERY (RIGHT SIDE) --- */
@@ -271,14 +252,14 @@
 
     @keyframes scanSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 140px)); }
+      100% { transform: translateX(calc(-100% + 250px)); }
     }
 
     /* --- VIEWPORT GRID --- */
     .viewer-container {
       display: grid; 
       grid-template-columns: 380px 1fr 340px; 
-      height: 100%; 
+      height: 100vh; 
       padding: 110px 40px 40px; 
       gap: 20px;
     }
@@ -291,6 +272,7 @@
       flex-direction: column; 
       justify-content: space-between;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       pointer-events: auto;
       transition: background 0.3s, border-color 0.3s;
     }
@@ -309,20 +291,106 @@
       border: 1px solid var(--ui-border);
       background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
       transition: border-color 0.3s;
-      min-height: 400px; /* Safe canvas viewing box sizing on dynamic screens */
+      min-height: 350px;
     }
-    #realModelCanvas { width: 100% !important; height: 100% !important; display: block;}
+    #realModelCanvas { width: 100% !important; height: 100% !important; display: block; }
     .status-overlay { position: absolute; bottom: 15px; left: 15px; font-size: 0.55rem; color: var(--accent); }
 
-    /* --- GLOBAL MEDIA RESPONSIVENESS OVERRIDES --- */
-    @media (max-width: 1024px) {
+    /* --- COMPREHENSIVE RESPONSIVE MOBILE ENGINE (max-width: 1100px) --- */
+    @media (max-width: 1100px) {
+      body {
+        overflow-y: auto !important;
+        height: auto !important;
+      }
+      
+      .hud-frame { display: none !important; }
+
+      /* Re-organizing structural content view to single down-stack flow */
       .viewer-container { 
         grid-template-columns: 1fr; 
-        padding: 110px 20px 30px; 
-        gap: 30px;
+        height: auto; 
+        padding: 100px 15px 30px; 
+        gap: 20px; 
+        display: flex;
+        flex-direction: column;
       }
-      .panel { gap: 20px; }
-      .hud-frame { inset: 10px; }
+      
+      /* Reorder blocks to bring Gear Preview and Canvas straight to the top context */
+      .panel-node-selection { order: 2; }
+      .panel-gear-preview { order: 1; } /* Gear preview structure panel container pushed up top */
+      .model-stage { order: 3; height: 50vh; min-height: 300px; }
+      .panel-asset-metadata { order: 4; }
+
+      .panel {
+        gap: 20px;
+        justify-content: flex-start;
+      }
+
+      /* Synchronized adaptive mobile header with active Hamburger Controls */
+      .site-nav { 
+        padding: 0 20px; 
+        flex-direction: row; 
+        height: 70px; 
+        justify-content: space-between;
+      }
+
+      .menu-toggle { display: flex; }
+
+      .nav-menu { 
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: var(--nav-bg);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        transition: left 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        border-bottom: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+
+      .nav-menu.open { left: 0; }
+      .nav-menu a { font-size: 14px; letter-spacing: 2px; }
+
+      .nav-right { display: none; } /* Hide theme switches into compact responsive flows if unneeded */
+
+      /* Convert automated CSS marquees back into fluid smart touch auto-scroll areas */
+      .wardrobe-scroll-container, .pattern-scroll-container {
+        mask-image: none !important;
+        -webkit-mask-image: none !important;
+        overflow-x: auto !important; /* Managed by native mobile touch swipe gestures */
+        padding-bottom: 15px;
+        position: relative;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .wardrobe-track, .pattern-track {
+        animation: none !important;
+        transform: none !important;
+        padding: 0 5px;
+      }
+
+      .wardrobe-item {
+        width: 190px;
+        height: 230px;
+      }
+      .wardrobe-item img {
+        filter: grayscale(0) !important;
+        opacity: 0.9 !important;
+      }
+
+      .pattern-item {
+        width: 110px;
+        height: 140px;
+      }
+      .pattern-img {
+        filter: grayscale(0) !important;
+        opacity: 0.9 !important;
+      }
     }
   </style>
 </head>
@@ -335,6 +403,13 @@
 
   <nav class="site-nav">
     <div class="logo-box"><h1 data-glitch="SABAH_HERITAGE">SABAH_HERITAGE</h1></div>
+    
+    <button class="menu-toggle" id="mobileMenuBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
     <ul class="nav-menu" id="navMenu">
       <li><a href="index.html">Home</a></li>
       <li><a href="explore.html">Explore</a></li>
@@ -342,21 +417,26 @@
       <li><a href="game.html">Game</a></li>
       <li><a href="about.html">About</a></li>
     </ul>
+
     <div class="nav-right">
-        <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggleBtn">MENU</button>
+        <button id="themeToggle" onclick="toggleTheme()" class="mode-swap">MODE_SWAP</button>
         <div id="digital-clock">00:00:00</div>
     </div>
   </nav>
 
   <main class="viewer-container">
-    <aside class="panel">
+    <aside class="panel panel-node-selection">
       <div>
         <div class="panel-header" data-glitch="NODE_SELECTION">NODE_SELECTION</div>
         <button id="loadFemale" class="terminal-btn active" data-glitch="[ MURUT_FEMALE ]">[ MURUT_FEMALE ]</button>
         <button id="loadMale" class="terminal-btn" data-glitch="[ MURUT_MALE ]">[ MURUT_MALE ]</button>
-        
-        <div class="panel-header" style="margin-top:25px;" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
-        <div class="wardrobe-scroll-container">
+      </div>
+    </aside>
+
+    <aside class="panel panel-gear-preview">
+      <div>
+        <div class="panel-header" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
+        <div class="wardrobe-scroll-container" id="gearScrollContainer">
           <div id="wardrobeTrack" class="wardrobe-track"></div>
         </div>
       </div>
@@ -365,20 +445,19 @@
     <section class="model-stage" id="stageContainer">
       <canvas id="realModelCanvas"></canvas>
       <div class="status-overlay">RENDER_MODE: <span id="modelStatus">IDLE</span></div>
-      <button id="themeToggle" onclick="toggleTheme()" class="mode-swap" data-glitch="MODE_SWAP">MODE_SWAP</button>
     </section>
 
-    <aside class="panel">
+    <aside class="panel panel-asset-metadata">
       <div>
         <div class="panel-header" data-glitch="ASSET_METADATA">ASSET_METADATA</div>
         
         <div class="pattern-archive-label">TEXTILE_PATTERNS // SCAN_04</div>
         
-        <div class="pattern-scroll-container">
+        <div class="pattern-scroll-container" id="assetScrollContainer">
           <div class="pattern-track">
-            <div class="pattern-item"><img src="m4.jpg" class="pattern-img"></div>
-            <div class="pattern-item"><img src="m2.jpg" class="pattern-img"></div>
-            <div class="pattern-item"><img src="m3.jpg" class="pattern-img"></div>
+            <div class="pattern-item"><img src="m4.jpg" class="pattern-img" alt="Pattern 1"></div>
+            <div class="pattern-item"><img src="m2.jpg" class="pattern-img" alt="Pattern 2"></div>
+            <div class="pattern-item"><img src="m3.jpg" class="pattern-img" alt="Pattern 3"></div>
           </div>
         </div>
 
@@ -400,16 +479,22 @@
         document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
 
-    function toggleMobileMenu() {
-        const menu = document.getElementById('navMenu');
-        const btn = document.getElementById('menuToggleBtn');
-        menu.classList.toggle('mobile-active');
-        if(menu.classList.contains('mobile-active')) {
-          btn.innerText = "CLOSE";
-        } else {
-          btn.innerText = "MENU";
-        }
-    }
+    // Mobile Hamburger functionality
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navMenu = document.getElementById('navMenu');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenuBtn.classList.toggle('open');
+      navMenu.classList.toggle('open');
+    });
+
+    // Close menu when clicking links
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenuBtn.classList.remove('open');
+        navMenu.classList.remove('open');
+      });
+    });
   </script>
 
   <script type="module">
@@ -439,9 +524,13 @@
     function updateWardrobeDisplay(gender) {
       wardrobeTrack.innerHTML = '';
       
+      // Clear inline track styling before rebuilding data structures
       wardrobeTrack.style.animation = 'none';
       wardrobeTrack.offsetHeight; 
-      wardrobeTrack.style.animation = 'gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
+      
+      if (!window.matchMedia("(max-width: 1100px)").matches) {
+        wardrobeTrack.style.animation = 'gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
+      }
 
       costumeData[gender].forEach(item => {
         const div = document.createElement('div');
@@ -452,12 +541,18 @@
         `;
         
         div.addEventListener('mouseenter', () => {
-          follower.style.transform = 'scale(1.3)';
-          follower.style.borderColor = 'var(--text-main)';
+          const follower = document.getElementById('cursor-follower');
+          if (follower && window.matchMedia("(pointer: fine)").matches) {
+            follower.style.transform = 'scale(1.3)';
+            follower.style.borderColor = 'var(--text-main)';
+          }
         });
         div.addEventListener('mouseleave', () => {
-          follower.style.transform = 'scale(1)';
-          follower.style.borderColor = 'var(--accent)';
+          const follower = document.getElementById('cursor-follower');
+          if (follower && window.matchMedia("(pointer: fine)").matches) {
+            follower.style.transform = 'scale(1)';
+            follower.style.borderColor = 'var(--accent)';
+          }
         });
 
         wardrobeTrack.appendChild(div);
@@ -500,6 +595,7 @@
     let mouseX = 0, mouseY = 0;
 
     document.addEventListener('mousemove', (e) => {
+        if (!window.matchMedia("(pointer: fine)").matches) return;
         mouseX = (e.clientX / window.innerWidth) - 0.5;
         mouseY = (e.clientY / window.innerHeight) - 0.5;
 
@@ -511,6 +607,7 @@
 
     document.querySelectorAll('.nav-menu a, button, .terminal-btn, .pattern-item, .mode-swap').forEach(item => {
         item.addEventListener('mouseenter', () => {
+            if (!window.matchMedia("(pointer: fine)").matches) return;
             follower.style.transform = 'scale(1.5)';
             follower.style.borderColor = 'var(--text-main)';
             if (item.classList.contains('mode-swap')) {
@@ -519,6 +616,7 @@
             }
         });
         item.addEventListener('mouseleave', () => {
+            if (!window.matchMedia("(pointer: fine)").matches) return;
             follower.style.transform = 'scale(1)';
             follower.style.borderColor = 'var(--accent)';
             follower.style.background = 'transparent';
@@ -562,7 +660,7 @@
     controls.dampingFactor = 0.05;
     camera.position.set(0, 0, 3);
 
-    /* INTERACTIVE PROCEDURAL HOLOGRAM MATRIX (EXACTLY REPLICATED) */
+    /* INTERACTIVE PROCEDURAL HOLOGRAM MATRIX */
     const particleCount = 1500;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -611,6 +709,7 @@
     let loadedMesh = null;
     const gltfLoader = new GLTFLoader();
 
+    // Mapping tracking files directly to the Murut target keys
     function loadModel(filename) {
       status.innerText = "LOADING...";
       
@@ -648,7 +747,7 @@
 
           scene.add(loadedMesh);
           status.innerText = "STABLE";
-          material.opacity = 0.15; 
+          material.opacity = 0.15;
         },
         (xhr) => {
           if (xhr.total > 0) {
@@ -695,8 +794,10 @@
       particleSystem.rotation.y += 0.001;
       particleSystem.rotation.x += 0.0005;
 
-      particleSystem.position.x += (mouseX * 0.3 - particleSystem.position.x) * 0.05;
-      particleSystem.position.y += (-mouseY * 0.3 - particleSystem.position.y) * 0.05;
+      if (window.matchMedia("(pointer: fine)").matches) {
+        particleSystem.position.x += (mouseX * 0.3 - particleSystem.position.x) * 0.05;
+        particleSystem.position.y += (-mouseY * 0.3 - particleSystem.position.y) * 0.05;
+      }
 
       if (loadedMesh) {
         loadedMesh.rotation.y += 0.003;
