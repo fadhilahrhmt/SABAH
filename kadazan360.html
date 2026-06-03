@@ -35,11 +35,20 @@
       --glass-border: rgba(0, 0, 0, 0.1);
     }
 
-    /* --- CUSTOM CURSOR SYNC CONFIGURATION --- */
-    * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+    /* --- CURSOR CONFIGURATION AND POINTER CONTROLS --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    #cursor { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: background 0.2s; }
-    #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: transform 0.1s ease-out, background 0.2s, border-color 0.2s; }
+    /* Fine precision cursor styling rules for desktop layout engines */
+    @media (pointer: fine) {
+      * { cursor: none !important; }
+      #cursor { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: background 0.2s; }
+      #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: transform 0.1s ease-out, background 0.2s, border-color 0.2s; }
+    }
+
+    /* Fallback engine rule setup to bypass desktop cursor rules on touch/mobile screens */
+    @media (pointer: coarse) {
+      #cursor, #cursor-follower { display: none !important; }
+    }
 
     body {
       background-color: var(--bg);
@@ -67,6 +76,7 @@
       padding: 0 50px; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
       z-index: 5000;
       backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       transition: background 0.4s, border-color 0.4s;
     }
 
@@ -115,7 +125,6 @@
       animation: gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
     }
     
-    /* CRITICAL FIX: When cursor is ANYWHERE over the container box, the inner track stops moving */
     .wardrobe-scroll-container:hover .wardrobe-track { 
       animation-play-state: paused !important; 
     }
@@ -239,6 +248,7 @@
       flex-direction: column; 
       justify-content: space-between;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       pointer-events: auto;
       transition: background 0.3s, border-color 0.3s;
     }
@@ -257,14 +267,82 @@
       border: 1px solid var(--ui-border);
       background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
       transition: border-color 0.3s;
+      min-height: 350px;
     }
-    #realModelCanvas { width: 100% !important; height: 100% !important; }
+    #realModelCanvas { width: 100% !important; height: 100% !important; display: block; }
     .status-overlay { position: absolute; bottom: 15px; left: 15px; font-size: 0.55rem; color: var(--accent); }
 
+    /* --- COMPREHENSIVE RESPONSIVE MOBILE ENGINE (max-width: 1100px) --- */
     @media (max-width: 1100px) {
-      .viewer-container { grid-template-columns: 1fr; height: auto; padding-top: 180px; }
-      .site-nav { padding: 0 20px; flex-direction: column; height: auto; gap: 15px; padding-top: 15px; padding-bottom: 15px; }
-      .nav-menu { gap: 15px; }
+      body {
+        overflow-y: auto !important;
+        height: auto !important;
+      }
+      
+      .hud-frame { display: none !important; }
+
+      /* Re-organizing structural content view to single down-stack flow */
+      .viewer-container { 
+        grid-template-columns: 1fr; 
+        height: auto; 
+        padding: 160px 15px 30px; 
+        gap: 20px; 
+      }
+      
+      .panel {
+        gap: 20px;
+        justify-content: flex-start;
+      }
+
+      /* Synchronized adaptive mobile header */
+      .site-nav { 
+        padding: 15px; 
+        flex-direction: column; 
+        height: auto; 
+        gap: 12px; 
+        top: 0;
+      }
+      .logo-box h1 { font-size: 13px; letter-spacing: 2px; text-align: center; }
+      .nav-menu { gap: 12px; flex-wrap: wrap; justify-content: center; }
+      .nav-menu a { font-size: 10px; letter-spacing: 1px; }
+      .nav-right { width: 100%; justify-content: space-between; border-top: 1px solid var(--glass-border); padding-top: 10px; }
+      #digital-clock { padding-left: 12px; font-size: 11px; }
+
+      /* Convert animated CSS marquees back into fluid hardware touch swipe tracks */
+      .wardrobe-scroll-container, .pattern-scroll-container {
+        mask-image: none !important;
+        -webkit-mask-image: none !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 15px;
+      }
+
+      .wardrobe-track, .pattern-track {
+        animation: none !important;
+        transform: none !important;
+        padding: 0 5px;
+      }
+
+      .wardrobe-item {
+        width: 190px;
+        height: 230px;
+      }
+      .wardrobe-item img {
+        filter: grayscale(0) !important;
+        opacity: 0.9 !important;
+      }
+
+      .pattern-item {
+        width: 110px;
+        height: 140px;
+      }
+      .pattern-img {
+        filter: grayscale(0) !important;
+        opacity: 0.9 !important;
+      }
+      
+      /* Order layout positioning engine to bring 3D canvas up top */
+      .model-stage { order: -1; height: 50vh; min-height: 300px; }
     }
   </style>
 </head>
@@ -299,8 +377,7 @@
         
         <div class="panel-header" style="margin-top:25px;" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
         <div class="wardrobe-scroll-container">
-          <div id="wardrobeTrack" class="wardrobe-track">
-             </div>
+          <div id="wardrobeTrack" class="wardrobe-track"></div>
         </div>
       </div>
     </aside>
@@ -318,9 +395,9 @@
         
         <div class="pattern-scroll-container">
           <div class="pattern-track">
-            <div class="pattern-item"><img src="g2.jpg" class="pattern-img"></div>
-            <div class="pattern-item"><img src="g1.jpg" class="pattern-img"></div>
-            <div class="pattern-item"><img src="g3.jpg" class="pattern-img"></div>
+            <div class="pattern-item"><img src="g2.jpg" class="pattern-img" alt="Pattern 1"></div>
+            <div class="pattern-item"><img src="g1.jpg" class="pattern-img" alt="Pattern 2"></div>
+            <div class="pattern-item"><img src="g3.jpg" class="pattern-img" alt="Pattern 3"></div>
           </div>
         </div>
 
@@ -329,10 +406,9 @@
           ARCHIVAL TEXTILE ANALYSIS:<br>
           traditional decorative embroidery technique practiced by the Kadazan-Dusun community in Sabah.<br>
           The word linangkit comes from the local term meaning "to join" or "to connect," referring to the way colorful threads are intricately stitched together to form beautiful geometric patterns.<br>
-          
         </p>
       </div>
-      <a href="kadazan.html" class="terminal-btn" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
+      <a href="kadazan.html" class="terminal-btn" style="margin-top: 15px;" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
     </aside>
   </main>
 
@@ -371,7 +447,10 @@
       // Clear inline track styling before rebuilding data structures
       wardrobeTrack.style.animation = 'none';
       wardrobeTrack.offsetHeight; 
-      wardrobeTrack.style.animation = 'gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
+      
+      if (!window.matchMedia("(max-width: 1100px)").matches) {
+        wardrobeTrack.style.animation = 'gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
+      }
 
       costumeData[gender].forEach(item => {
         const div = document.createElement('div');
@@ -382,19 +461,25 @@
         `;
         
         div.addEventListener('mouseenter', () => {
-          follower.style.transform = 'scale(1.3)';
-          follower.style.borderColor = 'var(--text-main)';
+          const follower = document.getElementById('cursor-follower');
+          if (follower && window.matchMedia("(pointer: fine)").matches) {
+            follower.style.transform = 'scale(1.3)';
+            follower.style.borderColor = 'var(--text-main)';
+          }
         });
         div.addEventListener('mouseleave', () => {
-          follower.style.transform = 'scale(1)';
-          follower.style.borderColor = 'var(--accent)';
+          const follower = document.getElementById('cursor-follower');
+          if (follower && window.matchMedia("(pointer: fine)").matches) {
+            follower.style.transform = 'scale(1)';
+            follower.style.borderColor = 'var(--accent)';
+          }
         });
 
         wardrobeTrack.appendChild(div);
       });
     }
 
-    // Initialize Box Content
+    // Initialize Content
     updateWardrobeDisplay('female');
 
     /* INTERACTIVE TEXT GLITCH ENGINE */
@@ -430,6 +515,7 @@
     let mouseX = 0, mouseY = 0;
 
     document.addEventListener('mousemove', (e) => {
+        if (!window.matchMedia("(pointer: fine)").matches) return;
         mouseX = (e.clientX / window.innerWidth) - 0.5;
         mouseY = (e.clientY / window.innerHeight) - 0.5;
 
@@ -441,6 +527,7 @@
 
     document.querySelectorAll('.nav-menu a, button, .terminal-btn, .pattern-item, .mode-swap').forEach(item => {
         item.addEventListener('mouseenter', () => {
+            if (!window.matchMedia("(pointer: fine)").matches) return;
             follower.style.transform = 'scale(1.5)';
             follower.style.borderColor = 'var(--text-main)';
             if (item.classList.contains('mode-swap')) {
@@ -449,6 +536,7 @@
             }
         });
         item.addEventListener('mouseleave', () => {
+            if (!window.matchMedia("(pointer: fine)").matches) return;
             follower.style.transform = 'scale(1)';
             follower.style.borderColor = 'var(--accent)';
             follower.style.background = 'transparent';
@@ -458,8 +546,11 @@
 
     /* CLOCK COMPONENT ENGINE */
     function updateClock() {
-      const now = new Date();
-      document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+      const clockEl = document.getElementById('digital-clock');
+      if (clockEl) {
+        const now = new Date();
+        clockEl.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+      }
     }
     setInterval(updateClock, 1000);
     updateClock();
@@ -622,8 +713,10 @@
       particleSystem.rotation.y += 0.001;
       particleSystem.rotation.x += 0.0005;
 
-      particleSystem.position.x += (mouseX * 0.3 - particleSystem.position.x) * 0.05;
-      particleSystem.position.y += (-mouseY * 0.3 - particleSystem.position.y) * 0.05;
+      if (window.matchMedia("(pointer: fine)").matches) {
+        particleSystem.position.x += (mouseX * 0.3 - particleSystem.position.x) * 0.05;
+        particleSystem.position.y += (-mouseY * 0.3 - particleSystem.position.y) * 0.05;
+      }
 
       if (loadedMesh) {
         loadedMesh.rotation.y += 0.003;
