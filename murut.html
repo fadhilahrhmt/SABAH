@@ -3,481 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SABAH HERITAGE // MURUT_HISTORY</title>
+    <title>Gallery | Sabah Heritage Archive</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-color: #0a0a0a;
+            --bg-color: #080808;
             --text-color: #ffffff;
-            --accent-gold: #d4af37;
-            --nav-bg: #0a0a0a;
-            --glass-bg: rgba(255, 255, 255, 0.03);
+            --accent-color: #d4af37;
+            --nav-bg: #080808;
             --glass-border: rgba(255, 255, 255, 0.15);
-            --font-heading: 'Syncopate', sans-serif;
             --font-main: 'Space Mono', monospace;
+            --font-heading: 'Syncopate', sans-serif;
         }
 
         [data-theme="light"] {
             --bg-color: #f9f7f2;
             --text-color: #1a1a1a;
-            --accent-gold: #8b6e3c;
+            --accent-color: #8b6e3c;
             --nav-bg: #f9f7f2;
-            --glass-bg: rgba(0, 0, 0, 0.05);
             --glass-border: rgba(0, 0, 0, 0.1);
         }
 
-        /* HOMEPAGE SCROLLBAR ENGINE IMPLEMENTATION */
-        ::-webkit-scrollbar { 
-            width: 4px; 
-        }
-        ::-webkit-scrollbar-track { 
-            background: #090a0f; 
-        }
-        ::-webkit-scrollbar-thumb { 
-            background: #c5a059; 
-            box-shadow: 0 0 15px #c5a059; 
-        }
-
-        /* Firefox Support Engine */
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: #c5a059 #090a0f;
-            margin: 0; padding: 0; box-sizing: border-box; cursor: none !important;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* Desktop Native Cursor Override Rule */
+        @media (pointer: fine) {
+            * { cursor: none !important; }
         }
         
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: var(--font-main);
-            line-height: 1.6;
-            transition: background 0.4s ease, color 0.4s ease;
+            min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.4s ease;
         }
 
-        /* CURSOR */
-        #custom-cursor {
-            width: 10px; height: 10px;
-            background-color: var(--accent-gold);
-            border-radius: 50%;
-            position: fixed; pointer-events: none;
-            z-index: 99999; transform: translate(-50%, -50%);
-            mix-blend-mode: difference;
-        }
-
-        #cursor-follower {
-            width: 40px; height: 40px;
-            border: 1px solid var(--accent-gold);
-            border-radius: 50%;
-            position: fixed; pointer-events: none;
-            z-index: 99998; transform: translate(-50%, -50%);
-            transition: transform 0.1s ease-out;
-            opacity: 0.5;
-        }
-
-        /* --- STANDARDIZED INTEGRATED NAV BAR --- */
+        /* NAVIGATION - SYNCHRONIZED FLUID STRUCTURAL SCALE */
         .site-nav {
             position: fixed; top: 0; width: 100%; height: 80px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 50px; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
+            padding: 0 clamp(16px, 4vw, 50px); 
+            background: var(--nav-bg); border-bottom: 1px solid var(--glass-border);
             z-index: 5000;
             backdrop-filter: blur(20px);
-            transition: background 0.4s, border-color 0.4s;
+            -webkit-backdrop-filter: blur(20px);
         }
 
         .logo-box h1 { 
             font-family: var(--font-heading); 
-            font-size: 14px; 
-            letter-spacing: 4px; 
-            color: var(--text-color);
+            font-size: clamp(10px, 1.4vw, 14px); 
+            letter-spacing: clamp(2px, 0.4vw, 4px); 
+            white-space: nowrap;
         }
         
         .nav-menu { 
-            display: flex; gap: 30px; list-style: none; 
+            display: flex; 
+            gap: clamp(10px, 2.5vw, 30px); 
+            list-style: none; 
+            align-items: center;
+        }
+        .nav-menu a { 
+            color: var(--text-color); text-decoration: none; 
+            font-size: clamp(9px, 1.1vw, 11px); 
+            opacity: 0.6; transition: 0.3s; text-transform: uppercase; font-weight: 700;
+            letter-spacing: clamp(1px, 0.2vw, 2px);
+            white-space: nowrap;
+        }
+        .nav-menu a.active, .nav-menu a:hover { opacity: 1; color: var(--accent-color); }
+
+        .nav-right { display: flex; align-items: center; gap: clamp(10px, 2vw, 25px); }
+        
+        /* MODE SWAP BUTTON STYLING */
+        .swap-mode-btn {
+            background: none; 
+            border: 1px solid var(--accent-color); 
+            color: var(--accent-color); 
+            padding: 5px clamp(8px, 1.5vw, 15px); 
+            font-size: clamp(8px, 0.9vw, 10px); 
+            font-family: var(--font-main);
+            transition: background 0.3s ease, color 0.3s ease;
+            white-space: nowrap;
         }
         
-        .nav-menu a { 
-            color: var(--text-color); text-decoration: none; font-size: 11px; 
-            opacity: 0.6; transition: 0.3s; text-transform: uppercase; font-weight: 700;
-            letter-spacing: 2px;
-        }
-        .nav-menu a.active, .nav-menu a:hover { opacity: 1; color: var(--accent-gold); }
-
-        .nav-right { 
-            display: flex; align-items: center; gap: 25px; 
-        }
-
-        .nav-right button {
-            background: none; border: 1px solid var(--accent-gold); color: var(--accent-gold); 
-            padding: 5px 15px; font-size: 10px; cursor: pointer; font-family: var(--font-main);
-            letter-spacing: 2px; text-transform: uppercase; transition: 0.3s;
-        }
-        .nav-right button:hover {
-            background: var(--accent-gold);
+        .swap-mode-btn:hover {
+            background: var(--accent-color);
             color: var(--bg-color);
         }
 
         #digital-clock { 
-            font-size: 12px; font-weight: 700; color: var(--accent-gold); 
-            border-left: 1px solid var(--glass-border); padding-left: 20px; 
+            font-size: clamp(10px, 1.2vw, 12px); 
+            font-weight: 700; 
+            color: var(--accent-color); 
+            border-left: 1px solid var(--glass-border); 
+            padding-left: clamp(10px, 2vw, 20px); 
+            white-space: nowrap;
         }
 
-        /* CONTENT */
-        .content {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 160px 60px 80px;
-        }
-
-        .tribe-title {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(2.5rem, 8vw, 5rem);
+        /* GALLERY INTRO */
+        .gallery-intro {
             text-align: center;
-            letter-spacing: 15px;
-            margin-bottom: 80px;
-            color: var(--accent-gold);
-            text-transform: uppercase;
+            padding: 160px 20px 60px;
         }
-
-        /* SHARED GRID STYLE */
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            margin-bottom: 120px;
-            align-items: center;
-        }
-
-        .text-box {
-            padding: 40px;
-            border-left: 1px solid var(--accent-gold);
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            position: relative;
-        }
-
-        .section-tag {
-            color: var(--accent-gold);
-            font-size: 9px;
-            letter-spacing: 5px;
-            display: block;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        .text-box h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 2rem;
+        .gallery-intro h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            letter-spacing: 8px;
             margin-bottom: 20px;
             color: var(--text-color);
         }
-
-        .text-box p {
-            font-size: 12px;
-            letter-spacing: 1px;
-            opacity: 0.8;
+        .gallery-intro p {
+            font-size: 10px;
+            letter-spacing: 3px;
+            opacity: 0.5;
             text-transform: uppercase;
-            text-align: justify;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .visual-frame {
-            width: 100%;
-            height: 450px;
-            overflow: hidden;
-            border: 1px solid var(--glass-border);
-            position: relative;
-        }
-
-        .visual-frame img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            filter: grayscale(1) brightness(0.7);
-            transition: 1s cubic-bezier(0.2, 1, 0.3, 1);
-        }
-
-        .visual-frame:hover img {
-            filter: grayscale(0) brightness(1);
-            transform: scale(1.05);
-        }
-        
-        /* ATTIRE EXPLANATION BOXES */
-        .attire-specs {
+        /* GALLERY GRID */
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto 100px;
+            padding: 0 40px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 60px;
-        }
-        .spec-box {
-            padding: 30px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-top: 3px solid var(--accent-gold);
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            z-index: 5;
         }
 
-        .spec-box h3 {
-            font-family: 'Cinzel', serif;
-            color: var(--accent-gold);
-            font-size: 14px;
-            letter-spacing: 4px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        .spec-box p {
-            font-size: 11px;
-            letter-spacing: 1px;
-            opacity: 0.7;
-            text-transform: uppercase;
-            text-align: justify;
-        }
-
-        /* SLIDERS */
-        .slider-section-label {
-            font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
-            text-align: center;
-            letter-spacing: 8px;
-            margin-bottom: 40px;
-            color: var(--accent-gold);
-        }
-
-        .slider-area {
+        .gallery-item {
             position: relative;
-            margin-bottom: 120px;
-        }
-
-        .gallery-viewport {
-            overflow: hidden;
-            padding: 20px 0;
-            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-        }
-
-        .gallery-track {
-            display: flex;
-            gap: 20px;
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        /* ARTIFACT CARDS */
-        .item-card {
-            flex: 0 0 300px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 20px;
-            text-align: center;
-            transition: 0.4s;
-        }
-
-        .item-card:hover { border-color: var(--accent-gold); transform: translateY(-10px); }
-
-        .item-frame {
-            width: 100%; height: 300px;
-            overflow: hidden; background: #000;
-            margin-bottom: 20px;
-        }
-
-        .item-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: 0.5s; }
-        .item-card:hover img { filter: grayscale(0); transform: scale(1.1); }
-
-        /* VIDEO CARDS */
-        .video-card {
-            flex: 0 0 450px;
-            aspect-ratio: 16/9;
             background: #000;
+            overflow: hidden;
+            aspect-ratio: 16 / 10;
             border: 1px solid var(--glass-border);
+            transition: border-color 0.4s;
+            text-decoration: none;
+        }
+
+        .gallery-item:hover { border-color: var(--accent-color); }
+
+        .img-wrapper {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
             overflow: hidden;
         }
 
-        .arrow {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            width: 50px; height: 50px; background: transparent;
-            color: var(--accent-gold); border: 1px solid var(--accent-gold);
-            font-family: 'Space Mono'; z-index: 100;
+        /* HORIZONTAL PANNING EFFECT */
+        .zone-img {
+            width: 120%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            filter: grayscale(100%);
+            transform: translateX(-10%);
+            transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s, filter 0.6s;
         }
-        .arrow:hover { background: var(--accent-gold); color: #000; }
-        .arrow-left { left: -70px; }
-        .arrow-right { right: -70px; }
 
-        .bottom-area { text-align: center; padding: 60px 0; }
-        .action-btn {
-            background: transparent; color: var(--accent-gold);
-            padding: 20px 50px; border: 1px solid var(--accent-gold);
-            font-family: 'Space Mono'; letter-spacing: 5px;
-            text-transform: uppercase; font-size: 12px;
+        .gallery-item:hover .zone-img {
+            transform: translateX(0%) scale(1.1); 
+            opacity: 0.9;
+            filter: grayscale(0%);
         }
-        .action-btn:hover { background: var(--accent-gold); color: #000; }
 
+        .item-overlay {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 25px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%);
+            z-index: 10;
+        }
+
+        .item-overlay span { color: var(--accent-color); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+        .item-overlay h2 { font-family: var(--font-heading); color: #fff; font-size: 14px; letter-spacing: 2px; }
+
+        /* UI ELEMENTS */
+        .grid-bg {
+            position: fixed; inset: 0;
+            background-image: linear-gradient(var(--glass-border) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+            background-size: 60px 60px; z-index: -1; pointer-events: none;
+            opacity: 0.3;
+        }
+
+        #cursor { width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 6000; display: none; }
+        #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent-color); border-radius: 50%; position: fixed; pointer-events: none; z-index: 5999; transition: 0.1s ease-out; display: none; }
+
+        @media (pointer: fine) {
+            #cursor, #cursor-follower { display: block; }
+        }
+
+        /* --- MOBILE GENERAL AREA ADJUSTMENTS --- */
         @media (max-width: 1100px) {
-            .info-grid { grid-template-columns: 1fr; }
-            .arrow { display: none; }
-            .site-nav { padding: 0 20px; flex-direction: column; height: auto; gap: 15px; padding-top: 15px; padding-bottom: 15px; }
-            .nav-menu { gap: 15px; }
-            .content { padding-top: 220px; }
+            .gallery-container { padding: 0 20px; grid-template-columns: 1fr; }
+            .zone-img { filter: grayscale(0%) !important; opacity: 0.7 !important; transform: none !important; width: 100%; }
         }
     </style>
 </head>
 <body>
 
-<div id="custom-cursor"></div>
-<div id="cursor-follower"></div>
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+    <div class="grid-bg"></div>
 
-<nav class="site-nav">
-    <div class="logo-box"><h1>SABAH_HERITAGE</h1></div>
-    <ul class="nav-menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="explore.html">Explore</a></li>
-        <li><a href="gallery.html">Gallery</a></li>
-        <li><a href="game.html">Game</a></li>
-        <li><a href="about.html">About</a></li>
-    </ul>
-    <div class="nav-right">
-        <button onclick="toggleTheme()">MODE_SWAP</button>
-        <div id="digital-clock">00:00:00</div>
-    </div>
-</nav>
-
-<main class="content">
-    <h1 class="tribe-title">Murut_History</h1>
-
-    <div class="info-grid">
-        <div class="visual-frame">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhZmvZuJTv-YVZImZd-ec0eDh7Q1lZ8mYeDQEMvmtrjafTdCchRl894gMrACuFiFWgtbCeBPEk6Dvts-_KXm8StnuCGmjiEbM6cWsCNEEs7w_UukHfkCsWVwDheAri1br-dq_zABaz5WmC8/s1600/1666069469361424-0.png" alt="Ancestral Roots">
+    <nav class="site-nav">
+        <div class="logo-box"><h1>SABAH_HERITAGE</h1></div>
+        <ul class="nav-menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="explore.html">Explore</a></li>
+            <li><a href="gallery.html" class="active">Gallery</a></li>
+            <li><a href="game.html">Game</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+        <div class="nav-right">
+            <button onclick="toggleTheme()" class="swap-mode-btn">MODE_SWAP</button>
+            <div id="digital-clock">00:00:00</div>
         </div>
-        <div class="text-box">
-            <span class="section-tag">Log_01 // Origins</span>
-            <h2>The Hill People</h2>
-            <p> The Murut are one of the major indigenous ethnic groups in Sabah. Traditionally, the Murut people lived in the inland and mountainous areas of Sabah, especially around Keningau, Tenom, Pensiangan, and Nabawan. The word “Murut” means “hill people” or “people of the interior.”
-                The Murut community is known for its rich cultural heritage, traditional longhouses, colorful clothing, beadwork, music, and warrior traditions. In the past, they were skilled hunters and farmers who depended on nature for their daily lives.</p>
-        </div>
+    </nav>
+
+    <div class="gallery-intro">
+        <h1>REGIONAL_DATA_LOG</h1>
+        <p>Tactical visual records of Sabah's 5 demographic zones. Hover to scan.</p>
     </div>
 
-    <div class="info-grid" style="direction: rtl;">
-        <div class="visual-frame" style="direction: ltr;">
-            <img src="https://www.sabahpost.net/wp-content/uploads/2019/03/D_060517.jpg" alt="Spiritual Rites">
-        </div>
-        <div class="text-box" style="direction: ltr;">
-            <span class="section-tag">Log_02 // Hill People</span>
-            <h2>The Lifestyle</h2>
-            <p>"Traditionally, the Murut people lived in longhouses built using bamboo and wood. A longhouse could accommodate several families living together as a community. Farming, especially hill paddy cultivation, was an important part of their lifestyle.
-                The Murut people also used bamboo in many aspects of life, including cooking, crafting tools, musical instruments, and building houses.”
-            </p>
-        </div>
-    </div>
-
-    <div class="attire-specs">
-        <div class="spec-box">
-            <h3>[ MENS_ATTIRE ]</h3>
-            <p> The traditional attire for Murut men is a powerful reflection of their warrior heritage and deep connection to the forest, defined by garments crafted from natural materials and intricate symbolic details. The ensemble features the Babaru Puputul, a sleeveless jacket made from processed tapa bark, paired with the Aba Puputul, a matching bark loincloth that serves as the traditional lower garment. To complete the silhouette, men wear the Tupi Sinulatan, a distinctive headgear adorned with the majestic feathers of the Argus pheasant or hornbill, which historically signified the wearer's bravery and social status within the tribe.</p>
-        </div>
-        <div class="spec-box">
-            <h3>[ WOMENS_ATTIRE ]</h3>
-            <p>for the Murut women, the traditional attire is specifically known as the Pinongkolo, consisting of a sleeveless black cotton blouse and a long wrap-around skirt. These garments are meticulously embellished with tiny, colorful beads arranged in ancient geometric motifs like the tina-uh (bamboo shoots) and linangkit (embroidery), which represent forest spirits and ancestral folklore. The silhouette is anchored by the Pipirot, a heavy ceremonial belt made from rows of silver coins and strands of red, yellow, and white beads that signify wealth and status. To finish the ensemble, women wear the Sinikot, a set of three elaborate hairpins often linked by silver chains that secure the hair in a traditional bun and symbolize the beauty of the Murut spirit.</p>
-        </div>
-    </div>
-
-    <h2 class="slider-section-label">TRIBAL_ARCHIVE</h2>
-    <div class="slider-area">
-        <button class="arrow arrow-left" onclick="moveSlide('artifact-track', -1)">PREV</button>
-        <div class="gallery-viewport">
-            <div class="gallery-track" id="artifact-track">
-                <div class="item-card"><div class="item-frame"><img src="pinongkoloh.jpg"></div><div class="oval-label">Pinongkoloh</div></div>
-                <div class="item-card"><div class="item-frame"><img src="lumpirot.png"></div><div class="oval-label">Lumpirot</div></div>
-                <div class="item-card"><div class="item-frame"><img src="taming kalir.jpg"></div><div class="oval-label">Taming Kalir</div></div>
-                <div class="item-card"><div class="item-frame"><img src="himpogot.jpg"></div><div class="oval-label">Himpogot</div></div>
-                <div class="item-card"><div class="item-frame"><img src="babaru puputul.png"></div><div class="oval-label">Babaru Puputul</div></div>
-                <div class="item-card"><div class="item-frame"><img src="aba puputul.png"></div><div class="oval-label">Aba Puputul</div></div>
-                <div class="item-card"><div class="item-frame"><img src="tupi sinulatan.jpg"></div><div class="oval-label">Tupi Sinulatan</div></div>
+    <div class="gallery-container">
+        <a href="kadazan.html" class="gallery-item">
+            <div class="img-wrapper">
+                <img src="https://sabah.gov.my/sites/default/files/inline-images/traditional-attire-people.jpg" class="zone-img" alt="West Coast">
             </div>
-        </div>
-        <button class="arrow arrow-right" onclick="moveSlide('artifact-track', 1)">NEXT</button>
-    </div>
-
-    <h2 class="slider-section-label">VISUAL_JOURNEY</h2>
-    <div class="slider-area">
-        <button class="arrow arrow-left" onclick="moveSlide('video-track', -1)">PREV</button>
-        <div class="gallery-viewport">
-            <div class="gallery-track" id="video-track">
-                <div class="video-card">
-                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/rANaiAmtpAo?si=Imbn7V9QDC6rwWP1" frameborder="0" allowfullscreen></iframe>
-                </div>
-                <div class="video-card">
-                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/7E_jEO_ilW0?si=gXoRigx0NkUJOgIl" frameborder="0" allowfullscreen></iframe>
-                </div>
-                <div class="video-card">
-                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/Hpy2e7qJxNg?si=FTw6qhV9I1C3X11j" frameborder="0" allowfullscreen></iframe>
-                </div>
+            <div class="item-overlay">
+                <span>ZONE_01 // KADAZAN-DUSUN</span>
+                <h2>WEST COAST ZONE</h2>
             </div>
-        </div>
-        <button class="arrow arrow-right" onclick="moveSlide('video-track', 1)">NEXT</button>
-    </div>
+        </a>
 
-    <div class="bottom-area">
-        <a href="murut360.html" style="text-decoration:none">
-            <button class="action-btn">view of 360</button>
+        <a href="murut.html" class="gallery-item">
+            <div class="img-wrapper">
+                <img src="https://www.mysabah.com/wordpress/wp-content/uploads/2009/04/Murut-Kalimaran-Festival.jpg" class="zone-img" alt="Interior">
+            </div>
+            <div class="item-overlay">
+                <span>ZONE_02 // MURUT</span>
+                <h2>INTERIOR ZONE</h2>
+            </div>
+        </a>
+
+        <a href="bajau.html" class="gallery-item">
+            <div class="img-wrapper">
+                <img src="https://media-perpaduan.com/wp-content/uploads/2023/11/img_1139-2-1.jpg" class="zone-img" alt="East Coast">
+            </div>
+            <div class="item-overlay">
+                <span>ZONE_03 // BAJAU</span>
+                <h2>EAST COAST ZONE</h2>
+            </div>
         </a>
     </div>
-</main>
 
-<script>
-    /* CLOCK ENGINE MODULE */
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const clockEl = document.getElementById('digital-clock');
+            if (clockEl) {
+                clockEl.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-    /* CURSOR LOGIC */
-    const cursor = document.getElementById('custom-cursor');
-    const follower = document.getElementById('cursor-follower');
-    
-    document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-        setTimeout(() => {
-            follower.style.left = e.clientX + 'px';
-            follower.style.top = e.clientY + 'px';
-        }, 50);
-    });
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        }
 
-    /* THEME TOGGLE */
-    function toggleTheme() {
-        const root = document.documentElement;
-        const currentTheme = root.getAttribute('data-theme');
-        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        root.setAttribute('data-theme', nextTheme);
-    }
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
 
-    /* SLIDER LOGIC */
-    const indices = { 'artifact-track': 0, 'video-track': 0 };
-
-    function moveSlide(trackId, direction) {
-        const track = document.getElementById(trackId);
-        const cards = track.children;
-        const cardWidth = cards[0].offsetWidth + 20; // width + gap
-        const maxScroll = cards.length - 1;
-
-        indices[trackId] += direction;
-
-        if (indices[trackId] > maxScroll) indices[trackId] = 0;
-        if (indices[trackId] < 0) indices[trackId] = maxScroll;
-
-        track.style.transform = `translateX(${-indices[trackId] * cardWidth}px)`;
-    }
-
-    // Hover scales for cursor
-    document.querySelectorAll('a, button, .item-card, .video-card, .nav-menu a, .nav-right button').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            follower.style.transform = 'translate(-50%, -50%) scale(1.8)';
-            follower.style.background = 'rgba(212, 175, 55, 0.1)';
+        document.addEventListener('mousemove', (e) => {
+            if (window.matchMedia("(pointer: fine)").matches) {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                follower.style.left = (e.clientX - 20) + 'px';
+                follower.style.top = (e.clientY - 20) + 'px';
+            }
         });
-        el.addEventListener('mouseleave', () => {
-            follower.style.transform = 'translate(-50%, -50%) scale(1)';
-            follower.style.background = 'transparent';
-        });
-    });
-</script>
 
+        document.querySelectorAll('.gallery-item, a, button').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                if (window.matchMedia("(pointer: fine)").matches) {
+                    follower.style.transform = 'scale(1.5)';
+                }
+            });
+            item.addEventListener('mouseleave', () => {
+                if (window.matchMedia("(pointer: fine)").matches) {
+                    follower.style.transform = 'scale(1)';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
