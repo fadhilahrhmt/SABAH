@@ -204,6 +204,41 @@
         .compass-btn:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--nav-hover-accent); color: var(--nav-hover-accent); }
 
         @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+        /* --- MOBILE FIX: ONLY activates on screens smaller than a desktop (less than 992px wide) --- */
+@media (max-width: 991px) {
+    body { 
+        overflow-y: auto !important; /* Allows scrolling down on mobile */
+        height: auto !important; 
+    }
+    
+    /* Turn off rigid desktop positioning so elements don't crash into each other */
+    .sidebar, .map-stage, .ai-sidebar { 
+        position: relative !important; 
+        width: 100% !important; 
+        height: auto !important; 
+        inset: auto !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+        border: none !important;
+        padding: 20px !important;
+    }
+
+    /* Fix the HUD infobox so it displays nicely under the map on phones */
+    .data-hud {
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        width: 100% !important;
+        margin-top: 20px !important;
+    }
+    
+    /* Auto-hide the desktop cursor circles on touchscreens so they don't glitch */
+    #c, #cr { 
+        display: none !important; 
+    }
+}
     </style>
 </head>
 <body>
