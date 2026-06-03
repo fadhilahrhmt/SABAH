@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sabah Archive // Murut Sync</title>
+  <title>Sabah Archive // Bajau Sync</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
@@ -41,6 +41,12 @@
     #cursor { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: background 0.2s; }
     #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: transform 0.1s ease-out, background 0.2s, border-color 0.2s; }
 
+    /* Disable custom cursor artifacts gracefully on touch hardware devices */
+    @media (pointer: coarse) {
+      * { cursor: auto !important; }
+      #cursor, #cursor-follower { display: none !important; }
+    }
+
     body {
       background-color: var(--bg);
       background-image: 
@@ -51,18 +57,7 @@
       font-family: var(--font-main);
       min-height: 100vh;
       overflow-x: hidden;
-      overflow-y: auto;
       transition: background-color 0.4s ease, color 0.4s ease;
-    }
-
-    @media (min-width: 1025px) {
-      body { height: 100vh; overflow: hidden; }
-    }
-
-    /* Disable custom cursor on touch devices */
-    @media (pointer: coarse) {
-      * { cursor: auto !important; }
-      #cursor, #cursor-follower { display: none !important; }
     }
 
     /* --- HUD FRAME --- */
@@ -109,42 +104,27 @@
 
     #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent); border-left: 1px solid var(--glass-border); padding-left: 20px; }
 
-    /* Mobile Menu Toggle Button */
-    .menu-toggle {
+    /* HAMBURGER TRIGGER HARDWARE MODULE */
+    .hamburger-toggle {
       display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 22px;
+      height: 16px;
       background: none;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 8px 12px;
-      font-family: var(--font-main);
-      font-size: 11px;
-      letter-spacing: 1px;
+      border: none;
+      z-index: 6000;
     }
-
-    /* --- MOBILE RESPONSIVE NAV OVERRIDES --- */
-    @media (max-width: 1024px) {
-      .site-nav { padding: 0 35px; }
-      .menu-toggle { display: block; }
-      
-      .nav-menu {
-        position: fixed;
-        top: 80px;
-        left: 0;
-        width: 100%;
-        background: var(--nav-bg);
-        border-bottom: 1px solid var(--glass-border);
-        flex-direction: column;
-        gap: 0;
-        padding: 10px 0;
-        display: none; /* Controlled via active class toggle */
-      }
-      
-      .nav-menu.mobile-active { display: flex; }
-      
-      .nav-menu li { width: 100%; text-align: center; }
-      .nav-menu a { display: block; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
-      #digital-clock { display: none; } /* Saved space on mobile headers */
+    .hamburger-toggle span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: var(--accent);
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
+    .hamburger-toggle.is-active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger-toggle.is-active span:nth-child(2) { opacity: 0; }
+    .hamburger-toggle.is-active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     /* --- FIXED HOVER-STOP SCROLL CONTAINER --- */
     .wardrobe-scroll-container {
@@ -185,7 +165,7 @@
       opacity: 0.5;
       transition: transform 0.5s ease, filter 0.5s ease, opacity 0.5s ease;
     }
-    .wardrobe-item:hover img {
+    .wardrobe-item:hover img, .wardrobe-item:active img {
       transform: scale(1.15);
       filter: grayscale(0);
       opacity: 1;
@@ -202,14 +182,14 @@
       text-transform: uppercase;
       border-top: 1px solid var(--ui-border);
     }
-    .wardrobe-item:hover .wardrobe-label {
+    .wardrobe-item:hover .wardrobe-label, .wardrobe-item:active .wardrobe-label {
       background: var(--accent);
       color: var(--bg);
     }
 
     @keyframes gearSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 240px)); }
+      100% { transform: translateX(calc(-100% + 310px)); }
     }
 
     /* --- TEXTILE SWIPING GALLERY (RIGHT SIDE) --- */
@@ -258,7 +238,7 @@
       transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1);
     }
 
-    .pattern-item:hover .pattern-img {
+    .pattern-item:hover .pattern-img, .pattern-item:active .pattern-img {
       opacity: 1;
       filter: grayscale(0);
       transform: scale(1.1);
@@ -266,14 +246,14 @@
 
     @keyframes scanSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 140px)); }
+      100% { transform: translateX(calc(-100% + 250px)); }
     }
 
     /* --- VIEWPORT GRID --- */
     .viewer-container {
       display: grid; 
       grid-template-columns: 380px 1fr 340px; 
-      height: 100%; 
+      height: 100vh; 
       padding: 110px 40px 40px; 
       gap: 20px;
     }
@@ -299,25 +279,100 @@
     }
     .terminal-btn:hover, .terminal-btn.active { background: var(--accent); color: var(--bg); box-shadow: 0 0 10px var(--accent); }
 
+    .metadata-desc {
+      font-size: 0.6rem; 
+      color: var(--text-dim); 
+      margin-top: 10px; 
+      line-height: 1.8; 
+      text-transform: uppercase;
+      text-align: justify;
+    }
+
     .model-stage { 
       position: relative; 
       border: 1px solid var(--ui-border);
       background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
       transition: border-color 0.3s;
-      min-height: 400px; /* Safe canvas viewing box sizing on dynamic screens */
+      min-height: 350px;
     }
-    #realModelCanvas { width: 100% !important; height: 100% !important; display: block;}
+    #realModelCanvas { width: 100% !important; height: 100% !important; }
     .status-overlay { position: absolute; bottom: 15px; left: 15px; font-size: 0.55rem; color: var(--accent); }
 
-    /* --- GLOBAL MEDIA RESPONSIVENESS OVERRIDES --- */
-    @media (max-width: 1024px) {
+    /* --- ENGINE BREAKPOINT OPTIMIZATIONS --- */
+    @media (max-width: 1100px) {
+      body {
+        overflow-y: auto;
+      }
+      .hud-frame {
+        display: none;
+      }
+      .site-nav {
+        padding: 0 24px;
+        height: 70px;
+      }
+      #digital-clock {
+        display: none;
+      }
+      .hamburger-toggle {
+        display: flex;
+      }
+
+      /* Transform navigation architecture into mobile structural drawer */
+      .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 100%;
+        height: 100vh;
+        background: var(--bg);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 35px;
+        padding: 80px 24px;
+        transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 5500;
+        backdrop-filter: blur(20px);
+        border-left: 1px solid var(--glass-border);
+      }
+      .nav-menu.is-active {
+        right: 0;
+      }
+      .nav-menu a {
+        font-size: 15px;
+        letter-spacing: 4px;
+        padding: 12px;
+      }
+
+      /* Stack structural responsive components clean layout */
       .viewer-container { 
         grid-template-columns: 1fr; 
-        padding: 110px 20px 30px; 
-        gap: 30px;
+        height: auto; 
+        padding: 100px 16px 40px; 
+        gap: 16px;
       }
-      .panel { gap: 20px; }
-      .hud-frame { inset: 10px; }
+      .panel {
+        gap: 24px;
+        justify-content: flex-start;
+      }
+      .model-stage {
+        height: 450px;
+        order: -1; /* Elevate model canvas view above parameters */
+      }
+
+      /* Configure track mechanics for touch screens */
+      .wardrobe-scroll-container, .pattern-scroll-container {
+        mask-image: none;
+        -webkit-mask-image: none;
+        overflow-x: auto;
+      }
+      .wardrobe-scroll-container::-webkit-scrollbar, .pattern-scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+      .wardrobe-track, .pattern-track {
+        animation: none !important;
+        padding: 0 4px;
+      }
     }
   </style>
 </head>
@@ -330,17 +385,21 @@
 
   <nav class="site-nav">
     <div class="logo-box"><h1 data-glitch="SABAH_HERITAGE">SABAH_HERITAGE</h1></div>
-    <ul class="nav-menu" id="navMenu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="explore.html">Explore</a></li>
-      <li><a href="gallery.html">Gallery</a></li>
-      <li><a href="game.html">Game</a></li>
-      <li><a href="about.html">About</a></li>
+    <ul class="nav-menu" id="mobile-nav">
+      <li><a href="index.html" onclick="toggleMenu()">Home</a></li>
+      <li><a href="explore.html" onclick="toggleMenu()">Explore</a></li>
+      <li><a href="gallery.html" onclick="toggleMenu()">Gallery</a></li>
+      <li><a href="game.html" onclick="toggleMenu()">Game</a></li>
+      <li><a href="about.html" onclick="toggleMenu()">About</a></li>
     </ul>
     <div class="nav-right">
-        <button id="themeToggle" onclick="toggleTheme()" class="mode-swap">MODE_SWAP</button>
-        <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggleBtn">MENU</button>
+        <button id="themeToggle" onclick="toggleTheme()" class="mode-swap" style="z-index: 6000;">MODE_SWAP</button>
         <div id="digital-clock">00:00:00</div>
+        <button class="hamburger-toggle" id="hamburger-btn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
   </nav>
 
@@ -348,8 +407,8 @@
     <aside class="panel">
       <div>
         <div class="panel-header" data-glitch="NODE_SELECTION">NODE_SELECTION</div>
-        <button id="loadFemale" class="terminal-btn active" data-glitch="[ MURUT_FEMALE ]">[ MURUT_FEMALE ]</button>
-        <button id="loadMale" class="terminal-btn" data-glitch="[ MURUT_MALE ]">[ MURUT_MALE ]</button>
+        <button id="loadFemale" class="terminal-btn active" data-glitch="[ BAJAU_FEMALE ]">[ BAJAU_FEMALE ]</button>
+        <button id="loadMale" class="terminal-btn" data-glitch="[ BAJAU_MALE ]">[ BAJAU_MALE ]</button>
         
         <div class="panel-header" style="margin-top:25px;" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
         <div class="wardrobe-scroll-container">
@@ -371,21 +430,27 @@
         
         <div class="pattern-scroll-container">
           <div class="pattern-track">
-            <div class="pattern-item"><img src="m4.jpg" class="pattern-img"></div>
-            <div class="pattern-item"><img src="m2.jpg" class="pattern-img"></div>
-            <div class="pattern-item"><img src="m3.jpg" class="pattern-img"></div>
+            <div class="pattern-item">
+              <img src="https://images.openai.com/static-rsc-4/udopBj9xhIqMhtSatuyl7FP_vTKv-xBcd_1Mfb-zWbye-TDE2_9x9DpLAZMGR47kjWxtlkqWLG_dh9II-S8p9SpgnYRDZiaz1mxLgBqkmtyzRUAajcHlg44cgfjg9tpjIfQhyA_UoLlXc3GlzmxcflJREvVmYw7Vla5ou6TA6sOHT91jld-Gd03ZDruYrjHm?purpose=fullsize" class="pattern-img">
+            </div>
+            <div class="pattern-item">
+              <img src="https://images.openai.com/static-rsc-4/_d0lFC8NMIo2HhiPDSiKR7JK3THVhXLhdJPTd8BT-yJcMPA1l5rKMCI1jkA3CRNiWAI3ZJv-CwEQC66nUf4YoxxIcNm9wl0h--9YGvqENfCyJ1648CBCsoVTyR9cx0HOjrP-r0CwNBdjEkN2N6MG54UApGZ8s0BpvFroPpnnAy9YYLk--ZO1xs6Uepxsxkae?purpose=fullsize" class="pattern-img">
+            </div>
+            <div class="pattern-item">
+              <img src="https://sabahnewstoday.net/wp-content/uploads/2024/09/fbbe2adf-83cd-46ba-a4ac-b2492554f1b5-300x212.jpeg" class="pattern-img">
+            </div>
           </div>
         </div>
 
-        <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 1.2rem; margin-top: 15px;">SINUSU</h2>
-        <p style="font-size: 0.6rem; color: var(--text-dim); margin-top:10px; line-height: 1.8; text-transform: uppercase;">
+        <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 1.2rem; margin-top: 15px;">MOTIFS</h2>
+        <p class="metadata-desc">
           ARCHIVAL TEXTILE ANALYSIS:<br>
-          one of the most distinctive and well-known traditional motifs of the Murut community in Sabah.<br>
-          It is commonly found on traditional Murut attire, especially the Pinongkoloh costume, as well as on beadwork accessories, belts, bags, and ceremonial decorations.<br>
-          Ancient Murut geometry detected.
+          Bajau Samah do not have a single widely recognized traditional pattern name that represents the entire ethnic group.<br>
+          Instead, Bajau Sama traditional attire is known for its floral embroidery, geometric motifs, gold thread decoration, and intricate embellishments.<br>
+          Bajau Samah pattern detected.
         </p>
       </div>
-      <a href="murut.html" class="terminal-btn" style="margin-top: 15px;" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
+      <a href="bajau.html" class="terminal-btn" style="margin-top: 15px;" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
     </aside>
   </main>
 
@@ -395,15 +460,11 @@
         document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
 
-    function toggleMobileMenu() {
-        const menu = document.getElementById('navMenu');
-        const btn = document.getElementById('menuToggleBtn');
-        menu.classList.toggle('mobile-active');
-        if(menu.classList.contains('mobile-active')) {
-          btn.innerText = "CLOSE";
-        } else {
-          btn.innerText = "MENU";
-        }
+    function toggleMenu() {
+        const btn = document.getElementById('hamburger-btn');
+        const nav = document.getElementById('mobile-nav');
+        btn.classList.toggle('is-active');
+        nav.classList.toggle('is-active');
     }
   </script>
 
@@ -412,31 +473,35 @@
     import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
     import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
 
-    /* WARDROBE HORIZONTAL TRACK CONFIGURATION (MURUT PROFILES) */
+    /* WARDROBE HORIZONTAL TRACK CONFIGURATION (BAJAU PROFILES) */
     const costumeData = {
       female: [
-        { name: "Pinongkoloh", img: "k4.png" },
-        { name: "Pipirot", img: "j4.png" },
-        { name: "Lumpirot", img: "j2.png" },
-        { name: "Himpogot", img: "rantai.png" },
-        { name: "Sandai", img: "j1.png" }
+        { name: "Badu Sipak", img: "b1.png" },
+        { name: "Olos Berangkit", img: "b2.png" },
+        { name: "Sarimpak", img: "b3.png" },
+        { name: "ingkot pangkat", img: "b4.png" },
+        { name: "Mandapun", img: "b5.png" }
       ],
       male: [
-        { name: "Aba Puputul", img: "u1.png" },
-        { name: "Babaru Puputul", img: "u2.png" },
-        { name: "Tupi Sinulatan", img: "u3.png" },
-        { name: "Taming Kalir", img: "u4.png" }
+        { name: "Badu Sampit", img: "b6.png" },
+        { name: "Saluar", img: "b7.png" },
+        { name: "Dastar", img: "b8.png" },
+        { name: "Kandit Belt", img: "b4.png" }
       ]
     };
 
     const wardrobeTrack = document.getElementById('wardrobeTrack');
+    const follower = document.getElementById('cursor-follower');
 
     function updateWardrobeDisplay(gender) {
       wardrobeTrack.innerHTML = '';
       
-      wardrobeTrack.style.animation = 'none';
-      wardrobeTrack.offsetHeight; 
-      wardrobeTrack.style.animation = 'gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
+      // Prevent running animations on viewport bounds below threshold
+      if (window.innerWidth > 1100) {
+        wardrobeTrack.style.animation = 'none';
+        wardrobeTrack.offsetHeight; 
+        wardrobeTrack.style.animation = 'gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
+      }
 
       costumeData[gender].forEach(item => {
         const div = document.createElement('div');
@@ -447,19 +512,23 @@
         `;
         
         div.addEventListener('mouseenter', () => {
-          follower.style.transform = 'scale(1.3)';
-          follower.style.borderColor = 'var(--text-main)';
+          if (follower && window.getComputedStyle(follower).display !== 'none') {
+            follower.style.transform = 'scale(1.3)';
+            follower.style.borderColor = 'var(--text-main)';
+          }
         });
         div.addEventListener('mouseleave', () => {
-          follower.style.transform = 'scale(1)';
-          follower.style.borderColor = 'var(--accent)';
+          if (follower && window.getComputedStyle(follower).display !== 'none') {
+            follower.style.transform = 'scale(1)';
+            follower.style.borderColor = 'var(--accent)';
+          }
         });
 
         wardrobeTrack.appendChild(div);
       });
     }
 
-    // Initialize Content
+    // Initialize Content Components
     updateWardrobeDisplay('female');
 
     /* INTERACTIVE TEXT GLITCH ENGINE */
@@ -489,42 +558,47 @@
       el.addEventListener('mouseenter', () => triggerGlitch(el));
     });
 
-    /* GALLERY MOUSE LOGIC SYNC */
+    /* GALLERY MOUSE LOGIC SYNC & PARALLAX TRACKERS */
     const cursor = document.getElementById('cursor');
-    const follower = document.getElementById('cursor-follower');
     let mouseX = 0, mouseY = 0;
 
     document.addEventListener('mousemove', (e) => {
-        mouseX = (e.clientX / window.innerWidth) - 0.5;
-        mouseY = (e.clientY / window.innerHeight) - 0.5;
+        if (cursor && window.getComputedStyle(cursor).display !== 'none') {
+          mouseX = (e.clientX / window.innerWidth) - 0.5;
+          mouseY = (e.clientY / window.innerHeight) - 0.5;
 
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-        follower.style.left = (e.clientX - 20) + 'px';
-        follower.style.top = (e.clientY - 20) + 'px';
+          cursor.style.left = e.clientX + 'px';
+          cursor.style.top = e.clientY + 'px';
+          follower.style.left = (e.clientX - 20) + 'px';
+          follower.style.top = (e.clientY - 20) + 'px';
+        }
     });
 
     document.querySelectorAll('.nav-menu a, button, .terminal-btn, .pattern-item, .mode-swap').forEach(item => {
         item.addEventListener('mouseenter', () => {
-            follower.style.transform = 'scale(1.5)';
-            follower.style.borderColor = 'var(--text-main)';
-            if (item.classList.contains('mode-swap')) {
-                follower.style.background = 'rgba(212, 175, 55, 0.2)';
-                cursor.style.background = 'var(--text-main)';
+            if (follower && window.getComputedStyle(follower).display !== 'none') {
+              follower.style.transform = 'scale(1.5)';
+              follower.style.borderColor = 'var(--text-main)';
+              if (item.classList.contains('mode-swap')) {
+                  follower.style.background = 'rgba(212, 175, 55, 0.2)';
+                  cursor.style.background = 'var(--text-main)';
+              }
             }
         });
         item.addEventListener('mouseleave', () => {
-            follower.style.transform = 'scale(1)';
-            follower.style.borderColor = 'var(--accent)';
-            follower.style.background = 'transparent';
-            cursor.style.background = 'var(--accent)';
+            if (follower && window.getComputedStyle(follower).display !== 'none') {
+              follower.style.transform = 'scale(1)';
+              follower.style.borderColor = 'var(--accent)';
+              follower.style.background = 'transparent';
+              cursor.style.background = 'var(--accent)';
+            }
         });
     });
 
     /* CLOCK COMPONENT ENGINE */
     function updateClock() {
       const clockEl = document.getElementById('digital-clock');
-      if (clockEl) {
+      if (clockEl && window.getComputedStyle(clockEl).display !== 'none') {
         const now = new Date();
         clockEl.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
       }
@@ -557,7 +631,7 @@
     controls.dampingFactor = 0.05;
     camera.position.set(0, 0, 3);
 
-    /* INTERACTIVE PROCEDURAL HOLOGRAM MATRIX (EXACTLY REPLICATED) */
+    /* INTERACTIVE PROCEDURAL HOLOGRAM MATRIX */
     const particleCount = 1500;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -602,7 +676,7 @@
     const particleSystem = new THREE.Points(geometry, material);
     scene.add(particleSystem);
 
-    /* MODEL LOADER CORE (TARGETING MURUT ASSETS) */
+    /* MODEL LOADER CORE */
     let loadedMesh = null;
     const gltfLoader = new GLTFLoader();
 
@@ -643,7 +717,7 @@
 
           scene.add(loadedMesh);
           status.innerText = "STABLE";
-          material.opacity = 0.15; 
+          material.opacity = 0.15;
         },
         (xhr) => {
           if (xhr.total > 0) {
@@ -658,7 +732,7 @@
       );
     }
 
-    loadModel('murut3d.glb');
+    loadModel('bajau3d.glb');
 
     const btnFemale = document.getElementById('loadFemale');
     const btnMale = document.getElementById('loadMale');
@@ -669,7 +743,7 @@
         btnMale.classList.remove('active');
         triggerGlitch(btnFemale);
         updateWardrobeDisplay('female');
-        loadModel('murut3d.glb');
+        loadModel('bajau3d.glb');
       }
     };
 
@@ -679,7 +753,7 @@
         btnFemale.classList.remove('active');
         triggerGlitch(btnMale);
         updateWardrobeDisplay('male');
-        loadModel('murut3dmale.glb');
+        loadModel('bajau3dmale.glb');
       }
     };
 
@@ -690,8 +764,10 @@
       particleSystem.rotation.y += 0.001;
       particleSystem.rotation.x += 0.0005;
 
-      particleSystem.position.x += (mouseX * 0.3 - particleSystem.position.x) * 0.05;
-      particleSystem.position.y += (-mouseY * 0.3 - particleSystem.position.y) * 0.05;
+      if (cursor && window.getComputedStyle(cursor).display !== 'none') {
+        particleSystem.position.x += (mouseX * 0.3 - particleSystem.position.x) * 0.05;
+        particleSystem.position.y += (-mouseY * 0.3 - particleSystem.position.y) * 0.05;
+      }
 
       if (loadedMesh) {
         loadedMesh.rotation.y += 0.003;
@@ -706,6 +782,13 @@
       camera.aspect = stage.clientWidth / stage.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(stage.clientWidth, stage.clientHeight);
+      
+      // Clear or apply track animations conditionally based on updated browser size parameters
+      if (window.innerWidth <= 1100) {
+        wardrobeTrack.style.animation = 'none';
+      } else {
+        wardrobeTrack.style.animation = 'gearSwipe 10s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate';
+      }
     });
   </script>
 </body>
