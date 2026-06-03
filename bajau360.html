@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sabah Archive // Bajau Sync</title>
+  <title>Sabah Archive // Murut Sync</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
@@ -49,9 +49,20 @@
       background-size: 40px 40px;
       color: var(--text-main);
       font-family: var(--font-main);
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
       transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    @media (min-width: 1025px) {
+      body { height: 100vh; overflow: hidden; }
+    }
+
+    /* Disable custom cursor on touch devices */
+    @media (pointer: coarse) {
+      * { cursor: auto !important; }
+      #cursor, #cursor-follower { display: none !important; }
     }
 
     /* --- HUD FRAME --- */
@@ -97,6 +108,43 @@
     }
 
     #digital-clock { font-size: 12px; font-weight: 700; color: var(--accent); border-left: 1px solid var(--glass-border); padding-left: 20px; }
+
+    /* Mobile Menu Toggle Button */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 12px;
+      font-family: var(--font-main);
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    /* --- MOBILE RESPONSIVE NAV OVERRIDES --- */
+    @media (max-width: 1024px) {
+      .site-nav { padding: 0 35px; }
+      .menu-toggle { display: block; }
+      
+      .nav-menu {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background: var(--nav-bg);
+        border-bottom: 1px solid var(--glass-border);
+        flex-direction: column;
+        gap: 0;
+        padding: 10px 0;
+        display: none; /* Controlled via active class toggle */
+      }
+      
+      .nav-menu.mobile-active { display: flex; }
+      
+      .nav-menu li { width: 100%; text-align: center; }
+      .nav-menu a { display: block; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
+      #digital-clock { display: none; } /* Saved space on mobile headers */
+    }
 
     /* --- FIXED HOVER-STOP SCROLL CONTAINER --- */
     .wardrobe-scroll-container {
@@ -161,7 +209,7 @@
 
     @keyframes gearSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 310px)); }
+      100% { transform: translateX(calc(-100% + 240px)); }
     }
 
     /* --- TEXTILE SWIPING GALLERY (RIGHT SIDE) --- */
@@ -218,14 +266,14 @@
 
     @keyframes scanSwipe {
       0% { transform: translateX(0px); }
-      100% { transform: translateX(calc(-100% + 250px)); }
+      100% { transform: translateX(calc(-100% + 140px)); }
     }
 
     /* --- VIEWPORT GRID --- */
     .viewer-container {
       display: grid; 
       grid-template-columns: 380px 1fr 340px; 
-      height: 100vh; 
+      height: 100%; 
       padding: 110px 40px 40px; 
       gap: 20px;
     }
@@ -251,28 +299,25 @@
     }
     .terminal-btn:hover, .terminal-btn.active { background: var(--accent); color: var(--bg); box-shadow: 0 0 10px var(--accent); }
 
-    .metadata-desc {
-      font-size: 0.6rem; 
-      color: var(--text-dim); 
-      margin-top: 10px; 
-      line-height: 1.8; 
-      text-transform: uppercase;
-      text-align: justify;
-    }
-
     .model-stage { 
       position: relative; 
       border: 1px solid var(--ui-border);
       background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
       transition: border-color 0.3s;
+      min-height: 400px; /* Safe canvas viewing box sizing on dynamic screens */
     }
-    #realModelCanvas { width: 100% !important; height: 100% !important; }
+    #realModelCanvas { width: 100% !important; height: 100% !important; display: block;}
     .status-overlay { position: absolute; bottom: 15px; left: 15px; font-size: 0.55rem; color: var(--accent); }
 
-    @media (max-width: 1100px) {
-      .viewer-container { grid-template-columns: 1fr; height: auto; padding-top: 180px; }
-      .site-nav { padding: 0 20px; flex-direction: column; height: auto; gap: 15px; padding-top: 15px; padding-bottom: 15px; }
-      .nav-menu { gap: 15px; }
+    /* --- GLOBAL MEDIA RESPONSIVENESS OVERRIDES --- */
+    @media (max-width: 1024px) {
+      .viewer-container { 
+        grid-template-columns: 1fr; 
+        padding: 110px 20px 30px; 
+        gap: 30px;
+      }
+      .panel { gap: 20px; }
+      .hud-frame { inset: 10px; }
     }
   </style>
 </head>
@@ -285,7 +330,7 @@
 
   <nav class="site-nav">
     <div class="logo-box"><h1 data-glitch="SABAH_HERITAGE">SABAH_HERITAGE</h1></div>
-    <ul class="nav-menu">
+    <ul class="nav-menu" id="navMenu">
       <li><a href="index.html">Home</a></li>
       <li><a href="explore.html">Explore</a></li>
       <li><a href="gallery.html">Gallery</a></li>
@@ -294,6 +339,7 @@
     </ul>
     <div class="nav-right">
         <button id="themeToggle" onclick="toggleTheme()" class="mode-swap">MODE_SWAP</button>
+        <button class="menu-toggle" onclick="toggleMobileMenu()" id="menuToggleBtn">MENU</button>
         <div id="digital-clock">00:00:00</div>
     </div>
   </nav>
@@ -302,8 +348,8 @@
     <aside class="panel">
       <div>
         <div class="panel-header" data-glitch="NODE_SELECTION">NODE_SELECTION</div>
-        <button id="loadFemale" class="terminal-btn active" data-glitch="[ BAJAU_FEMALE ]">[ BAJAU_FEMALE ]</button>
-        <button id="loadMale" class="terminal-btn" data-glitch="[ BAJAU_MALE ]">[ BAJAU_MALE ]</button>
+        <button id="loadFemale" class="terminal-btn active" data-glitch="[ MURUT_FEMALE ]">[ MURUT_FEMALE ]</button>
+        <button id="loadMale" class="terminal-btn" data-glitch="[ MURUT_MALE ]">[ MURUT_MALE ]</button>
         
         <div class="panel-header" style="margin-top:25px;" data-glitch="GEAR_PREVIEW">GEAR_PREVIEW</div>
         <div class="wardrobe-scroll-container">
@@ -325,27 +371,21 @@
         
         <div class="pattern-scroll-container">
           <div class="pattern-track">
-            <div class="pattern-item">
-              <img src="https://images.openai.com/static-rsc-4/udopBj9xhIqMhtSatuyl7FP_vTKv-xBcd_1Mfb-zWbye-TDE2_9x9DpLAZMGR47kjWxtlkqWLG_dh9II-S8p9SpgnYRDZiaz1mxLgBqkmtyzRUAajcHlg44cgfjg9tpjIfQhyA_UoLlXc3GlzmxcflJREvVmYw7Vla5ou6TA6sOHT91jld-Gd03ZDruYrjHm?purpose=fullsize" class="pattern-img">
-            </div>
-            <div class="pattern-item">
-              <img src="https://images.openai.com/static-rsc-4/_d0lFC8NMIo2HhiPDSiKR7JK3THVhXLhdJPTd8BT-yJcMPA1l5rKMCI1jkA3CRNiWAI3ZJv-CwEQC66nUf4YoxxIcNm9wl0h--9YGvqENfCyJ1648CBCsoVTyR9cx0HOjrP-r0CwNBdjEkN2N6MG54UApGZ8s0BpvFroPpnnAy9YYLk--ZO1xs6Uepxsxkae?purpose=fullsize" class="pattern-img">
-            </div>
-            <div class="pattern-item">
-              <img src="https://sabahnewstoday.net/wp-content/uploads/2024/09/fbbe2adf-83cd-46ba-a4ac-b2492554f1b5-300x212.jpeg" class="pattern-img">
-            </div>
+            <div class="pattern-item"><img src="m4.jpg" class="pattern-img"></div>
+            <div class="pattern-item"><img src="m2.jpg" class="pattern-img"></div>
+            <div class="pattern-item"><img src="m3.jpg" class="pattern-img"></div>
           </div>
         </div>
 
-        <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 1.2rem; margin-top: 15px;">MOTIFS</h2>
-        <p class="metadata-desc">
+        <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 1.2rem; margin-top: 15px;">SINUSU</h2>
+        <p style="font-size: 0.6rem; color: var(--text-dim); margin-top:10px; line-height: 1.8; text-transform: uppercase;">
           ARCHIVAL TEXTILE ANALYSIS:<br>
-          Bajau Samah do not have a single widely recognized traditional pattern name that represents the entire ethnic group.<br>
-          Instead, Bajau Sama traditional attire is known for its floral embroidery, geometric motifs, gold thread decoration, and intricate embellishments.<br>
-          Bajau Samah pattern detected.
+          one of the most distinctive and well-known traditional motifs of the Murut community in Sabah.<br>
+          It is commonly found on traditional Murut attire, especially the Pinongkoloh costume, as well as on beadwork accessories, belts, bags, and ceremonial decorations.<br>
+          Ancient Murut geometry detected.
         </p>
       </div>
-      <a href="bajau.html" class="terminal-btn" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
+      <a href="murut.html" class="terminal-btn" style="margin-top: 15px;" data-glitch="EXIT_ARCHIVE">EXIT_ARCHIVE</a>
     </aside>
   </main>
 
@@ -354,6 +394,17 @@
         const current = document.documentElement.getAttribute('data-theme');
         document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
+
+    function toggleMobileMenu() {
+        const menu = document.getElementById('navMenu');
+        const btn = document.getElementById('menuToggleBtn');
+        menu.classList.toggle('mobile-active');
+        if(menu.classList.contains('mobile-active')) {
+          btn.innerText = "CLOSE";
+        } else {
+          btn.innerText = "MENU";
+        }
+    }
   </script>
 
   <script type="module">
@@ -361,20 +412,20 @@
     import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
     import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
 
-    /* WARDROBE HORIZONTAL TRACK CONFIGURATION (BAJAU PROFILES) */
+    /* WARDROBE HORIZONTAL TRACK CONFIGURATION (MURUT PROFILES) */
     const costumeData = {
       female: [
-        { name: "Badu Sipak", img: "b1.png" },
-        { name: "Olos Berangkit", img: "b2.png" },
-        { name: "Sarimpak", img: "b3.png" },
-        { name: "ingkot pangkat", img: "b4.png" },
-        { name: "Mandapun", img: "b5.png" }
+        { name: "Pinongkoloh", img: "k4.png" },
+        { name: "Pipirot", img: "j4.png" },
+        { name: "Lumpirot", img: "j2.png" },
+        { name: "Himpogot", img: "rantai.png" },
+        { name: "Sandai", img: "j1.png" }
       ],
       male: [
-        { name: "Badu Sampit", img: "b6.png" },
-        { name: "Saluar", img: "b7.png" },
-        { name: "Dastar", img: "b8.png" },
-        { name: "Kandit Belt", img: "b4.png" }
+        { name: "Aba Puputul", img: "u1.png" },
+        { name: "Babaru Puputul", img: "u2.png" },
+        { name: "Tupi Sinulatan", img: "u3.png" },
+        { name: "Taming Kalir", img: "u4.png" }
       ]
     };
 
@@ -408,7 +459,7 @@
       });
     }
 
-    // Initialize Content Components
+    // Initialize Content
     updateWardrobeDisplay('female');
 
     /* INTERACTIVE TEXT GLITCH ENGINE */
@@ -438,7 +489,7 @@
       el.addEventListener('mouseenter', () => triggerGlitch(el));
     });
 
-    /* GALLERY MOUSE LOGIC SYNC & PARALLAX TRACKERS */
+    /* GALLERY MOUSE LOGIC SYNC */
     const cursor = document.getElementById('cursor');
     const follower = document.getElementById('cursor-follower');
     let mouseX = 0, mouseY = 0;
@@ -472,8 +523,11 @@
 
     /* CLOCK COMPONENT ENGINE */
     function updateClock() {
-      const now = new Date();
-      document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+      const clockEl = document.getElementById('digital-clock');
+      if (clockEl) {
+        const now = new Date();
+        clockEl.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+      }
     }
     setInterval(updateClock, 1000);
     updateClock();
@@ -503,7 +557,7 @@
     controls.dampingFactor = 0.05;
     camera.position.set(0, 0, 3);
 
-    /* INTERACTIVE PROCEDURAL HOLOGRAM MATRIX */
+    /* INTERACTIVE PROCEDURAL HOLOGRAM MATRIX (EXACTLY REPLICATED) */
     const particleCount = 1500;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -548,7 +602,7 @@
     const particleSystem = new THREE.Points(geometry, material);
     scene.add(particleSystem);
 
-    /* MODEL LOADER CORE */
+    /* MODEL LOADER CORE (TARGETING MURUT ASSETS) */
     let loadedMesh = null;
     const gltfLoader = new GLTFLoader();
 
@@ -589,7 +643,7 @@
 
           scene.add(loadedMesh);
           status.innerText = "STABLE";
-          material.opacity = 0.15;
+          material.opacity = 0.15; 
         },
         (xhr) => {
           if (xhr.total > 0) {
@@ -604,7 +658,7 @@
       );
     }
 
-    loadModel('bajau3d.glb');
+    loadModel('murut3d.glb');
 
     const btnFemale = document.getElementById('loadFemale');
     const btnMale = document.getElementById('loadMale');
@@ -615,7 +669,7 @@
         btnMale.classList.remove('active');
         triggerGlitch(btnFemale);
         updateWardrobeDisplay('female');
-        loadModel('bajau3d.glb');
+        loadModel('murut3d.glb');
       }
     };
 
@@ -625,7 +679,7 @@
         btnFemale.classList.remove('active');
         triggerGlitch(btnMale);
         updateWardrobeDisplay('male');
-        loadModel('bajau3dmale.glb');
+        loadModel('murut3dmale.glb');
       }
     };
 
