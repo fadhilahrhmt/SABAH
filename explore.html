@@ -79,28 +79,12 @@
         .summary-card { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--accent); padding: 20px; border-radius: 4px; font-size: 10px; line-height: 1.6; }
 
         /* INTERACTIVE SVG STAGE STYLING */
-        .map-stage {
-    position: fixed;
-    top: 80px;
-    left: 340px;
-    right: 380px;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 1500px;
-    padding: 20px;
-    overflow: hidden;
-}
+        .map-stage { position: fixed; inset: 80px 380px 0 340px; display: flex; align-items: center; justify-content: center; perspective: 1500px; padding: 0px 20px; overflow: hidden; }
+        .interactive-container { width: 100%; height: 100%; display: grid; grid-template-columns: 1fr; align-items: center; justify-content: center; transform-style: preserve-3d; transition: transform 0.15s ease-out; position: relative; }
         
-       #map-svg {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    max-height: 85vh;
-    overflow: visible;
-    justify-self: center;
-}
+        #map-svg { width: 100%; height: 92vh; max-height: 92vh; overflow: visible; justify-self: center; }
+        .region { fill: rgba(255,255,255,0.02); stroke: var(--map-stroke); stroke-width: 5; transition: 0.3s; pointer-events: all; }
+        .region:hover { fill: rgba(212, 175, 55, 0.2); stroke: var(--accent); stroke-width: 10; filter: drop-shadow(0 0 20px var(--accent)); }
 
         /* HUD OVERLAY CONTAINER */
         .data-hud { 
@@ -220,57 +204,47 @@
         .compass-btn:hover { background: rgba(212, 175, 55, 0.1); border-color: var(--nav-hover-accent); color: var(--nav-hover-accent); }
 
         @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
-        /* =========================
-   MOBILE AI TOGGLE BUTTON
-========================= */
+        /* ========================================
+   MOBILE & TABLET RESPONSIVE
+======================================== */
 
-.ai-mobile-toggle {
-    display: none;
+.ai-toggle-btn{
+    display:none;
 }
 
-/* =========================
-   TABLET
-========================= */
-
-@media (max-width:1024px){
+/* Tablet */
+@media screen and (max-width:1200px){
 
     .sidebar{
         width:260px;
     }
 
     .ai-sidebar{
-        width:300px;
+        width:320px;
     }
 
     .map-stage{
-        left:260px;
-        right:300px;
+        inset:80px 320px 0 260px;
     }
-
 }
 
-/* =========================
-   MOBILE
-========================= */
 
-@media (max-width:768px){
+/* Mobile */
+@media screen and (max-width:768px){
 
     *{
         cursor:auto !important;
-    }
-
-    #c,
-    #cr{
-        display:none;
     }
 
     body{
         overflow:hidden;
     }
 
+    /* NAVIGATION */
+
     .site-nav{
-        padding:0 15px;
         height:70px;
+        padding:0 15px;
     }
 
     .logo-box h1{
@@ -278,77 +252,104 @@
         letter-spacing:2px;
     }
 
-    .nav-menu{
-        display:none;
-    }
-
     .clock-box{
         display:none;
     }
+
+    .swap-btn{
+        padding:4px 10px;
+        font-size:8px;
+    }
+
+    .nav-menu{
+        gap:12px;
+    }
+
+    .nav-menu a{
+        font-size:9px;
+    }
+
+    /* LEFT PANEL */
 
     .sidebar{
         display:none;
     }
 
+    /* MAP TAKES FULL SCREEN */
+
     .map-stage{
-        top:70px;
-        left:0;
-        right:0;
-        bottom:0;
+        inset:70px 0 0 0;
         padding:10px;
     }
 
     #map-svg{
         width:100%;
-        height:auto;
-        max-height:80vh;
+        height:75vh;
+        max-height:none;
     }
+
+    /* HUD */
 
     .data-hud{
         width:90%;
-        left:5%;
-        top:10px;
+        left:50%;
+        transform:translateX(-50%);
+        top:20px;
+        z-index:999;
     }
 
-    .ai-sidebar{
-        top:70px;
-        width:100%;
-        right:-100%;
-        bottom:0;
-        z-index:2000;
-        transition:right .35s ease;
-    }
+    /* AI TOGGLE BUTTON */
 
-    .ai-sidebar.open{
-        right:0;
-    }
-
-    .ai-mobile-toggle{
+    .ai-toggle-btn{
         display:flex;
-        align-items:center;
-        justify-content:center;
-
         position:fixed;
+        right:15px;
         bottom:20px;
-        right:20px;
-
         width:60px;
         height:60px;
-
-        border:none;
         border-radius:50%;
-
-        background:var(--accent);
-        color:var(--bg);
-
-        font-size:20px;
-        font-weight:bold;
-
-        z-index:3000;
+        border:1px solid var(--accent);
+        background:var(--bg);
+        color:var(--accent);
+        z-index:2000;
+        align-items:center;
+        justify-content:center;
+        font-size:22px;
     }
 
+    /* AI PANEL HIDDEN BY DEFAULT */
+
+    .ai-sidebar{
+        width:100%;
+        left:0;
+        right:0;
+        top:70px;
+        bottom:0;
+
+        transform:translateX(100%);
+        transition:0.3s;
+        z-index:1500;
+    }
+
+    .ai-sidebar.active{
+        transform:translateX(0);
+    }
+
+    .ai-chat-body{
+        font-size:12px;
+    }
+
+    .ai-input{
+        font-size:12px;
+    }
+
+    /* REMOVE CUSTOM CURSOR */
+
+    #c,
+    #cr{
+        display:none;
+    }
 }
-        
     </style>
 </head>
 <body>
@@ -429,11 +430,21 @@
 
     <aside class="ai-sidebar" id="aiSidebarFrame">
         <div class="ai-terminal-header">
-            <h3>HERITAGE_CORE_AI</h3>
-            <div class="ai-status" id="aiStatusBlock">
-                <div class="ai-status-dot" id="aiStatusDot"></div>
-                <span id="aiStatusText">ONLINE</span>
-            </div>
+
+    <h3>HERITAGE_CORE_AI</h3>
+
+    <button
+        onclick="toggleAI()"
+        style="
+            background:none;
+            border:1px solid var(--accent);
+            color:var(--accent);
+            padding:4px 8px;
+        ">
+        ✕
+    </button>
+
+</div>
         </div>
         <div class="ai-chat-body" id="aiChatBody">
             <div class="chat-msg bot">Systems online. Click directly on any sector of the map to open up its parameters and play its localized audio recording.</div>
@@ -775,27 +786,14 @@
             item.addEventListener('mouseenter', () => document.body.classList.add('nav-hovering'));
             item.addEventListener('mouseleave', () => document.body.classList.remove('nav-hovering'));
         });
-        const aiToggleBtn = document.getElementById('aiToggleBtn');
-const aiSidebarFrame = document.getElementById('aiSidebarFrame');
-
-if(aiToggleBtn){
-
-    aiToggleBtn.addEventListener('click', () => {
-
-        aiSidebarFrame.classList.toggle('open');
-
-        if(aiSidebarFrame.classList.contains('open')){
-            aiToggleBtn.innerHTML = "✕";
-        }else{
-            aiToggleBtn.innerHTML = "AI";
-        }
-
-    });
-
+        function toggleAI(){
+    document
+        .getElementById('aiSidebarFrame')
+        .classList.toggle('active');
 }
     </script>
-    <button class="ai-mobile-toggle" id="aiToggleBtn">
-    AI
+    <button class="ai-toggle-btn" onclick="toggleAI()">
+    💬
 </button>
 </body>
 </html>
